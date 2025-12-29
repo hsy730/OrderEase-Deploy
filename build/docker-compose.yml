@@ -1,0 +1,19 @@
+version: '3.8'
+
+# OrderEase 镜像构建配置
+# 用途：构建 orderease 应用镜像
+# 使用方法：
+#   cd d:\local_code_repo\OrderEase-Deploy\build
+#   docker-compose build
+
+services:
+  orderease:
+    build:
+      context: ../..
+      dockerfile: OrderEase-Deploy/build/Dockerfile
+    image: orderease:latest
+    # 构建参数（可选）
+    # build:
+    #   args:
+    #     - VERSION=1.0.0
+    #     - BUILD_DATE=${BUILD_DATE}

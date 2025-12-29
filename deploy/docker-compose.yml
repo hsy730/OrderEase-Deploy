@@ -1,0 +1,79 @@
+version: '3.8'
+
+# OrderEase 生产环境部署配置
+# 用途：基于已构建的镜像进行部署
+# 使用方法：
+#   cd d:\local_code_repo\OrderEase-Deploy\deploy
+#   docker-compose up -d
+
+services:
+  # 应用服务
+  orderease-app:
+    image: orderease:latest
+    container_name: orderease-app
+    ports:
+      - "8080:8080"  # Go后端提供所有服务（API + 前后台UI）
+    depends_on:
+      - mysql
+    environment:
+      # 数据库配置
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+      - DB_NAME=orderease
+      
+      # JWT配置
+      - JWT_SECRET=e6jf493kdhbms9ew6mv2v1a4dx2
+      - JWT_EXPIRATION=7200
+      
+      # 服务器配置
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8080
+      
+      # 时区配置
+      - TZ=Asia/Shanghai
+    volumes:
+      # 持久化上传文件
+      - ./data/uploads:/app/uploads
+      # 持久化日志
+      - ./data/logs:/app/logs
+      # 配置文件（可选，如需动态修改）
+      - ./config/config.yaml:/app/config/config.yaml:ro
+    networks:
+      - orderease-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/order-ease-iui/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # MySQL数据库
+  mysql:
+    image: mysql:8.0
+    container_name: orderease-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=orderease
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      # 初始化SQL脚本（可选）
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - orderease-network
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  orderease-network:
+    driver: bridge

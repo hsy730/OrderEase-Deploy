@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  basePath: "/api/order-ease/v1"
+  host: "0.0.0.0"
+  domain: "localhost"
+  allowedOrigins:
+    - "http://localhost:8080"
+    - "http://127.0.0.1:8080"
+
+database:
+  driver: mysql
+  host: mysql
+  port: 3306
+  username: root
+  password: 123456
+  dbname: orderease
+  charset: utf8mb4
+  parseTime: true
+  loc: Local 
+  logLevel: 4 # 1=Silent, 2=Error, 3=Warn, 4=Info, 5=Debug
+
+jwt:
+  secret: "e6jf493kdhbms9ew6mv2v1a4dx2"
+  expiration: 7200
