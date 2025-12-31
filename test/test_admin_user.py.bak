@@ -1,0 +1,69 @@
+import os
+import pytest
+import requests
+
+from conftest import API_BASE_URL
+
+
+class TestAdminUserAPI:
+    """管理员用户管理接口测试"""
+
+    def test_create_user(self):
+        """测试创建用户"""
+        url = f"{API_BASE_URL}/admin/user/create"
+        payload = {
+            "name": f"Test User {os.urandom(4).hex()}",
+            "password": "123456",
+            "phone": "13800138000",
+            "type": "delivery",
+            "address": "Test address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 409]
+
+    def test_get_user_list(self):
+        """测试获取用户列表"""
+        url = f"{API_BASE_URL}/admin/user/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_simple_list(self):
+        """测试获取用户简单列表"""
+        url = f"{API_BASE_URL}/admin/user/simple-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_detail(self):
+        """测试获取用户详情"""
+        url = f"{API_BASE_URL}/admin/user/detail"
+        params = {"userId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_user(self):
+        """测试更新用户信息"""
+        url = f"{API_BASE_URL}/admin/user/update"
+        payload = {
+            "user_id": "1",
+            "name": "Updated User Name",
+            "address": "Updated address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_user(self):
+        """测试删除用户"""
+        url = f"{API_BASE_URL}/admin/user/delete"
+        params = {"userId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]

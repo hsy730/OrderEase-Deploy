@@ -1,0 +1,1106 @@
+import os
+import pytest
+import requests
+import json
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080/api")
+
+class TestAuthAPI:
+    """认证相关接口测试"""
+
+    def test_universal_login_admin(self):
+        """测试管理员登录"""
+        url = f"{API_BASE_URL}/login"
+        payload = {
+            "username": "admin",
+            "password": "admin123"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 401]
+
+    def test_universal_login_shop_owner(self):
+        """测试商家登录"""
+        url = f"{API_BASE_URL}/login"
+        payload = {
+            "username": "shop1",
+            "password": "shop123"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 401]
+
+    def test_refresh_admin_token(self):
+        """测试刷新管理员令牌"""
+        url = f"{API_BASE_URL}/admin/refresh-token"
+        payload = {
+            "refresh_token": "test_refresh_token"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 400, 401]
+
+    def test_refresh_shop_token(self):
+        """测试刷新商家令牌"""
+        url = f"{API_BASE_URL}/shop/refresh-token"
+        payload = {
+            "refresh_token": "test_refresh_token"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 400, 401]
+
+    def test_frontend_user_login(self):
+        """测试前端用户登录"""
+        url = f"{API_BASE_URL}/user/login"
+        payload = {
+            "username": "testuser",
+            "password": "123456"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 401]
+
+    def test_frontend_user_register(self):
+        """测试前端用户注册"""
+        url = f"{API_BASE_URL}/user/register"
+        payload = {
+            "username": f"testuser_{os.urandom(4).hex()}",
+            "password": "123456"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 400, 409]
+
+    def test_temp_token_login(self):
+        """测试临时令牌登录"""
+        url = f"{API_BASE_URL}/shop/temp-login"
+        payload = {
+            "temp_token": "test_temp_token"
+        }
+        response = requests.post(url, json=payload)
+        assert response.status_code in [200, 400, 401]
+
+
+class TestFrontendAPI:
+    """前端用户接口测试"""
+
+    def test_get_product_image(self):
+        """测试获取产品图片"""
+        url = f"{API_BASE_URL}/product/image"
+        params = {"productId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_product_list(self):
+        """测试获取产品列表"""
+        url = f"{API_BASE_URL}/product/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400]
+
+    def test_get_product_detail(self):
+        """测试获取产品详情"""
+        url = f"{API_BASE_URL}/product/detail"
+        params = {"productId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_create_order(self):
+        """测试创建订单"""
+        url = f"{API_BASE_URL}/order/create"
+        payload = {
+            "shop_id": "1",
+            "user_id": "1",
+            "items": [
+                {
+                    "product_id": "1",
+                    "quantity": 1,
+                    "price": 100
+                }
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_order_list(self):
+        """测试获取用户订单列表"""
+        url = f"{API_BASE_URL}/order/user/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_detail(self):
+        """测试获取订单详情"""
+        url = f"{API_BASE_URL}/order/detail"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_order(self):
+        """测试删除订单"""
+        url = f"{API_BASE_URL}/order/delete"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_tag_list(self):
+        """测试获取标签列表"""
+        url = f"{API_BASE_URL}/tag/list"
+        response = requests.get(url)
+        assert response.status_code in [200, 400]
+
+    def test_get_tag_detail(self):
+        """测试获取标签详情"""
+        url = f"{API_BASE_URL}/tag/detail"
+        params = {"tagId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_tag_bound_products(self):
+        """测试获取标签已绑定的商品"""
+        url = f"{API_BASE_URL}/tag/bound-products"
+        params = {"tagId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_tags(self):
+        """测试获取店铺标签列表"""
+        url = f"{API_BASE_URL}/shop/1/tags"
+        response = requests.get(url)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_detail(self):
+        """测试获取店铺详情"""
+        url = f"{API_BASE_URL}/shop/detail"
+        params = {"shopId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_image(self):
+        """测试获取店铺图片"""
+        url = f"{API_BASE_URL}/shop/image"
+        params = {"shopId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_check_username_exists(self):
+        """测试检查用户名是否存在"""
+        url = f"{API_BASE_URL}/user/check-username"
+        params = {"username": "testuser"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+
+class TestAdminAPI:
+    """管理员接口测试"""
+
+    def test_admin_logout(self):
+        """测试管理员登出"""
+        url = f"{API_BASE_URL}/admin/logout"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, headers=headers)
+        assert response.status_code in [200, 401]
+
+    def test_change_admin_password(self):
+        """测试修改管理员密码"""
+        url = f"{API_BASE_URL}/admin/change-password"
+        payload = {
+            "old_password": "old123",
+            "new_password": "new123"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_shop(self):
+        """测试创建店铺"""
+        url = f"{API_BASE_URL}/admin/shop/create"
+        payload = {
+            "name": f"Test Shop {os.urandom(4).hex()}",
+            "description": "Test shop description",
+            "address": "Test address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_update_shop(self):
+        """测试更新店铺信息"""
+        url = f"{API_BASE_URL}/admin/shop/update"
+        payload = {
+            "shop_id": "1",
+            "name": "Updated Shop Name",
+            "description": "Updated description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_shop_detail_admin(self):
+        """测试获取店铺详情（管理员）"""
+        url = f"{API_BASE_URL}/admin/shop/detail"
+        params = {"shopId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_shop_list_admin(self):
+        """测试获取店铺列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/shop/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_delete_shop(self):
+        """测试删除店铺"""
+        url = f"{API_BASE_URL}/admin/shop/delete"
+        params = {"shopId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_upload_shop_image(self):
+        """测试上传店铺图片"""
+        url = f"{API_BASE_URL}/admin/shop/upload-image"
+        files = {"image": ("test.jpg", b"fake image data", "image/jpeg")}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, files=files, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_check_shop_name_exists(self):
+        """测试检查店铺名称是否存在"""
+        url = f"{API_BASE_URL}/admin/shop/check-name"
+        params = {"name": "test shop"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_shop_image_admin(self):
+        """测试获取店铺图片（管理员）"""
+        url = f"{API_BASE_URL}/admin/shop/image"
+        params = {"shopId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_shop_temp_token(self):
+        """测试获取店铺临时令牌"""
+        url = f"{API_BASE_URL}/admin/shop/temp-token"
+        params = {"shopId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_order_status_flow(self):
+        """测试更新订单状态流转"""
+        url = f"{API_BASE_URL}/admin/shop/update-order-status-flow"
+        payload = {
+            "shop_id": "1",
+            "flow": [
+                {"from": "pending", "to": "processing"},
+                {"from": "processing", "to": "completed"}
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_product_admin(self):
+        """测试创建商品（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/create"
+        payload = {
+            "shop_id": "1",
+            "name": f"Test Product {os.urandom(4).hex()}",
+            "price": 100,
+            "description": "Test product description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_product_list_admin(self):
+        """测试获取商品列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_product_detail_admin(self):
+        """测试获取商品详情（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/detail"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_product_admin(self):
+        """测试更新商品信息（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/update"
+        payload = {
+            "product_id": "1",
+            "name": "Updated Product Name",
+            "price": 150
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_product_admin(self):
+        """测试删除商品（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/delete"
+        params = {"productId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_upload_product_image_admin(self):
+        """测试上传商品图片（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/upload-image"
+        files = {"image": ("test.jpg", b"fake image data", "image/jpeg")}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, files=files, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_toggle_product_status_admin(self):
+        """测试切换商品状态（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/toggle-status"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_product_image_admin(self):
+        """测试获取商品图片（管理员）"""
+        url = f"{API_BASE_URL}/admin/product/image"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_create_user_admin(self):
+        """测试创建用户（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/create"
+        payload = {
+            "name": f"Test User {os.urandom(4).hex()}",
+            "password": "123456",
+            "phone": "13800138000",
+            "type": "delivery",
+            "address": "Test address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 409]
+
+    def test_get_user_list_admin(self):
+        """测试获取用户列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_simple_list_admin(self):
+        """测试获取用户简单列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/simple-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_detail_admin(self):
+        """测试获取用户详情（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/detail"
+        params = {"userId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_user_admin(self):
+        """测试更新用户信息（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/update"
+        payload = {
+            "user_id": "1",
+            "name": "Updated User Name",
+            "address": "Updated address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_user_admin(self):
+        """测试删除用户（管理员）"""
+        url = f"{API_BASE_URL}/admin/user/delete"
+        params = {"userId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_create_order_admin(self):
+        """测试创建订单（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/create"
+        payload = {
+            "shop_id": "1",
+            "user_id": "1",
+            "items": [
+                {
+                    "product_id": "1",
+                    "quantity": 1,
+                    "price": 100
+                }
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_list_admin(self):
+        """测试获取订单列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_detail_admin(self):
+        """测试获取订单详情（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/detail"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_order_admin(self):
+        """测试更新订单信息（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/update"
+        payload = {
+            "order_id": "1",
+            "status": "processing"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_order_admin(self):
+        """测试删除订单（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/delete"
+        params = {"orderId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_toggle_order_status_admin(self):
+        """测试切换订单状态（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/toggle-status"
+        params = {
+            "orderId": "1",
+            "status": "completed"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_order_status_flow_admin(self):
+        """测试获取订单状态流转（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/status-flow"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_advance_search_orders_admin(self):
+        """测试高级搜索订单（管理员）"""
+        url = f"{API_BASE_URL}/admin/order/advance-search"
+        payload = {
+            "page": 1,
+            "pageSize": 10,
+            "filters": {}
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_tag_admin(self):
+        """测试创建标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/create"
+        payload = {
+            "name": f"Test Tag {os.urandom(4).hex()}",
+            "description": "Test tag description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_list_admin(self):
+        """测试获取标签列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_detail_admin(self):
+        """测试获取标签详情（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/detail"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_tag_admin(self):
+        """测试更新标签信息（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/update"
+        payload = {
+            "tag_id": "1",
+            "name": "Updated Tag Name",
+            "description": "Updated description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_tag_admin(self):
+        """测试删除标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/delete"
+        params = {"tagId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_batch_tag_products_admin(self):
+        """测试批量打标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/batch-tag"
+        payload = {
+            "tag_id": "1",
+            "product_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_online_products_admin(self):
+        """测试获取标签关联的已上架商品（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/online-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_bound_tags_admin(self):
+        """测试获取商品已绑定的标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/bound-tags"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_unbound_tags_admin(self):
+        """测试获取商品未绑定的标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/unbound-tags"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_batch_tag_product_admin(self):
+        """测试批量设置商品标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/batch-tag-product"
+        payload = {
+            "product_id": "1",
+            "tag_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_batch_untag_products_admin(self):
+        """测试批量解绑商品标签（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/batch-untag"
+        payload = {
+            "tag_id": "1",
+            "product_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_unbound_tags_list_admin(self):
+        """测试获取没有绑定商品的标签列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/unbound-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_unbound_products_for_tag_admin(self):
+        """测试获取标签未绑定的商品列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/unbound-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_tag_bound_products_admin(self):
+        """测试获取标签已绑定的商品列表（管理员）"""
+        url = f"{API_BASE_URL}/admin/tag/bound-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_export_data(self):
+        """测试导出数据"""
+        url = f"{API_BASE_URL}/admin/data/export"
+        params = {"type": "products"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_import_data(self):
+        """测试导入数据"""
+        url = f"{API_BASE_URL}/admin/data/import"
+        files = {"file": ("test.json", b'{"data": []}', "application/json")}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, files=files, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+
+class TestShopOwnerAPI:
+    """商家接口测试"""
+
+    def test_shop_owner_logout(self):
+        """测试商家登出"""
+        url = f"{API_BASE_URL}/shopOwner/logout"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, headers=headers)
+        assert response.status_code in [200, 401]
+
+    def test_change_shop_password(self):
+        """测试修改商家密码"""
+        url = f"{API_BASE_URL}/shopOwner/change-password"
+        payload = {
+            "old_password": "old123",
+            "new_password": "new123"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_product_shop_owner(self):
+        """测试创建商品（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/create"
+        payload = {
+            "name": f"Test Product {os.urandom(4).hex()}",
+            "price": 100,
+            "description": "Test product description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_product_list_shop_owner(self):
+        """测试获取商品列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_product_detail_shop_owner(self):
+        """测试获取商品详情（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/detail"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_product_shop_owner(self):
+        """测试更新商品信息（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/update"
+        payload = {
+            "product_id": "1",
+            "name": "Updated Product Name",
+            "price": 150
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_product_shop_owner(self):
+        """测试删除商品（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/delete"
+        params = {"productId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_upload_product_image_shop_owner(self):
+        """测试上传商品图片（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/upload-image"
+        files = {"image": ("test.jpg", b"fake image data", "image/jpeg")}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, files=files, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_toggle_product_status_shop_owner(self):
+        """测试切换商品状态（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/toggle-status"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_product_image_shop_owner(self):
+        """测试获取商品图片（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/product/image"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_create_order_shop_owner(self):
+        """测试创建订单（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/create"
+        payload = {
+            "user_id": "1",
+            "items": [
+                {
+                    "product_id": "1",
+                    "quantity": 1,
+                    "price": 100
+                }
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_list_shop_owner(self):
+        """测试获取订单列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_detail_shop_owner(self):
+        """测试获取订单详情（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/detail"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_order_shop_owner(self):
+        """测试更新订单信息（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/update"
+        payload = {
+            "order_id": "1",
+            "status": "processing"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_order_shop_owner(self):
+        """测试删除订单（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/delete"
+        params = {"orderId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_toggle_order_status_shop_owner(self):
+        """测试切换订单状态（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/toggle-status"
+        params = {
+            "orderId": "1",
+            "status": "completed"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_order_status_flow_shop_owner(self):
+        """测试获取订单状态流转（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/status-flow"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_unfinished_orders_shop_owner(self):
+        """测试获取未完成订单列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/unfinished-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_advance_search_orders_shop_owner(self):
+        """测试高级搜索订单（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/order/advance-search"
+        payload = {
+            "page": 1,
+            "pageSize": 10,
+            "filters": {}
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_tag_shop_owner(self):
+        """测试创建标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/create"
+        payload = {
+            "name": f"Test Tag {os.urandom(4).hex()}",
+            "description": "Test tag description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_list_shop_owner(self):
+        """测试获取标签列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_detail_shop_owner(self):
+        """测试获取标签详情（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/detail"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_tag_shop_owner(self):
+        """测试更新标签信息（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/update"
+        payload = {
+            "tag_id": "1",
+            "name": "Updated Tag Name",
+            "description": "Updated description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_tag_shop_owner(self):
+        """测试删除标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/delete"
+        params = {"tagId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_batch_tag_products_shop_owner(self):
+        """测试批量打标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/batch-tag"
+        payload = {
+            "tag_id": "1",
+            "product_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_tag_online_products_shop_owner(self):
+        """测试获取标签关联的已上架商品（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/online-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_bound_tags_shop_owner(self):
+        """测试获取商品已绑定的标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/bound-tags"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_unbound_tags_shop_owner(self):
+        """测试获取商品未绑定的标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/unbound-tags"
+        params = {"productId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_batch_tag_product_shop_owner(self):
+        """测试批量设置商品标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/batch-tag-product"
+        payload = {
+            "product_id": "1",
+            "tag_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_batch_untag_products_shop_owner(self):
+        """测试批量解绑商品标签（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/batch-untag"
+        payload = {
+            "tag_id": "1",
+            "product_ids": ["1", "2"]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_unbound_tags_list_shop_owner(self):
+        """测试获取没有绑定商品的标签列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/unbound-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_unbound_products_for_tag_shop_owner(self):
+        """测试获取标签未绑定的商品列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/unbound-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_tag_bound_products_shop_owner(self):
+        """测试获取标签已绑定的商品列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/tag/bound-products"
+        params = {"tagId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_shop_detail_shop_owner(self):
+        """测试获取店铺详情（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/shop/detail"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_shop_image_shop_owner(self):
+        """测试获取店铺图片（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/shop/image"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_update_shop_shop_owner(self):
+        """测试更新店铺信息（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/shop/update"
+        payload = {
+            "name": "Updated Shop Name",
+            "description": "Updated description"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_update_order_status_flow_shop_owner(self):
+        """测试更新订单状态流转（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/shop/update-order-status-flow"
+        payload = {
+            "flow": [
+                {"from": "pending", "to": "processing"},
+                {"from": "processing", "to": "completed"}
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_create_user_shop_owner(self):
+        """测试创建用户（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/create"
+        payload = {
+            "name": f"Test User {os.urandom(4).hex()}",
+            "password": "123456",
+            "phone": "13800138000",
+            "type": "delivery",
+            "address": "Test address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 409]
+
+    def test_get_user_list_shop_owner(self):
+        """测试获取用户列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_simple_list_shop_owner(self):
+        """测试获取用户简单列表（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/simple-list"
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_detail_shop_owner(self):
+        """测试获取用户详情（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/detail"
+        params = {"userId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_update_user_shop_owner(self):
+        """测试更新用户信息（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/update"
+        payload = {
+            "user_id": "1",
+            "name": "Updated User Name",
+            "address": "Updated address"
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.put(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_user_shop_owner(self):
+        """测试删除用户（商家）"""
+        url = f"{API_BASE_URL}/shopOwner/user/delete"
+        params = {"userId": "999"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]

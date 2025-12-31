@@ -1,0 +1,24 @@
+import pytest
+import requests
+
+from conftest import API_BASE_URL
+
+
+class TestAdminDataAPI:
+    """管理员数据管理接口测试"""
+
+    def test_export_data(self):
+        """测试导出数据"""
+        url = f"{API_BASE_URL}/admin/data/export"
+        params = {"type": "products"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_import_data(self):
+        """测试导入数据"""
+        url = f"{API_BASE_URL}/admin/data/import"
+        files = {"file": ("test.json", b'{"data": []}', "application/json")}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, files=files, headers=headers)
+        assert response.status_code in [200, 400, 401]

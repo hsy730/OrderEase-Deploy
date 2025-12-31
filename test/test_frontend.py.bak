@@ -1,0 +1,125 @@
+import pytest
+import requests
+
+from conftest import API_BASE_URL
+
+
+class TestFrontendAPI:
+    """前端用户接口测试"""
+
+    def test_get_product_image(self):
+        """测试获取产品图片"""
+        url = f"{API_BASE_URL}/product/image"
+        params = {"productId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_product_list(self):
+        """测试获取产品列表"""
+        url = f"{API_BASE_URL}/product/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400]
+
+    def test_get_product_detail(self):
+        """测试获取产品详情"""
+        url = f"{API_BASE_URL}/product/detail"
+        params = {"productId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_create_order(self):
+        """测试创建订单"""
+        url = f"{API_BASE_URL}/order/create"
+        payload = {
+            "shop_id": "1",
+            "user_id": "1",
+            "items": [
+                {
+                    "product_id": "1",
+                    "quantity": 1,
+                    "price": 100
+                }
+            ]
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.post(url, json=payload, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_user_order_list(self):
+        """测试获取用户订单列表"""
+        url = f"{API_BASE_URL}/order/user/list"
+        params = {
+            "page": 1,
+            "pageSize": 10
+        }
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
+
+    def test_get_order_detail(self):
+        """测试获取订单详情"""
+        url = f"{API_BASE_URL}/order/detail"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_delete_order(self):
+        """测试删除订单"""
+        url = f"{API_BASE_URL}/order/delete"
+        params = {"orderId": "1"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.delete(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401, 404]
+
+    def test_get_tag_list(self):
+        """测试获取标签列表"""
+        url = f"{API_BASE_URL}/tag/list"
+        response = requests.get(url)
+        assert response.status_code in [200, 400]
+
+    def test_get_tag_detail(self):
+        """测试获取标签详情"""
+        url = f"{API_BASE_URL}/tag/detail"
+        params = {"tagId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_tag_bound_products(self):
+        """测试获取标签已绑定的商品"""
+        url = f"{API_BASE_URL}/tag/bound-products"
+        params = {"tagId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_tags(self):
+        """测试获取店铺标签列表"""
+        url = f"{API_BASE_URL}/shop/1/tags"
+        response = requests.get(url)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_detail(self):
+        """测试获取店铺详情"""
+        url = f"{API_BASE_URL}/shop/detail"
+        params = {"shopId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_get_shop_image(self):
+        """测试获取店铺图片"""
+        url = f"{API_BASE_URL}/shop/image"
+        params = {"shopId": "1"}
+        response = requests.get(url, params=params)
+        assert response.status_code in [200, 400, 404]
+
+    def test_check_username_exists(self):
+        """测试检查用户名是否存在"""
+        url = f"{API_BASE_URL}/user/check-username"
+        params = {"username": "testuser"}
+        headers = {"Authorization": "Bearer test_token"}
+        response = requests.get(url, params=params, headers=headers)
+        assert response.status_code in [200, 400, 401]
