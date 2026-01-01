@@ -169,14 +169,14 @@ def test_user_id(admin_token):
     return None
 
 @pytest.fixture(scope="session")
-def shop_owner_shop_id(shop_owner_token):
+def shop_owner_shop_id(admin_token):
     """商家店铺ID fixture - 从数据库获取商家的店铺ID"""
-    url = f"{API_BASE_URL}/shopOwner/shop/list"
+    url = f"{API_BASE_URL}/admin/shop/list"
     params = {
         "page": 1,
-        "pageSize": 1
+        "pageSize": 10
     }
-    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    headers = {"Authorization": f"Bearer {admin_token}"}
     
     def request_func():
         return requests.get(url, params=params, headers=headers)
@@ -186,18 +186,20 @@ def shop_owner_shop_id(shop_owner_token):
         data = response.json()
         shops = data.get("data", data.get("shops", []))
         if shops and len(shops) > 0:
-            return shops[0].get("id")
+            for shop in shops:
+                if shop.get("owner_username") == "shop1":
+                    return shop.get("id")
     return None
 
 @pytest.fixture(scope="session")
-def shop_owner_user_id(shop_owner_token):
+def shop_owner_user_id(admin_token):
     """商家用户ID fixture - 从数据库获取第一个用户ID"""
     url = f"{API_BASE_URL}/admin/user/list"
     params = {
         "page": 1,
         "pageSize": 1
     }
-    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    headers = {"Authorization": f"Bearer {admin_token}"}
     
     def request_func():
         return requests.get(url, params=params, headers=headers)
@@ -211,7 +213,7 @@ def shop_owner_user_id(shop_owner_token):
     return None
 
 @pytest.fixture(scope="session")
-def shop_owner_product_id(shop_owner_token, shop_owner_shop_id):
+def shop_owner_product_id(admin_token, shop_owner_shop_id):
     """商家商品ID fixture - 从数据库获取第一个商品ID"""
     url = f"{API_BASE_URL}/admin/product/list"
     params = {
@@ -219,7 +221,7 @@ def shop_owner_product_id(shop_owner_token, shop_owner_shop_id):
         "pageSize": 1,
         "shop_id": str(shop_owner_shop_id)
     }
-    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    headers = {"Authorization": f"Bearer {admin_token}"}
     
     def request_func():
         return requests.get(url, params=params, headers=headers)
