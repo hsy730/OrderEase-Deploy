@@ -30,7 +30,7 @@ class TestAdminProductAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200
 
     def test_get_product_detail(self):
         """测试获取商品详情"""
@@ -38,7 +38,7 @@ class TestAdminProductAPI:
         params = {"productId": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_update_product(self):
         """测试更新商品信息"""
@@ -50,15 +50,14 @@ class TestAdminProductAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.put(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
-
+        assert response.status_code == 200
     def test_delete_product(self):
         """测试删除商品"""
         url = f"{API_BASE_URL}/admin/product/delete"
         params = {"productId": "999"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.delete(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_upload_product_image(self):
         """测试上传商品图片"""
@@ -66,7 +65,7 @@ class TestAdminProductAPI:
         files = {"image": ("test.jpg", b"fake image data", "image/jpeg")}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.post(url, files=files, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200
 
     def test_toggle_product_status(self):
         """测试切换商品状态"""
@@ -74,7 +73,7 @@ class TestAdminProductAPI:
         params = {"productId": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.put(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_get_product_image(self):
         """测试获取商品图片"""
@@ -82,4 +81,4 @@ class TestAdminProductAPI:
         params = {"productId": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200

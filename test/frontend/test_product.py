@@ -16,7 +16,7 @@ class TestFrontendProduct:
         }
         headers = {"Authorization": f"Bearer {user_token}"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 429]
+        assert response.status_code == 200
 
     def test_get_product_detail(self, user_token):
         """测试获取商品详情"""
@@ -24,7 +24,7 @@ class TestFrontendProduct:
         params = {"product_id": "1"}
         headers = {"Authorization": f"Bearer {user_token}"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 404, 429]
+        assert response.status_code == 200
 
     def test_get_product_image(self, user_token):
         """测试获取商品图片"""
@@ -32,4 +32,4 @@ class TestFrontendProduct:
         params = {"product_id": "1"}
         headers = {"Authorization": f"Bearer {user_token}"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 404, 429]
+        assert response.status_code == 200

@@ -15,7 +15,7 @@ class TestLogin:
             "password": "Admin@123456"
         }
         response = requests.post(url, json=payload)
-        assert response.status_code in [200, 401]
+        assert response.status_code == 200
 
     def test_universal_login_shop_owner(self):
         """测试商家登录"""
@@ -25,4 +25,4 @@ class TestLogin:
             "password": "Admin@123456"
         }
         response = requests.post(url, json=payload)
-        assert response.status_code in [200, 401]
+        assert response.status_code == 200

@@ -18,7 +18,7 @@ class TestRefreshToken:
             return requests.post(url, json=payload)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400], f"Expected 200 or 400, got {response.status_code}"
+        assert response.status_code == 200
 
     def test_refresh_shop_token(self):
         """测试刷新商家令牌"""
@@ -31,4 +31,4 @@ class TestRefreshToken:
             return requests.post(url, json=payload)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400], f"Expected 200 or 400, got {response.status_code}"
+        assert response.status_code == 200

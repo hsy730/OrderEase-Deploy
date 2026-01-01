@@ -17,7 +17,7 @@ class TestShopOwnerTagAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200
 
     def test_batch_tag_products(self):
         """测试批量给商品打标签"""
@@ -28,7 +28,7 @@ class TestShopOwnerTagAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200
 
     def test_get_bound_tags(self):
         """测试获取商品已绑定的标签"""
@@ -36,7 +36,7 @@ class TestShopOwnerTagAPI:
         params = {"product_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_get_online_products(self):
         """测试获取标签关联的已上架商品"""
@@ -44,7 +44,7 @@ class TestShopOwnerTagAPI:
         params = {"tag_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_get_unbound_tags(self):
         """测试获取商品未绑定的标签"""
@@ -52,4 +52,4 @@ class TestShopOwnerTagAPI:
         params = {"product_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200

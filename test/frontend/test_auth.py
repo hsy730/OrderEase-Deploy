@@ -16,7 +16,7 @@ class TestFrontendAuth:
             "password": "Admin@123456"
         }
         response = requests.post(url, json=payload)
-        assert response.status_code in [200, 401, 404]
+        assert response.status_code == 200
 
     def test_frontend_user_register(self):
         """测试前端用户注册"""
@@ -26,7 +26,7 @@ class TestFrontendAuth:
             "password": "Admin@123456"
         }
         response = requests.post(url, json=payload)
-        assert response.status_code in [200, 400, 409, 429]
+        assert response.status_code == 200
 
     def test_check_username_exists(self):
         """测试检查用户名是否存在"""
@@ -34,4 +34,4 @@ class TestFrontendAuth:
         params = {"username": "testuser"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200

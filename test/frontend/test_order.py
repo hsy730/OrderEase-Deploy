@@ -27,7 +27,7 @@ class TestFrontendOrder:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)
 
     def test_get_user_order_list(self, user_token):
         """测试获取用户订单列表"""
@@ -42,7 +42,7 @@ class TestFrontendOrder:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)
 
     def test_get_order_detail(self, user_token):
         """测试获取订单详情"""
@@ -54,7 +54,7 @@ class TestFrontendOrder:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)
 
     def test_delete_order(self, user_token):
         """测试删除订单"""
@@ -66,4 +66,4 @@ class TestFrontendOrder:
             return requests.delete(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)

@@ -114,4 +114,4 @@ class TestAdminOrderAPI:
             return requests.put(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 400])
+        assert_response_status(response, 200)

@@ -31,7 +31,7 @@ class TestShopOwnerOrderAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)
 
     def test_get_order_list(self, shop_owner_token, shop_owner_shop_id):
         """测试获取订单列表"""
@@ -51,7 +51,7 @@ class TestShopOwnerOrderAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401])
+        assert_response_status(response, 200)
 
     def test_get_order_detail(self, shop_owner_token, shop_owner_shop_id):
         """测试获取订单详情"""
@@ -70,7 +70,7 @@ class TestShopOwnerOrderAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401, 404])
+        assert_response_status(response, 200)
 
     def test_update_order(self, shop_owner_token, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
         """测试更新订单信息"""
@@ -99,7 +99,7 @@ class TestShopOwnerOrderAPI:
             return requests.put(url, params=params, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401, 404])
+        assert_response_status(response, 200)
 
     def test_delete_order(self, shop_owner_token, shop_owner_shop_id):
         """测试删除订单"""
@@ -118,7 +118,7 @@ class TestShopOwnerOrderAPI:
             return requests.delete(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 401, 404])
+        assert_response_status(response, 200)
 
     def test_toggle_order_status(self, shop_owner_token, shop_owner_shop_id):
         """测试切换订单状态"""
@@ -138,4 +138,4 @@ class TestShopOwnerOrderAPI:
             return requests.put(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert_response_status(response, [200, 400, 401, 404])
+        assert_response_status(response, 200)

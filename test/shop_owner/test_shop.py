@@ -33,7 +33,7 @@ class TestShopOwnerShopAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.put(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        assert response.status_code == 200
 
     def test_update_order_status_flow(self):
         """测试更新订单状态流转"""
@@ -60,4 +60,4 @@ class TestShopOwnerShopAPI:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.put(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200
