@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="3.269" timestamp="2026-01-01T11:31:42.279476+08:00" hostname="DESKTOP-CEV3NCM"><testcase classname="admin.test_base.TestAdminBase" name="test_change_admin_password" time="3.052"><failure message="Failed: Expected [200, 429], got 401&#10;&#10;Response Details:&#10;{'status_code': 401, 'expected_status': [200, 429], 'response_body': '{&quot;error&quot;:&quot;无效的token&quot;}', 'url': 'http://localhost:8080/api/order-ease/v1/admin/change-password'}">admin\test_base.py:24: in test_change_admin_password
+    assert_response_status(response, [200, 429])
+conftest.py:34: in assert_response_status
+    pytest.fail(f"{message}\n\nResponse Details:\n{error_details}")
+E   Failed: Expected [200, 429], got 401
+E   
+E   Response Details:
+E   {'status_code': 401, 'expected_status': [200, 429], 'response_body': '{"error":"无效的token"}', 'url': 'http://localhost:8080/api/order-ease/v1/admin/change-password'}</failure></testcase><testcase classname="admin.test_base.TestAdminBase" name="test_login_with_new_password" time="0.060" /><testcase classname="admin.test_base.TestAdminBase" name="test_change_password_back_to_default" time="0.003"><failure message="Failed: Expected [200, 429], got 401&#10;&#10;Response Details:&#10;{'status_code': 401, 'expected_status': [200, 429], 'response_body': '{&quot;error&quot;:&quot;无效的token&quot;}', 'url': 'http://localhost:8080/api/order-ease/v1/admin/change-password'}">admin\test_base.py:53: in test_change_password_back_to_default
+    assert_response_status(response, [200, 429])
+conftest.py:34: in assert_response_status
+    pytest.fail(f"{message}\n\nResponse Details:\n{error_details}")
+E   Failed: Expected [200, 429], got 401
+E   
+E   Response Details:
+E   {'status_code': 401, 'expected_status': [200, 429], 'response_body': '{"error":"无效的token"}', 'url': 'http://localhost:8080/api/order-ease/v1/admin/change-password'}</failure></testcase></testsuite></testsuites>

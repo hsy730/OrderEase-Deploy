@@ -27,7 +27,7 @@ class TestAdminUserAPI:
         url = f"{API_BASE_URL}/admin/user/list"
         params = {
             "page": 1,
-            "pageSize": 10
+            "page_size": 10
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
@@ -43,7 +43,7 @@ class TestAdminUserAPI:
     def test_get_user_detail(self):
         """测试获取用户详情"""
         url = f"{API_BASE_URL}/admin/user/detail"
-        params = {"userId": "1"}
+        params = {"user_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]

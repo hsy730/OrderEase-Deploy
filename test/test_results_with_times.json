@@ -1,0 +1,470 @@
+{
+  "test_run": {
+    "start_time": "2026-01-01 11:28:51",
+    "end_time": "2026-01-01 11:29:32",
+    "total_duration": 41.334438
+  },
+  "modules": [
+    {
+      "module": "admin",
+      "description": "管理员模块",
+      "start_time": "2026-01-01 11:28:51",
+      "test_cases": {
+        "admin/test_base.py::TestAdminBase::test_change_admin_password": {
+          "status": "PASSED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_base.py::TestAdminBase::test_login_with_new_password": {
+          "status": "PASSED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_base.py::TestAdminBase::test_change_password_back_to_default": {
+          "status": "PASSED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:28:52",
+      "duration": 1.391525,
+      "passed": 3,
+      "failed": 0,
+      "exit_code": 0
+    },
+    {
+      "module": "admin_shop",
+      "description": "管理员-店铺模块",
+      "start_time": "2026-01-01 11:28:52",
+      "test_cases": {
+        "admin/test_shop.py::TestAdminShopAPI::test_create_shop": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_update_shop": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_get_shop_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_get_shop_list": {
+          "status": "PASSED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_delete_shop": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_upload_shop_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_check_shop_name_exists": {
+          "status": "PASSED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_get_shop_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_get_shop_temp_token": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_shop.py::TestAdminShopAPI::test_update_order_status_flow": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:28:56",
+      "duration": 4.230077,
+      "passed": 2,
+      "failed": 8,
+      "exit_code": 1
+    },
+    {
+      "module": "admin_user",
+      "description": "管理员-用户模块",
+      "start_time": "2026-01-01 11:28:56",
+      "test_cases": {
+        "admin/test_user.py::TestAdminUserAPI::test_create_user": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_user.py::TestAdminUserAPI::test_get_user_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_user.py::TestAdminUserAPI::test_get_user_simple_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_user.py::TestAdminUserAPI::test_get_user_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_user.py::TestAdminUserAPI::test_update_user": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:00",
+      "duration": 4.073663,
+      "passed": 0,
+      "failed": 5,
+      "exit_code": 1
+    },
+    {
+      "module": "admin_product",
+      "description": "管理员-商品模块",
+      "start_time": "2026-01-01 11:29:00",
+      "test_cases": {
+        "admin/test_product.py::TestAdminProductAPI::test_create_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_get_product_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_get_product_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_update_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_delete_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_upload_product_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_toggle_product_status": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_product.py::TestAdminProductAPI::test_get_product_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:08",
+      "duration": 7.231017,
+      "passed": 0,
+      "failed": 8,
+      "exit_code": 1
+    },
+    {
+      "module": "admin_order",
+      "description": "管理员-订单模块",
+      "start_time": "2026-01-01 11:29:08",
+      "test_cases": {
+        "admin/test_order.py::TestAdminOrderAPI::test_create_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_order.py::TestAdminOrderAPI::test_get_order_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_order.py::TestAdminOrderAPI::test_get_order_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_order.py::TestAdminOrderAPI::test_update_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_order.py::TestAdminOrderAPI::test_delete_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "admin/test_order.py::TestAdminOrderAPI::test_toggle_order_status": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:13",
+      "duration": 5.100504,
+      "passed": 0,
+      "failed": 6,
+      "exit_code": 1
+    },
+    {
+      "module": "shop_owner",
+      "description": "店铺所有者模块",
+      "start_time": "2026-01-01 11:29:13",
+      "test_cases": {
+        "shop_owner/test_base.py::TestShopOwnerBase::test_change_shop_password": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_base.py::TestShopOwnerBase::test_login_with_new_password": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:17",
+      "duration": 4.066188,
+      "passed": 0,
+      "failed": 2,
+      "exit_code": 1
+    },
+    {
+      "module": "shop_owner_product",
+      "description": "店铺所有者-商品模块",
+      "start_time": "2026-01-01 11:29:17",
+      "test_cases": {
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_create_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_update_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_delete_product": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_upload_product_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_toggle_product_status": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:23",
+      "duration": 6.133961,
+      "passed": 0,
+      "failed": 8,
+      "exit_code": 1
+    },
+    {
+      "module": "shop_owner_order",
+      "description": "店铺所有者-订单模块",
+      "start_time": "2026-01-01 11:29:23",
+      "test_cases": {
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_create_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_get_order_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_get_order_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_update_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_delete_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "shop_owner/test_order.py::TestShopOwnerOrderAPI::test_toggle_order_status": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:26",
+      "duration": 3.098794,
+      "passed": 0,
+      "failed": 6,
+      "exit_code": 1
+    },
+    {
+      "module": "frontend",
+      "description": "前端用户模块",
+      "start_time": "2026-01-01 11:29:26",
+      "test_cases": {},
+      "end_time": "2026-01-01 11:29:27",
+      "duration": 0.881532,
+      "passed": 0,
+      "failed": 0,
+      "exit_code": 4
+    },
+    {
+      "module": "frontend_product",
+      "description": "前端用户-商品模块",
+      "start_time": "2026-01-01 11:29:27",
+      "test_cases": {
+        "frontend/test_product.py::TestFrontendProduct::test_get_product_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "frontend/test_product.py::TestFrontendProduct::test_get_product_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "frontend/test_product.py::TestFrontendProduct::test_get_product_image": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:28",
+      "duration": 1.035222,
+      "passed": 0,
+      "failed": 3,
+      "exit_code": 1
+    },
+    {
+      "module": "frontend_order",
+      "description": "前端用户-订单模块",
+      "start_time": "2026-01-01 11:29:28",
+      "test_cases": {
+        "frontend/test_order.py::TestFrontendOrder::test_create_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "frontend/test_order.py::TestFrontendOrder::test_get_user_order_list": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "frontend/test_order.py::TestFrontendOrder::test_get_order_detail": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        },
+        "frontend/test_order.py::TestFrontendOrder::test_delete_order": {
+          "status": "FAILED",
+          "duration": 0,
+          "start_time": "N/A",
+          "end_time": "N/A"
+        }
+      },
+      "end_time": "2026-01-01 11:29:32",
+      "duration": 4.082557,
+      "passed": 0,
+      "failed": 4,
+      "exit_code": 1
+    }
+  ]
+}

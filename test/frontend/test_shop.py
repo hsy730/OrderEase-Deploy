@@ -10,14 +10,14 @@ class TestFrontendShop:
     def test_get_shop_detail(self):
         """测试获取店铺详情"""
         url = f"{API_BASE_URL}/shop/detail"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         response = requests.get(url, params=params)
         assert response.status_code in [200, 400, 404, 429]
 
     def test_get_shop_image(self):
         """测试获取店铺图片"""
         url = f"{API_BASE_URL}/shop/image"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         response = requests.get(url, params=params)
         assert response.status_code in [200, 400, 404, 429]
 

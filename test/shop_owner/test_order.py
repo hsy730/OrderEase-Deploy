@@ -1,82 +1,114 @@
 import pytest
 import requests
 
-from conftest import API_BASE_URL
+from conftest import API_BASE_URL, make_request_with_retry, assert_response_status
 
 
 class TestShopOwnerOrderAPI:
     """商家订单管理接口测试"""
 
-    def test_create_order(self):
+    def test_create_order(self, shop_owner_token, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
         """测试创建订单"""
         url = f"{API_BASE_URL}/shopOwner/order/create"
         payload = {
-            "shop_id": "1",
-            "user_id": "1",
+            "shop_id": shop_owner_shop_id,
+            "user_id": shop_owner_user_id,
             "items": [
                 {
-                    "product_id": "1",
+                    "product_id": shop_owner_product_id,
                     "quantity": 1,
                     "price": 100
                 }
             ]
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.post(url, json=payload, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)
 
-    def test_get_order_list(self):
+    def test_get_order_list(self, shop_owner_token, shop_owner_shop_id):
         """测试获取订单列表"""
         url = f"{API_BASE_URL}/shopOwner/order/list"
         params = {
             "page": 1,
-            "pageSize": 10
+            "pageSize": 10,
+            "shop_id": shop_owner_shop_id
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.get(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)
 
-    def test_get_order_detail(self):
+    def test_get_order_detail(self, shop_owner_token, shop_owner_shop_id):
         """测试获取订单详情"""
         url = f"{API_BASE_URL}/shopOwner/order/detail"
-        params = {"orderId": "1"}
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.get(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        params = {
+            "orderId": "1",
+            "shop_id": shop_owner_shop_id
+        }
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.get(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)
 
-    def test_update_order(self):
+    def test_update_order(self, shop_owner_token, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
         """测试更新订单信息"""
         url = f"{API_BASE_URL}/shopOwner/order/update"
         payload = {
-            "shop_id": "1",
-            "user_id": "1",
+            "shop_id": shop_owner_shop_id,
+            "user_id": shop_owner_user_id,
             "items": [
                 {
-                    "product_id": "1",
+                    "product_id": shop_owner_product_id,
                     "quantity": 1,
                     "price": 100
                 }
             ]
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.put(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.put(url, json=payload, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)
 
-    def test_delete_order(self):
+    def test_delete_order(self, shop_owner_token, shop_owner_shop_id):
         """测试删除订单"""
         url = f"{API_BASE_URL}/shopOwner/order/delete"
-        params = {"orderId": "999"}
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.delete(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        params = {
+            "orderId": "999",
+            "shop_id": shop_owner_shop_id
+        }
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.delete(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)
 
-    def test_toggle_order_status(self):
+    def test_toggle_order_status(self, shop_owner_token, shop_owner_shop_id):
         """测试切换订单状态"""
         url = f"{API_BASE_URL}/shopOwner/order/toggle-status"
         params = {
             "orderId": "1",
+            "shop_id": shop_owner_shop_id,
             "status": "completed"
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.put(url, params=params, headers=headers)
-        assert response.status_code in [200, 400, 401, 404, 429]
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def request_func():
+            return requests.put(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert_response_status(response, 200)

@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from conftest import API_BASE_URL
+from conftest import API_BASE_URL, make_request_with_retry
 
 
 class TestRefreshToken:
@@ -13,8 +13,12 @@ class TestRefreshToken:
         payload = {
             "token": "test_refresh_token"
         }
-        response = requests.post(url, json=payload)
-        assert response.status_code in [200, 400, 401, 429]
+        
+        def request_func():
+            return requests.post(url, json=payload)
+        
+        response = make_request_with_retry(request_func)
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
     def test_refresh_shop_token(self):
         """测试刷新商家令牌"""
@@ -22,5 +26,9 @@ class TestRefreshToken:
         payload = {
             "token": "test_refresh_token"
         }
-        response = requests.post(url, json=payload)
-        assert response.status_code in [200, 400, 401, 429]
+        
+        def request_func():
+            return requests.post(url, json=payload)
+        
+        response = make_request_with_retry(request_func)
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"

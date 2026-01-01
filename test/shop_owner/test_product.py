@@ -26,7 +26,7 @@ class TestShopOwnerProductAPI:
         url = f"{API_BASE_URL}/shopOwner/product/list"
         params = {
             "page": 1,
-            "pageSize": 10
+            "page_size": 10
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
@@ -35,7 +35,7 @@ class TestShopOwnerProductAPI:
     def test_get_product_detail(self):
         """测试获取商品详情"""
         url = f"{API_BASE_URL}/shopOwner/product/detail"
-        params = {"productId": "1"}
+        params = {"product_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -55,7 +55,7 @@ class TestShopOwnerProductAPI:
     def test_delete_product(self):
         """测试删除商品"""
         url = f"{API_BASE_URL}/shopOwner/product/delete"
-        params = {"productId": "999"}
+        params = {"product_id": "999"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.delete(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -71,7 +71,7 @@ class TestShopOwnerProductAPI:
     def test_toggle_product_status(self):
         """测试切换商品状态"""
         url = f"{API_BASE_URL}/shopOwner/product/toggle-status"
-        params = {"productId": "1"}
+        params = {"product_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.put(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -79,7 +79,7 @@ class TestShopOwnerProductAPI:
     def test_get_product_image(self):
         """测试获取商品图片"""
         url = f"{API_BASE_URL}/shopOwner/product/image"
-        params = {"productId": "1"}
+        params = {"product_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]

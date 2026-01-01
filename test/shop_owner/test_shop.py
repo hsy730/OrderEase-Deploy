@@ -10,7 +10,7 @@ class TestShopOwnerShopAPI:
     def test_get_shop_detail(self):
         """测试获取店铺详情"""
         url = f"{API_BASE_URL}/shopOwner/shop/detail"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -18,7 +18,7 @@ class TestShopOwnerShopAPI:
     def test_get_shop_image(self):
         """测试获取店铺图片"""
         url = f"{API_BASE_URL}/shopOwner/shop/image"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]

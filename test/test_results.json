@@ -1,0 +1,2573 @@
+{
+  "test_run": {
+    "start_time": "2026-01-01 11:23:57",
+    "end_time": "2026-01-01 11:23:57",
+    "total_duration": 57.44
+  },
+  "modules": [
+    {
+      "module": "admin",
+      "description": "管理员模块",
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19",
+      "duration": 20.08,
+      "passed": 7,
+      "failed": 30,
+      "exit_code": 1,
+      "test_cases": {
+        "TestAdminBase::test_change_admin_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminBase::test_login_with_new_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminBase::test_change_password_back_to_default": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_create_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_get_order_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_get_order_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_update_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_delete_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminOrderAPI::test_toggle_order_status": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_create_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_get_product_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_get_product_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_update_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_delete_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_upload_product_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_toggle_product_status": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminProductAPI::test_get_product_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_create_shop": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_update_shop": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_get_shop_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_get_shop_list": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_delete_shop": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_upload_shop_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_check_shop_name_exists": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_get_shop_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_get_shop_temp_token": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminShopAPI::test_update_order_status_flow": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminTagAPI::test_create_tag": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminTagAPI::test_batch_tag_products": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminTagAPI::test_get_bound_tags": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminTagAPI::test_get_online_products": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminTagAPI::test_get_unbound_tags": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminUserAPI::test_create_user": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminUserAPI::test_get_user_list": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminUserAPI::test_get_user_simple_list": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestAdminUserAPI::test_get_user_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestAdminUserAPI::test_update_user": {
+          "status": "FAILED",
+          "time": 0
+        }
+      }
+    },
+    {
+      "module": "shop_owner",
+      "description": "商家模块",
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34",
+      "duration": 14.46,
+      "passed": 0,
+      "failed": 30,
+      "exit_code": 1,
+      "test_cases": {
+        "TestShopOwnerBase::test_change_shop_password": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerBase::test_login_with_new_password": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_create_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_get_order_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_get_order_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_update_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_delete_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerOrderAPI::test_toggle_order_status": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_create_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_get_product_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_get_product_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_update_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_delete_product": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_upload_product_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_toggle_product_status": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerProductAPI::test_get_product_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerShopAPI::test_get_shop_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerShopAPI::test_get_shop_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerShopAPI::test_update_shop": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerShopAPI::test_update_order_status_flow": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerTagAPI::test_create_tag": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerTagAPI::test_batch_tag_products": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerTagAPI::test_get_bound_tags": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerTagAPI::test_get_online_products": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerTagAPI::test_get_unbound_tags": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerUserAPI::test_create_user": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerUserAPI::test_get_user_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerUserAPI::test_get_user_simple_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerUserAPI::test_get_user_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestShopOwnerUserAPI::test_update_user": {
+          "status": "FAILED",
+          "time": 0
+        }
+      }
+    },
+    {
+      "module": "auth",
+      "description": "认证模块",
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49",
+      "duration": 14.63,
+      "passed": 122,
+      "failed": 7,
+      "exit_code": 1,
+      "test_cases": {
+        "TestBoundaryConditions::test_pagination_with_page_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_pagination_with_page_size_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_pagination_with_page_size_1": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_pagination_with_large_page_number": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_price_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_stock_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_stock_1": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_min_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_max_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_exceeding_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_min_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_max_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_exceeding_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_min_length_description": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_max_length_description": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_product_with_exceeding_length_description": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_change_password_with_min_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_change_password_with_max_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_change_password_with_exceeding_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_shop_with_min_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_shop_with_max_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_shop_with_exceeding_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_tag_with_min_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_tag_with_max_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_tag_with_exceeding_length_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_batch_tag_products_with_single_product": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_batch_tag_products_with_many_products": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_batch_tag_products_with_exceeding_products": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_single_item": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_many_items": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_exceeding_items": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_quantity_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_quantity_1": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_large_quantity": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_order_with_exceeding_quantity": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_update_order_status_flow_with_single_status": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_update_order_status_flow_with_many_statuses": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_update_order_status_flow_with_exceeding_statuses": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_get_detail_with_id_0": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_get_detail_with_id_1": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_get_detail_with_large_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_get_detail_with_exceeding_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_min_length_phone": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_max_length_phone": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_exceeding_length_phone": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_min_length_address": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_max_length_address": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_create_user_with_exceeding_length_address": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_register_with_min_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_register_with_max_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_register_with_exceeding_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_min_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_max_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_exceeding_length_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_min_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_max_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestBoundaryConditions::test_login_with_exceeding_length_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestLogin::test_universal_login_admin": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestLogin::test_universal_login_shop_owner": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestLogout::test_admin_logout": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestLogout::test_shop_owner_logout": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestParameterValidation::test_login_with_missing_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_login_with_missing_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_login_with_empty_credentials": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_login_with_invalid_password_format": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_user_with_missing_required_fields": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_user_with_invalid_phone": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_user_with_invalid_user_type": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_product_with_negative_price": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_product_with_negative_stock": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_product_with_zero_price": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_update_order_with_invalid_status": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_pagination_with_invalid_page_number": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_pagination_with_invalid_page_size": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_pagination_with_excessive_page_size": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_change_password_with_old_password_missing": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_change_password_with_new_password_missing": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_change_password_with_weak_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_shop_with_duplicate_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_get_detail_with_invalid_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_delete_with_missing_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_update_with_missing_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_register_with_existing_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_register_with_short_password": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_refresh_token_with_missing_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_temp_login_with_missing_shop_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_temp_login_with_missing_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_batch_tag_products_with_empty_list": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_batch_tag_products_with_missing_tag_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_upload_image_with_missing_file": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_get_detail_with_nonexistent_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_delete_nonexistent_resource": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_update_nonexistent_resource": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_toggle_status_with_invalid_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_check_shop_name_with_empty_name": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_check_username_with_empty_username": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_order_with_empty_items": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_create_order_with_missing_shop_id": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_update_order_status_flow_with_invalid_status": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestParameterValidation::test_update_order_status_flow_with_empty_flow": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_access_admin_api": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_access_other_shop_api": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_access_admin_api": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_access_shop_owner_api": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_admin_access_frontend_user_api": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_create_shop": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_create_product": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_delete_other_shop_product": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_delete_order": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_update_other_shop_order": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_admin_access_shop_owner_specific_data": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_cross_tenant_access": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_access_other_user_order": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_shop_owner_access_all_orders": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestPrivilegeEscalation::test_frontend_user_access_all_shops": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestRefreshToken::test_refresh_admin_token": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestRefreshToken::test_refresh_shop_token": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestTempLogin::test_temp_token_login": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_admin_api_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_admin_api_with_invalid_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_admin_api_with_expired_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_shop_owner_api_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_shop_owner_api_with_invalid_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_create_shop_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_create_user_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_update_order_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_delete_product_without_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_malformed_token": {
+          "status": "PASSED",
+          "time": 0
+        },
+        "TestUnauthorizedAccess::test_empty_token": {
+          "status": "PASSED",
+          "time": 0
+        }
+      }
+    },
+    {
+      "module": "frontend",
+      "description": "前端模块",
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57",
+      "duration": 8.27,
+      "passed": 0,
+      "failed": 13,
+      "exit_code": 1,
+      "test_cases": {
+        "TestFrontendAuth::test_frontend_user_login": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendAuth::test_frontend_user_register": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendAuth::test_check_username_exists": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendOrder::test_create_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendOrder::test_get_user_order_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendOrder::test_get_order_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendOrder::test_delete_order": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendProduct::test_get_product_list": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendProduct::test_get_product_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendProduct::test_get_product_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendShop::test_get_shop_detail": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendShop::test_get_shop_image": {
+          "status": "FAILED",
+          "time": 0
+        },
+        "TestFrontendShop::test_get_shop_tags": {
+          "status": "FAILED",
+          "time": 0
+        }
+      }
+    }
+  ],
+  "all_test_cases": [
+    {
+      "module": "admin",
+      "test_case": "TestAdminBase::test_change_admin_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminBase::test_login_with_new_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminBase::test_change_password_back_to_default",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_create_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_get_order_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_get_order_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_update_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_delete_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminOrderAPI::test_toggle_order_status",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_create_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_get_product_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_get_product_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_update_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_delete_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_upload_product_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_toggle_product_status",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminProductAPI::test_get_product_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_create_shop",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_update_shop",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_get_shop_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_get_shop_list",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_delete_shop",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_upload_shop_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_check_shop_name_exists",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_get_shop_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_get_shop_temp_token",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminShopAPI::test_update_order_status_flow",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminTagAPI::test_create_tag",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminTagAPI::test_batch_tag_products",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminTagAPI::test_get_bound_tags",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminTagAPI::test_get_online_products",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminTagAPI::test_get_unbound_tags",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminUserAPI::test_create_user",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminUserAPI::test_get_user_list",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminUserAPI::test_get_user_simple_list",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminUserAPI::test_get_user_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "admin",
+      "test_case": "TestAdminUserAPI::test_update_user",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:22:59",
+      "end_time": "2026-01-01 11:23:19"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerBase::test_change_shop_password",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerBase::test_login_with_new_password",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_create_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_get_order_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_get_order_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_update_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_delete_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerOrderAPI::test_toggle_order_status",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_create_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_get_product_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_get_product_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_update_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_delete_product",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_upload_product_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_toggle_product_status",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerProductAPI::test_get_product_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerShopAPI::test_get_shop_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerShopAPI::test_get_shop_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerShopAPI::test_update_shop",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerShopAPI::test_update_order_status_flow",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerTagAPI::test_create_tag",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerTagAPI::test_batch_tag_products",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerTagAPI::test_get_bound_tags",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerTagAPI::test_get_online_products",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerTagAPI::test_get_unbound_tags",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerUserAPI::test_create_user",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerUserAPI::test_get_user_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerUserAPI::test_get_user_simple_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerUserAPI::test_get_user_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "shop_owner",
+      "test_case": "TestShopOwnerUserAPI::test_update_user",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:19",
+      "end_time": "2026-01-01 11:23:34"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_pagination_with_page_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_pagination_with_page_size_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_pagination_with_page_size_1",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_pagination_with_large_page_number",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_price_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_stock_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_stock_1",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_min_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_max_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_exceeding_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_min_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_max_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_exceeding_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_min_length_description",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_max_length_description",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_product_with_exceeding_length_description",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_change_password_with_min_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_change_password_with_max_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_change_password_with_exceeding_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_shop_with_min_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_shop_with_max_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_shop_with_exceeding_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_tag_with_min_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_tag_with_max_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_tag_with_exceeding_length_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_batch_tag_products_with_single_product",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_batch_tag_products_with_many_products",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_batch_tag_products_with_exceeding_products",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_single_item",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_many_items",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_exceeding_items",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_quantity_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_quantity_1",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_large_quantity",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_order_with_exceeding_quantity",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_update_order_status_flow_with_single_status",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_update_order_status_flow_with_many_statuses",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_update_order_status_flow_with_exceeding_statuses",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_get_detail_with_id_0",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_get_detail_with_id_1",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_get_detail_with_large_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_get_detail_with_exceeding_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_min_length_phone",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_max_length_phone",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_exceeding_length_phone",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_min_length_address",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_max_length_address",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_create_user_with_exceeding_length_address",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_register_with_min_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_register_with_max_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_register_with_exceeding_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_min_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_max_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_exceeding_length_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_min_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_max_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestBoundaryConditions::test_login_with_exceeding_length_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestLogin::test_universal_login_admin",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestLogin::test_universal_login_shop_owner",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestLogout::test_admin_logout",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestLogout::test_shop_owner_logout",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_login_with_missing_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_login_with_missing_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_login_with_empty_credentials",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_login_with_invalid_password_format",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_user_with_missing_required_fields",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_user_with_invalid_phone",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_user_with_invalid_user_type",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_product_with_negative_price",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_product_with_negative_stock",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_product_with_zero_price",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_update_order_with_invalid_status",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_pagination_with_invalid_page_number",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_pagination_with_invalid_page_size",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_pagination_with_excessive_page_size",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_change_password_with_old_password_missing",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_change_password_with_new_password_missing",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_change_password_with_weak_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_shop_with_duplicate_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_get_detail_with_invalid_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_delete_with_missing_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_update_with_missing_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_register_with_existing_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_register_with_short_password",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_refresh_token_with_missing_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_temp_login_with_missing_shop_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_temp_login_with_missing_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_batch_tag_products_with_empty_list",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_batch_tag_products_with_missing_tag_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_upload_image_with_missing_file",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_get_detail_with_nonexistent_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_delete_nonexistent_resource",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_update_nonexistent_resource",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_toggle_status_with_invalid_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_check_shop_name_with_empty_name",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_check_username_with_empty_username",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_order_with_empty_items",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_create_order_with_missing_shop_id",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_update_order_status_flow_with_invalid_status",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestParameterValidation::test_update_order_status_flow_with_empty_flow",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_access_admin_api",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_access_other_shop_api",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_access_admin_api",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_access_shop_owner_api",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_admin_access_frontend_user_api",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_create_shop",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_create_product",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_delete_other_shop_product",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_delete_order",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_update_other_shop_order",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_admin_access_shop_owner_specific_data",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_cross_tenant_access",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_access_other_user_order",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_shop_owner_access_all_orders",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestPrivilegeEscalation::test_frontend_user_access_all_shops",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestRefreshToken::test_refresh_admin_token",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestRefreshToken::test_refresh_shop_token",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestTempLogin::test_temp_token_login",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_admin_api_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_admin_api_with_invalid_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_admin_api_with_expired_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_shop_owner_api_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_shop_owner_api_with_invalid_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_create_shop_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_create_user_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_update_order_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_delete_product_without_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_malformed_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "auth",
+      "test_case": "TestUnauthorizedAccess::test_empty_token",
+      "status": "PASSED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:34",
+      "end_time": "2026-01-01 11:23:49"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendAuth::test_frontend_user_login",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendAuth::test_frontend_user_register",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendAuth::test_check_username_exists",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendOrder::test_create_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendOrder::test_get_user_order_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendOrder::test_get_order_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendOrder::test_delete_order",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendProduct::test_get_product_list",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendProduct::test_get_product_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendProduct::test_get_product_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendShop::test_get_shop_detail",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendShop::test_get_shop_image",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    },
+    {
+      "module": "frontend",
+      "test_case": "TestFrontendShop::test_get_shop_tags",
+      "status": "FAILED",
+      "time": 0,
+      "start_time": "2026-01-01 11:23:49",
+      "end_time": "2026-01-01 11:23:57"
+    }
+  ],
+  "summary": {
+    "total_passed": 129,
+    "total_failed": 80,
+    "total_tests": 209,
+    "success_rate": 61.72
+  }
+}

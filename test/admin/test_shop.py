@@ -35,7 +35,7 @@ class TestAdminShopAPI:
     def test_get_shop_detail(self):
         """测试获取店铺详情"""
         url = f"{API_BASE_URL}/admin/shop/detail"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -45,7 +45,7 @@ class TestAdminShopAPI:
         url = f"{API_BASE_URL}/admin/shop/list"
         params = {
             "page": 1,
-            "pageSize": 10
+            "page_size": 10
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
@@ -54,7 +54,7 @@ class TestAdminShopAPI:
     def test_delete_shop(self):
         """测试删除店铺"""
         url = f"{API_BASE_URL}/admin/shop/delete"
-        params = {"shopId": "999"}
+        params = {"shop_id": "999"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.delete(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -78,7 +78,7 @@ class TestAdminShopAPI:
     def test_get_shop_image(self):
         """测试获取店铺图片"""
         url = f"{API_BASE_URL}/admin/shop/image"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
@@ -86,7 +86,7 @@ class TestAdminShopAPI:
     def test_get_shop_temp_token(self):
         """测试获取店铺临时令牌"""
         url = f"{API_BASE_URL}/admin/shop/temp-token"
-        params = {"shopId": "1"}
+        params = {"shop_id": "1"}
         headers = {"Authorization": "Bearer test_token"}
         response = requests.get(url, params=params, headers=headers)
         assert response.status_code in [200, 400, 401, 404, 429]
