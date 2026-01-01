@@ -2,13 +2,13 @@ import os
 import pytest
 import requests
 
-from conftest import API_BASE_URL
+from conftest import API_BASE_URL, make_request_with_retry
 
 
 class TestAdminUserAPI:
     """管理员用户管理接口测试"""
 
-    def test_create_user(self):
+    def test_create_user(self, admin_token):
         """测试创建用户"""
         url = f"{API_BASE_URL}/admin/user/create"
         payload = {
@@ -18,44 +18,64 @@ class TestAdminUserAPI:
             "phone": "13800138000",
             "address": "Test address"
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 409, 429]
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.post(url, json=payload, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        assert response.status_code in [200, 400, 401, 409]
 
-    def test_get_user_list(self):
+    def test_get_user_list(self, admin_token):
         """测试获取用户列表"""
         url = f"{API_BASE_URL}/admin/user/list"
         params = {
             "page": 1,
-            "page_size": 10
+            "pageSize": 10
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.get(url, params=params, headers=headers)
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.get(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_get_user_simple_list(self):
+    def test_get_user_simple_list(self, admin_token):
         """测试获取用户简单列表"""
         url = f"{API_BASE_URL}/admin/user/simple-list"
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.get(url, headers=headers)
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.get(url, headers=headers)
+        
+        response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_get_user_detail(self):
+    def test_get_user_detail(self, admin_token):
         """测试获取用户详情"""
         url = f"{API_BASE_URL}/admin/user/detail"
-        params = {"user_id": "1"}
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.get(url, params=params, headers=headers)
+        params = {"id": 1}
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.get(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_update_user(self):
+    def test_update_user(self, admin_token):
         """测试更新用户信息"""
         url = f"{API_BASE_URL}/admin/user/update"
         payload = {
-            "id": "1",
+            "id": 1,
             "name": "Updated User Name",
             "address": "Updated address"
         }
-        headers = {"Authorization": "Bearer test_token"}
-        response = requests.put(url, json=payload, headers=headers)
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.put(url, json=payload, headers=headers)
+        
+        response = make_request_with_retry(request_func)
         assert response.status_code == 200

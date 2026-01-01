@@ -104,9 +104,9 @@ class TestAdminOrderAPI:
         """测试切换订单状态"""
         url = f"{API_BASE_URL}/admin/order/toggle-status"
         payload = {
-            "id": str(test_order_id) if test_order_id else "1",
-            "shop_id": str(test_shop_id),
-            "next_status": 1
+            "id": int(test_order_id) if test_order_id else 1,
+            "shop_id": int(test_shop_id) if test_shop_id else 1,
+            "next_status": 2
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
         

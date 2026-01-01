@@ -61,8 +61,8 @@ class TestShopOwnerOrderAPI:
             
         url = f"{API_BASE_URL}/shopOwner/order/detail"
         params = {
-            "id": "1",
-            "shop_id": shop_owner_shop_id
+            "id": 1,
+            "shop_id": int(shop_owner_shop_id) if shop_owner_shop_id else 1
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
@@ -80,7 +80,7 @@ class TestShopOwnerOrderAPI:
             
         url = f"{API_BASE_URL}/shopOwner/order/update"
         params = {
-            "id": "1"
+            "id": 1
         }
         payload = {
             "shop_id": int(shop_owner_shop_id) if shop_owner_shop_id else 1,
@@ -109,8 +109,8 @@ class TestShopOwnerOrderAPI:
             
         url = f"{API_BASE_URL}/shopOwner/order/delete"
         params = {
-            "id": "999",
-            "shop_id": shop_owner_shop_id
+            "id": 999,
+            "shop_id": int(shop_owner_shop_id) if shop_owner_shop_id else 1
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
@@ -128,9 +128,9 @@ class TestShopOwnerOrderAPI:
             
         url = f"{API_BASE_URL}/shopOwner/order/toggle-status"
         payload = {
-            "id": "1",
+            "id": 1,
             "shop_id": int(shop_owner_shop_id) if shop_owner_shop_id else 1,
-            "next_status": 1
+            "next_status": 2
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
