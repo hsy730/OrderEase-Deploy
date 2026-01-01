@@ -77,7 +77,11 @@ class TestAdminShopAPI:
             return requests.delete(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"删除店铺失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_upload_shop_image(self, admin_token):
         """测试上传店铺图片"""
@@ -89,7 +93,11 @@ class TestAdminShopAPI:
             return requests.post(url, files=files, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"上传店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_check_shop_name_exists(self, admin_token):
         """测试检查店铺名称是否存在"""
@@ -113,7 +121,11 @@ class TestAdminShopAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_get_shop_temp_token(self, admin_token):
         """测试获取店铺临时令牌"""
@@ -125,7 +137,11 @@ class TestAdminShopAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取店铺临时令牌失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_update_order_status_flow(self, admin_token):
         """测试更新订单状态流转"""

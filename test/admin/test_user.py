@@ -78,4 +78,8 @@ class TestAdminUserAPI:
             return requests.put(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"更新用户信息失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise

@@ -38,7 +38,11 @@ class TestAdminProductAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            response.status_code == 200
+        except AssertionError:
+            print(f"获取商品列表失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_get_product_detail(self, admin_token):
         """测试获取商品详情"""
@@ -50,7 +54,11 @@ class TestAdminProductAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取商品详情失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_update_product(self, admin_token):
         """测试更新商品信息"""
@@ -66,7 +74,12 @@ class TestAdminProductAPI:
             return requests.put(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"更新商品信息失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
+
     def test_delete_product(self, admin_token):
         """测试删除商品"""
         url = f"{API_BASE_URL}/admin/product/delete"
@@ -74,10 +87,14 @@ class TestAdminProductAPI:
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():
-            return requests.delete(url, params=params, headers=headers)
+            return requests.delete(url, params=params, headers=headers) 
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"删除商品失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_upload_product_image(self, admin_token):
         """测试上传商品图片"""
@@ -89,7 +106,11 @@ class TestAdminProductAPI:
             return requests.post(url, files=files, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"上传商品图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_toggle_product_status(self, admin_token):
         """测试切换商品状态"""
@@ -104,7 +125,11 @@ class TestAdminProductAPI:
             return requests.put(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"切换商品状态失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_get_product_image(self, admin_token):
         """测试获取商品图片"""

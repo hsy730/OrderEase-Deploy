@@ -48,7 +48,11 @@ class TestAdminTagAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取商品已绑定的标签失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_get_online_products(self, admin_token):
         """测试获取标签关联的已上架商品"""
@@ -60,7 +64,11 @@ class TestAdminTagAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取标签关联的已上架商品失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
 
     def test_get_unbound_tags(self, admin_token):
         """测试获取商品未绑定的标签"""
@@ -72,4 +80,8 @@ class TestAdminTagAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code == 200
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"获取商品未绑定的标签失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
