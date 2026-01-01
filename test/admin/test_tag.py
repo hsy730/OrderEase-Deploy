@@ -38,15 +38,18 @@ class TestAdminTagAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code in [200, 400, 401]
 
-    def test_get_bound_tags(self, admin_token):
+    def test_get_bound_tags(self, admin_token, test_product_id, test_shop_id):
         """测试获取商品已绑定的标签"""
         url = f"{API_BASE_URL}/admin/tag/bound-tags"
-        params = {"product_id": 1}
+        params = {
+            "product_id": test_product_id if test_product_id else 1,
+            "shop_id": test_shop_id if test_shop_id else 1
+        }
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -54,15 +57,18 @@ class TestAdminTagAPI:
             print(f"获取商品已绑定的标签失败，状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
-    def test_get_online_products(self, admin_token):
+    def test_get_online_products(self, admin_token, test_tag_id, test_shop_id):
         """测试获取标签关联的已上架商品"""
         url = f"{API_BASE_URL}/admin/tag/online-products"
-        params = {"tag_id": 1}
+        params = {
+            "tag_id": test_tag_id if test_tag_id else 1,
+            "shop_id": test_shop_id if test_shop_id else 1
+        }
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -70,15 +76,18 @@ class TestAdminTagAPI:
             print(f"获取标签关联的已上架商品失败，状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
-    def test_get_unbound_tags(self, admin_token):
+    def test_get_unbound_tags(self, admin_token, test_product_id, test_shop_id):
         """测试获取商品未绑定的标签"""
         url = f"{API_BASE_URL}/admin/tag/unbound-tags"
-        params = {"product_id": 1}
+        params = {
+            "product_id": test_product_id if test_product_id else 1,
+            "shop_id": test_shop_id if test_shop_id else 1
+        }
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200

@@ -52,10 +52,10 @@ class TestAdminUserAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_get_user_detail(self, admin_token):
+    def test_get_user_detail(self, admin_token, test_user_id):
         """测试获取用户详情"""
         url = f"{API_BASE_URL}/admin/user/detail"
-        params = {"id": 1}
+        params = {"id": test_user_id if test_user_id else 1}
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():
@@ -64,19 +64,21 @@ class TestAdminUserAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_update_user(self, admin_token):
+    def test_update_user(self, admin_token, test_user_id):
         """测试更新用户信息"""
         url = f"{API_BASE_URL}/admin/user/update"
+        params = {
+            "id": test_user_id if test_user_id else 1
+        }
         payload = {
-            "id": 1,
             "name": "Updated User Name",
             "address": "Updated address"
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
-            return requests.put(url, json=payload, headers=headers)
-        
+            return requests.put(url, params=params, json=payload, headers=headers)
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200

@@ -64,14 +64,15 @@ class TestAdminOrderAPI:
         """测试更新订单信息"""
         url = f"{API_BASE_URL}/admin/order/update"
         params = {
-            "id": str(test_order_id) if test_order_id else "1"
+            "id": str(test_order_id) if test_order_id else "1",
+            "shop_id": str(test_shop_id) if test_shop_id else "1"
         }
         payload = {
             "shop_id": int(test_shop_id) if test_shop_id else 1,
-            "user_id": str(test_user_id),
+            "user_id": int(test_user_id) if test_user_id else 1,
             "items": [
                 {
-                    "product_id": str(test_product_id),
+                    "product_id": int(test_product_id) if test_product_id else 1,
                     "quantity": 1,
                     "price": 100
                 }
@@ -104,7 +105,7 @@ class TestAdminOrderAPI:
         """测试切换订单状态"""
         url = f"{API_BASE_URL}/admin/order/toggle-status"
         payload = {
-            "id": int(test_order_id) if test_order_id else 1,
+            "id": str(test_order_id) if test_order_id else "1",
             "shop_id": int(test_shop_id) if test_shop_id else 1,
             "next_status": 2
         }

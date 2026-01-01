@@ -24,26 +24,28 @@ class TestAdminShopAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code in [200, 400, 401]
 
-    def test_update_shop(self, admin_token):
+    def test_update_shop(self, admin_token, test_shop_id):
         """测试更新店铺信息"""
         url = f"{API_BASE_URL}/admin/shop/update"
+        params = {
+            "id": test_shop_id if test_shop_id else 1
+        }
         payload = {
-            "id": 1,
             "name": "Updated Shop Name",
             "description": "Updated description"
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():
-            return requests.put(url, json=payload, headers=headers)
+            return requests.put(url, params=params, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
         assert response.status_code in [200, 400, 401, 404]
 
-    def test_get_shop_detail(self, admin_token):
+    def test_get_shop_detail(self, admin_token, test_shop_id):
         """测试获取店铺详情"""
         url = f"{API_BASE_URL}/admin/shop/detail"
-        params = {"id": 1}
+        params = {"shop_id": test_shop_id if test_shop_id else 1}
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():
@@ -67,15 +69,15 @@ class TestAdminShopAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_delete_shop(self, admin_token):
+    def test_delete_shop(self, admin_token, test_shop_id):
         """测试删除店铺"""
         url = f"{API_BASE_URL}/admin/shop/delete"
-        params = {"id": 999}
+        params = {"shop_id": test_shop_id if test_shop_id else 999}
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.delete(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -83,15 +85,18 @@ class TestAdminShopAPI:
             print(f"删除店铺失败，状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
-    def test_upload_shop_image(self, admin_token):
+    def test_upload_shop_image(self, admin_token, test_shop_id):
         """测试上传店铺图片"""
         url = f"{API_BASE_URL}/admin/shop/upload-image"
+        params = {
+            "id": test_shop_id if test_shop_id else 1
+        }
         files = {"image": ("test.jpg", b"fake image data", "image/jpeg")}
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
-            return requests.post(url, files=files, headers=headers)
-        
+            return requests.post(url, params=params, files=files, headers=headers)
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -111,15 +116,15 @@ class TestAdminShopAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_get_shop_image(self, admin_token):
+    def test_get_shop_image(self, admin_token, test_shop_id):
         """测试获取店铺图片"""
         url = f"{API_BASE_URL}/admin/shop/image"
-        params = {"id": 1}
+        params = {"path": f"shop_{test_shop_id if test_shop_id else 1}_1234567890.jpg"}
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -127,15 +132,15 @@ class TestAdminShopAPI:
             print(f"获取店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
-    def test_get_shop_temp_token(self, admin_token):
+    def test_get_shop_temp_token(self, admin_token, test_shop_id):
         """测试获取店铺临时令牌"""
         url = f"{API_BASE_URL}/admin/shop/temp-token"
-        params = {"id": 1}
+        params = {"shop_id": test_shop_id if test_shop_id else 1}
         headers = {"Authorization": f"Bearer {admin_token}"}
-        
+            
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
+            
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
@@ -143,11 +148,11 @@ class TestAdminShopAPI:
             print(f"获取店铺临时令牌失败，状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
-    def test_update_order_status_flow(self, admin_token):
+    def test_update_order_status_flow(self, admin_token, test_shop_id):
         """测试更新订单状态流转"""
         url = f"{API_BASE_URL}/admin/shop/update-order-status-flow"
         payload = {
-            "shop_id": 1,
+            "shop_id": test_shop_id if test_shop_id else 1,
             "order_status_flow": {
                 "statuses": [
                     {
