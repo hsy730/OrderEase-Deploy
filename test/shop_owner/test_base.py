@@ -7,8 +7,11 @@ from conftest import API_BASE_URL, make_request_with_retry
 class TestShopOwnerBase:
     """商家基础功能测试"""
 
-    def test_change_shop_password(self, shop_owner_token):
-        """测试修改商家密码"""
+    def test_change_shop_password(self, shop_owner_token, shop_owner_shop_id):
+        """测试修改商家密码"""          
+        print(f"店铺ID: {shop_owner_shop_id}, 类型: {type(shop_owner_shop_id)}")
+            
+        # 直接修改密码
         url = f"{API_BASE_URL}/shopOwner/change-password"
         payload = {
             "old_password": "Admin@123456",

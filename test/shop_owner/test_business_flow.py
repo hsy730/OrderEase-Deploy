@@ -8,13 +8,13 @@ from conftest import API_BASE_URL, make_request_with_retry
 class TestShopOwnerBusinessFlow:
     """商家业务流程测试 - 按照正确的业务顺序执行测试"""
 
-    def test_complete_business_flow(self, shop_owner_token, shop_owner_shop_id):
-        """测试完整的业务流程：获取店铺 → 创建商品 → 创建订单 → 管理标签 → 删除订单 → 删除商品"""
+    def test_complete_business_flow(self, admin_token, shop_owner_token):
+        """测试完整的业务流程：创建店铺 → 创建商品 → 创建订单 → 管理标签 → 删除订单 → 删除商品"""
         
-        # 第一步：获取店铺信息（店铺已存在）
-        shop_id = shop_owner_shop_id
-        assert shop_id is not None, "获取店铺ID失败"
-        print(f"✓ 成功获取店铺，ID: {shop_id}")
+        # 第一步：通过管理员账户创建店铺，并从响应中获取shopId
+        shop_id = self._create_shop(admin_token)
+        assert shop_id is not None, "创建店铺失败"
+        print(f"✓ 成功创建店铺，ID: {shop_id}")
         
         # 第二步：创建商品
         product_id = self._create_product(shop_owner_token, shop_id)
@@ -49,16 +49,42 @@ class TestShopOwnerBusinessFlow:
         print(f"✓ 成功删除商品，ID: {product_id}")
         
         # 第九步：删除标签
-        self._delete_tag(shop_owner_token, tag_id)
+        self._delete_tag(shop_owner_token, tag_id, shop_id)
         print(f"✓ 成功删除标签，ID: {tag_id}")
         
         print("✓ 完整业务流程测试通过")
+
+    def _create_shop(self, admin_token):
+        """创建店铺"""
+        url = f"{API_BASE_URL}/admin/shop/create"
+        # 生成唯一的店主用户名，避免重复
+        unique_suffix = os.urandom(4).hex()
+        payload = {
+            "owner_username": f"shop_{unique_suffix}",
+            "owner_password": "Admin@123456",
+            "name": f"Business Flow Test Shop {unique_suffix}",
+            "contact_phone": "13800138000",
+            "contact_email": f"test_{unique_suffix}@example.com",
+            "description": "Business flow test shop description",
+            "valid_until": "2027-12-31T23:59:59Z"
+        }
+        headers = {"Authorization": f"Bearer {admin_token}"}
+        
+        def request_func():
+            return requests.post(url, json=payload, headers=headers)
+        
+        response = make_request_with_retry(request_func)
+        print(f"创建店铺响应状态码: {response.status_code}, 响应内容: {response.text}")
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("data", {}).get("id")
+        return None
 
     def _create_product(self, shop_owner_token, shop_id):
         """创建商品"""
         url = f"{API_BASE_URL}/shopOwner/product/create"
         payload = {
-            "shop_id": shop_id,
+            "shop_id": int(shop_id),
             "name": f"Business Flow Test Product {os.urandom(4).hex()}",
             "price": 100,
             "description": "Business flow test product description"
@@ -127,7 +153,7 @@ class TestShopOwnerBusinessFlow:
         url = f"{API_BASE_URL}/shopOwner/tag/create"
         payload = {
             "name": f"Business Flow Test Tag {os.urandom(4).hex()}",
-            "shop_id": shop_id
+            "shop_id": int(shop_id)
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
@@ -147,7 +173,7 @@ class TestShopOwnerBusinessFlow:
         payload = {
             "product_ids": [product_id],
             "tag_id": tag_id,  # API期望的是tag_id（单数），不是tag_ids（复数）
-            "shop_id": shop_id
+            "shop_id": int(shop_id)
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
@@ -179,7 +205,7 @@ class TestShopOwnerBusinessFlow:
         url = f"{API_BASE_URL}/shopOwner/product/delete"
         params = {
             "id": product_id,
-            "shop_id": shop_id
+            "shop_id": int(shop_id)
         }
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
@@ -190,14 +216,13 @@ class TestShopOwnerBusinessFlow:
         print(f"删除商品响应状态码: {response.status_code}, 响应内容: {response.text}")
         assert response.status_code == 200, f"删除商品失败，状态码: {response.status_code}, 响应: {response.text}"
 
-    def _delete_tag(self, shop_owner_token, tag_id):
+    def _delete_tag(self, shop_owner_token, tag_id, shop_id):
         """删除标签"""
-        url = f"{API_BASE_URL}/shopOwner/tag/delete"
-        params = {"id": tag_id}
+        url = f"{API_BASE_URL}/shopOwner/tag/delete?id={tag_id}&shop_id={int(shop_id)}"
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
         def request_func():
-            return requests.delete(url, params=params, headers=headers)
+            return requests.delete(url, headers=headers)
         
         response = make_request_with_retry(request_func)
         print(f"删除标签响应状态码: {response.status_code}, 响应内容: {response.text}")

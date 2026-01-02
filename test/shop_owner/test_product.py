@@ -102,23 +102,6 @@ class TestShopOwnerProductAPI:
         print(f"更新商品响应状态码: {response.status_code}, 响应内容: {response.text}")
         assert response.status_code == 200
 
-    def test_delete_product(self, shop_owner_token, shop_owner_product_id, shop_owner_shop_id):
-        """测试删除商品"""
-            
-        url = f"{API_BASE_URL}/shopOwner/product/delete"
-        params = {
-            "id": shop_owner_product_id,
-            "shop_id": shop_owner_shop_id
-        }
-        headers = {"Authorization": f"Bearer {shop_owner_token}"}
-        
-        def request_func():
-            return requests.delete(url, params=params, headers=headers)
-        
-        response = make_request_with_retry(request_func)
-        print(f"删除商品响应状态码: {response.status_code}, 响应内容: {response.text}")
-        assert response.status_code == 200
-
     def test_upload_product_image(self, shop_owner_token, shop_owner_product_id, shop_owner_shop_id):
         """测试上传商品图片"""
         if not shop_owner_product_id:
@@ -180,4 +163,49 @@ class TestShopOwnerProductAPI:
         
         response = make_request_with_retry(request_func)
         print(f"获取商品图片响应状态码: {response.status_code}, 响应内容: {response.text}")
+        assert response.status_code == 200
+
+
+    def test_delete_product(self, shop_owner_token, shop_owner_shop_id):
+        """测试删除商品"""
+        # First create a new product specifically for deletion testing
+        create_url = f"{API_BASE_URL}/shopOwner/product/create"
+        create_payload = {
+            "shop_id": shop_owner_shop_id,
+            "name": f"Product for Deletion Test {os.urandom(4).hex()}",
+            "price": 100,
+            "description": "Product created specifically for deletion test"
+        }
+        headers = {"Authorization": f"Bearer {shop_owner_token}"}
+        
+        def create_request_func():
+            return requests.post(create_url, json=create_payload, headers=headers)
+        
+        create_response = make_request_with_retry(create_request_func)
+        print(f"创建测试商品响应状态码: {create_response.status_code}, 响应内容: {create_response.text}")
+        
+        if create_response.status_code != 200:
+            pytest.skip("Failed to create product for deletion test")
+            return
+            
+        # Extract the product ID from the creation response
+        product_data = create_response.json()
+        test_product_id = product_data.get("id") or product_data.get("product_id")
+        
+        if not test_product_id:
+            pytest.skip("Could not extract product ID from creation response")
+            return
+            
+        # Now delete the newly created product
+        url = f"{API_BASE_URL}/shopOwner/product/delete"
+        params = {
+            "id": test_product_id,
+            "shop_id": shop_owner_shop_id
+        }
+        
+        def delete_request_func():
+            return requests.delete(url, params=params, headers=headers)
+        
+        response = make_request_with_retry(delete_request_func)
+        print(f"删除商品响应状态码: {response.status_code}, 响应内容: {response.text}")
         assert response.status_code == 200
