@@ -5,6 +5,7 @@ import requests
 from conftest import API_BASE_URL, make_request_with_retry
 
 
+@pytest.mark.skip(reason="业务流程测试已整合到 test_business_flow.py 中")
 class TestAdminShopAPI:
     """管理员店铺管理接口测试"""
 
@@ -82,7 +83,7 @@ class TestAdminShopAPI:
         try:
             assert response.status_code == 200
         except AssertionError:
-            print(f"删除店铺失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            print(f"删除店铺失败，请求参数: {params}, 状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
     def test_upload_shop_image(self, admin_token, test_shop_id):
@@ -100,8 +101,20 @@ class TestAdminShopAPI:
         response = make_request_with_retry(request_func)
         try:
             assert response.status_code == 200
+            # 解析响应，获取图片URL
+            response_data = response.json()
+            print(f"上传店铺图片成功，响应内容: {response_data}")
+            if 'url' in response_data:
+                # 将图片URL保存到类属性中，供后续测试使用
+                self.__class__.uploaded_shop_image_url = response_data['url']
+                print(f"上传店铺图片成功，图片URL: {self.__class__.uploaded_shop_image_url}")
+            else:
+                print("上传成功但未返回图片URL")
         except AssertionError:
-            print(f"上传店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            print(f"上传店铺图片失败，请求参数: {params}, 状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
+        except Exception as e:
+            print(f"解析上传图片响应失败: {str(e)}")
             raise
 
     def test_check_shop_name_exists(self, admin_token):
@@ -119,7 +132,9 @@ class TestAdminShopAPI:
     def test_get_shop_image(self, admin_token, test_shop_id):
         """测试获取店铺图片"""
         url = f"{API_BASE_URL}/admin/shop/image"
-        params = {"path": f"shop_{test_shop_id if test_shop_id else 1}_1234567890.jpg"}
+        # 尝试使用上传图片测试中保存的类属性URL，如果不存在则使用默认路径
+        image_path = getattr(self.__class__, 'uploaded_shop_image_url', None) if hasattr(self.__class__, 'uploaded_shop_image_url') else f"shop_{test_shop_id if test_shop_id else 1}_1234567890.jpg"
+        params = {"path": image_path}
         headers = {"Authorization": f"Bearer {admin_token}"}
             
         def request_func():
@@ -129,7 +144,7 @@ class TestAdminShopAPI:
         try:
             assert response.status_code == 200
         except AssertionError:
-            print(f"获取店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+            print(f"获取店铺图片失败，请求参数: {params}, 状态码: {response.status_code}, 响应内容: {response.text}")
             raise
 
     def test_get_shop_temp_token(self, admin_token, test_shop_id):

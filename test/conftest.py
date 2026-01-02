@@ -14,7 +14,7 @@ def make_request_with_retry(request_func, max_retries=3):
     while True:
         response = request_func()
         if response.status_code == 429 and retry_count < max_retries:
-            time.sleep(0.5)
+            time.sleep(0.2)
             retry_count += 1
         else:
             return response
