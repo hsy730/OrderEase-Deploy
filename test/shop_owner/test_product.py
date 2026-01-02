@@ -104,9 +104,6 @@ class TestShopOwnerProductAPI:
 
     def test_delete_product(self, shop_owner_token, shop_owner_product_id, shop_owner_shop_id):
         """测试删除商品"""
-        if not shop_owner_product_id or not shop_owner_shop_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
             
         url = f"{API_BASE_URL}/shopOwner/product/delete"
         params = {

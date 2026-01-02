@@ -9,9 +9,6 @@ class TestShopOwnerOrderAPI:
 
     def test_create_order(self, shop_owner_token, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
         """测试创建订单"""
-        if not shop_owner_shop_id or not shop_owner_user_id or not shop_owner_product_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
             
         url = f"{API_BASE_URL}/shopOwner/order/create"
         payload = {
@@ -55,9 +52,6 @@ class TestShopOwnerOrderAPI:
 
     def test_get_order_detail(self, shop_owner_token, shop_owner_order_id, shop_owner_shop_id):
         """测试获取订单详情"""
-        if not shop_owner_order_id or not shop_owner_shop_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
             
         url = f"{API_BASE_URL}/shopOwner/order/detail"
         params = {
@@ -74,9 +68,6 @@ class TestShopOwnerOrderAPI:
 
     def test_update_order(self, shop_owner_token, shop_owner_order_id, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
         """测试更新订单信息"""
-        if not shop_owner_order_id or not shop_owner_shop_id or not shop_owner_user_id or not shop_owner_product_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
             
         url = f"{API_BASE_URL}/shopOwner/order/update"
         params = {
@@ -103,10 +94,7 @@ class TestShopOwnerOrderAPI:
 
     def test_toggle_order_status(self, shop_owner_token, shop_owner_order_id, shop_owner_shop_id):
         """测试切换订单状态"""
-        if not shop_owner_order_id or not shop_owner_shop_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
-            
+
         url = f"{API_BASE_URL}/shopOwner/order/toggle-status"
         payload = {
             "id": shop_owner_order_id,
@@ -123,9 +111,6 @@ class TestShopOwnerOrderAPI:
 
     def test_delete_order(self, shop_owner_token, shop_owner_order_id, shop_owner_shop_id):
         """测试删除订单"""
-        if not shop_owner_order_id or not shop_owner_shop_id:
-            pytest.skip("缺少必要的fixture数据")
-            return
             
         url = f"{API_BASE_URL}/shopOwner/order/delete"
         params = {
