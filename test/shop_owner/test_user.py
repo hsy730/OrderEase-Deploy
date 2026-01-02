@@ -52,10 +52,14 @@ class TestShopOwnerUserAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_get_user_detail(self, shop_owner_token):
+    def test_get_user_detail(self, shop_owner_token, shop_owner_user_id):
         """测试获取用户详情"""
+        if not shop_owner_user_id:
+            pytest.skip("缺少shop_owner_user_id fixture")
+            return
+            
         url = f"{API_BASE_URL}/shopOwner/user/detail"
-        params = {"id": 1}
+        params = {"id": shop_owner_user_id}
         headers = {"Authorization": f"Bearer {shop_owner_token}"}
         
         def request_func():
@@ -64,11 +68,15 @@ class TestShopOwnerUserAPI:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
 
-    def test_update_user(self, shop_owner_token):
+    def test_update_user(self, shop_owner_token, shop_owner_user_id):
         """测试更新用户信息"""
+        if not shop_owner_user_id:
+            pytest.skip("缺少shop_owner_user_id fixture")
+            return
+            
         url = f"{API_BASE_URL}/shopOwner/user/update"
         payload = {
-            "id": 1,
+            "id": shop_owner_user_id,
             "name": "Updated User Name",
             "address": "Updated address"
         }

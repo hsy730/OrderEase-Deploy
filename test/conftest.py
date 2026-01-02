@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080/api")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080/api/order-ease/v1")
 
 def make_request_with_retry(request_func, max_retries=3):
     """执行请求，如果遇到429则等待0.5秒后重试"""
@@ -275,4 +275,55 @@ def test_order_id(admin_token, test_shop_id):
         orders = data.get("data", data.get("orders", []))
         if orders and len(orders) > 0:
             return orders[0].get("id")
+    return None
+
+@pytest.fixture(scope="session")
+def shop_owner_order_id(shop_owner_token, shop_owner_shop_id, shop_owner_user_id, shop_owner_product_id):
+    """商家订单ID fixture - 创建测试订单"""
+    if not shop_owner_shop_id or not shop_owner_user_id or not shop_owner_product_id:
+        return None
+        
+    url = f"{API_BASE_URL}/shopOwner/order/create"
+    payload = {
+        "shop_id": int(shop_owner_shop_id),
+        "user_id": str(shop_owner_user_id),
+        "items": [
+            {
+                "product_id": str(shop_owner_product_id),
+                "quantity": 1,
+                "price": 100
+            }
+        ]
+    }
+    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    
+    def request_func():
+        return requests.post(url, json=payload, headers=headers)
+    
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("order_id") or data.get("id")
+    return None
+
+@pytest.fixture(scope="session")
+def shop_owner_tag_id(shop_owner_token, shop_owner_shop_id):
+    """商家标签ID fixture - 创建测试标签"""
+    if not shop_owner_shop_id:
+        return None
+        
+    url = f"{API_BASE_URL}/shopOwner/tag/create"
+    payload = {
+        "name": "Test Tag",
+        "shop_id": shop_owner_shop_id
+    }
+    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    
+    def request_func():
+        return requests.post(url, json=payload, headers=headers)
+    
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        data = response.json()
+        return data.get("id") or data.get("tag_id") or data.get("tagId")
     return None

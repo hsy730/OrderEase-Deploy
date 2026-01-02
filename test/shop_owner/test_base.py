@@ -20,4 +20,5 @@ class TestShopOwnerBase:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401]
+        print(f"修改密码响应状态码: {response.status_code}, 响应内容: {response.text}")
+        assert response.status_code == 200

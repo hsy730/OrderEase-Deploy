@@ -24,7 +24,7 @@ class TestAdminProductAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401]
+        assert response.status_code == 200
 
     def test_get_product_list(self, admin_token, test_shop_id):
         """测试获取商品列表"""
