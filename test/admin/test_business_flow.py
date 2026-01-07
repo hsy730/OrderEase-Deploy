@@ -58,7 +58,7 @@ class TestBusinessFlow:
         }
         headers = {"Authorization": f"Bearer {self.admin_token}"}
         response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429], f"修改密码失败，状态码: {response.status_code}"
+        assert response.status_code == 200, f"修改密码失败，状态码: {response.status_code}"
         print("✓ 修改管理员密码测试通过")
 
     # ==================== 完整业务流程测试 ====================

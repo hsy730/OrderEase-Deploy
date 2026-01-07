@@ -46,7 +46,7 @@ class TestAdminShopAPI:
             return requests.put(url, params=params, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404]
+        assert response.status_code == 200
 
     def test_get_shop_detail(self, admin_token, test_shop_id):
         """测试获取店铺详情"""
@@ -58,7 +58,7 @@ class TestAdminShopAPI:
             return requests.get(url, params=params, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404]
+        assert response.status_code == 200
 
     def test_get_shop_list(self, admin_token):
         """测试获取店铺列表"""

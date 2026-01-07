@@ -92,7 +92,7 @@ def update_shop(admin_token, shop_id, name=None, description=None):
         return requests.put(url, params=params, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    return response.status_code in [200, 400, 401, 404]
+    return response.status_code == 200
 
 
 def get_shop_detail(admin_token, shop_id):
