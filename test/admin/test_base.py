@@ -19,4 +19,4 @@ class TestAdminBase:
         }
         headers = {"Authorization": "Bearer test_token"}
         response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code in [200, 400, 401, 429]
+        assert response.status_code == 200

@@ -45,7 +45,7 @@ class TestAuthFlow:
         
         response = make_request_with_retry(request_func)
         # 允许 200 或 429（频率限制）
-        assert response.status_code in [200, 429], f"Expected 200 or 429, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         if response.status_code == 200:
             print("✓ 管理员登录成功")
@@ -118,7 +118,7 @@ class TestAuthFlow:
         
         response = make_request_with_retry(login_request_func)
         # 允许 200 或 429（频率限制）
-        assert response.status_code in [200, 429], f"Expected 200 or 429, got {response.status_code}，{response.text}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}，{response.text}"
 
         if response.status_code == 200:
             # 保存 token 供后续测试使用
@@ -163,7 +163,7 @@ class TestAuthFlow:
 
         response = make_request_with_retry(request_func)
         # 允许 200 或 401（token 可能已失效）
-        assert response.status_code in [200, 401], f"Expected 200 or 401, got {response.status_code}，{response.text}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}，{response.text}"
         if response.status_code == 200:
             print("✓ 刷新商家令牌成功")
         else:
@@ -202,7 +202,7 @@ class TestAuthFlow:
 
         response = make_request_with_retry(request_func)
         # 允许 200 或 401（token 可能已失效）
-        assert response.status_code in [200, 401], f"Expected 200 or 401, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         if response.status_code == 200:
             print("✓ 商家登出成功")
         else:
@@ -311,7 +311,7 @@ class TestAuthFlow:
         # 400: 请求参数错误（可能是功能未实现或参数不正确）
         # 404: 端点不存在（可能是功能未实现）
         # 401: 权限不足或token失效
-        assert response.status_code in [200, 400, 404, 401], f"Expected 200, 400, 404 or 401, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         if response.status_code == 200:
             print("[OK] 成功获取临时令牌")

@@ -27,7 +27,7 @@ class TestAdminUserAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 409]
+        assert response.status_code == 200
 
     def test_get_user_list(self, admin_token):
         """测试获取用户列表"""

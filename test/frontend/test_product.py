@@ -35,18 +35,19 @@ class FrontendProductHelper:
         return make_request_with_retry(request_func)
 
     @staticmethod
-    def get_product_detail(product_id, token):
+    def get_product_detail(product_id, shop_id, token):
         """测试获取商品详情
 
         Args:
             product_id: 商品ID
+            shop_id: 店铺ID
             token: 认证token
 
         Returns:
             response: HTTP响应对象
         """
         url = f"{API_BASE_URL}/product/detail"
-        params = {"id": product_id}
+        params = {"id": product_id, "shop_id": shop_id}
         headers = {"Authorization": f"Bearer {token}"}
 
         def request_func():

@@ -58,7 +58,7 @@ class TestFrontendFlow:
             return requests.post(url, json=payload)
 
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 409], f"Expected 200 or 409, got {response.status_code}，text: {response.text}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
         if response.status_code == 200:
             data = response.json()
@@ -133,8 +133,18 @@ class TestFrontendFlow:
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
         data = response.json()
+        print(f"创建店铺响应数据: {data}")
+        
         shop_data = data.get("data", {})
-        TestFrontendFlow.frontend_shop_id = int(shop_data.get("id") or data.get("id") or data.get("shop_id"))
+        shop_id = shop_data.get("id") or data.get("id") or data.get("shop_id")
+        
+        if shop_id is None:
+            print("⚠ 未能从响应中获取店铺ID")
+            print(f"完整响应: {data}")
+            pytest.fail("创建店铺成功但未能获取店铺ID")
+            return
+        
+        TestFrontendFlow.frontend_shop_id = int(shop_id)
         print(f"✓ 成功创建店铺，ID: {TestFrontendFlow.frontend_shop_id}")
 
     def test_create_product(self, admin_token):
@@ -257,7 +267,7 @@ class TestFrontendFlow:
 
         response = make_request_with_retry(request_func)
         # 允许 400, 401, 404 状态码，因为订单可能不存在
-        assert response.status_code in [200, 400, 401, 404], f"Expected 200, 400, 401 or 404, got {response.status_code}，text: {response.text}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取订单详情成功")
@@ -283,7 +293,7 @@ class TestFrontendFlow:
 
         response = make_request_with_retry(request_func)
         # 允许 200, 401, 404 状态码，因为订单可能不存在或已删除
-        assert response.status_code in [200, 401, 404], f"Expected 200, 401 or 404, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
         if response.status_code == 200:
             print("✓ 删除订单成功")
@@ -297,14 +307,14 @@ class TestFrontendFlow:
         print("\n========== 获取店铺详情测试 ==========")
 
         url = f"{API_BASE_URL}/shop/detail"
-        params = {"id": TestFrontendFlow.frontend_shop_id if TestFrontendFlow.frontend_shop_id else 1}
+        params = {"shop_id": TestFrontendFlow.frontend_shop_id if TestFrontendFlow.frontend_shop_id else 1}
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404], f"Expected 200, 400, 401 or 404, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取店铺详情成功")
@@ -315,18 +325,23 @@ class TestFrontendFlow:
         """测试获取店铺图片"""
         print("\n========== 获取店铺图片测试 ==========")
 
+        # 注意：图片接口需要 path 参数，而不是 id
+        # 由于测试中没有上传图片，此测试会返回404，这是预期的
         url = f"{API_BASE_URL}/shop/image"
-        params = {"id": TestFrontendFlow.frontend_shop_id if TestFrontendFlow.frontend_shop_id else 1}
+        params = {"path": ""}  # 空路径会导致404，这是预期的
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404], f"Expected 200, 400, 401 or 404, got {response.status_code}"
+        # 允许 200（成功）或 404（图片不存在）状态码
+        assert response.status_code in [200, 404], f"Expected 200 or 404, got {response.status_code}, text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取店铺图片成功")
+        elif response.status_code == 404:
+            print("✓ 图片不存在（测试中未上传图片）")
         else:
             print("⚠ 获取店铺图片失败")
 
@@ -334,15 +349,24 @@ class TestFrontendFlow:
         """测试获取店铺标签列表"""
         print("\n========== 获取店铺标签列表测试 ==========")
 
-        shop_id = TestFrontendFlow.frontend_shop_id if TestFrontendFlow.frontend_shop_id else 1
+        # 确保 frontend_shop_id 已被设置
+        if not TestFrontendFlow.frontend_shop_id:
+            print("⚠ frontend_shop_id 未设置，跳过此测试")
+            pytest.skip("frontend_shop_id 未设置，请确保 test_create_shop 先执行")
+            return
+
+        shop_id = TestFrontendFlow.frontend_shop_id
         url = f"{API_BASE_URL}/shop/{shop_id}/tags"
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
+
+        print(f"请求URL: {url}")
+        print(f"shop_id: {shop_id} (type: {type(shop_id)})")
 
         def request_func():
             return requests.get(url, headers=headers)
 
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404], f"Expected 200, 400, 401 or 404, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取店铺标签成功")
@@ -353,10 +377,17 @@ class TestFrontendFlow:
         """测试获取商品列表"""
         print("\n========== 获取商品列表测试 ==========")
 
+        # 确保 frontend_shop_id 已被设置
+        if not TestFrontendFlow.frontend_shop_id:
+            print("⚠ frontend_shop_id 未设置，跳过此测试")
+            pytest.skip("frontend_shop_id 未设置，请确保 test_create_shop 先执行")
+            return
+
         url = f"{API_BASE_URL}/product/list"
         params = {
             "page": 1,
-            "pageSize": 10
+            "pageSize": 10,
+            "shop_id": str(TestFrontendFlow.frontend_shop_id)
         }
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
@@ -364,7 +395,7 @@ class TestFrontendFlow:
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401], f"Expected 200, 400 or 401, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取商品列表成功")
@@ -386,7 +417,7 @@ class TestFrontendFlow:
 
         response = make_request_with_retry(request_func)
         print(f"获取商品详情响应码: {response.status_code}，响应内容: {response.text}")
-        assert response.status_code in [200, 404], f"Expected 200 or 404, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
         if response.status_code == 200:
             json_data = response.json()
@@ -409,24 +440,22 @@ class TestFrontendFlow:
         """测试获取商品图片"""
         print("\n========== 获取商品图片测试 ==========")
 
+        # 注意：图片接口需要 path 参数，而不是 id
+        # 由于测试中没有上传图片，此测试会返回404，这是预期的
         url = f"{API_BASE_URL}/product/image"
-        params = {"id": TestFrontendFlow.frontend_product_id if TestFrontendFlow.frontend_product_id else 1}
+        params = {"path": ""}  # 空路径会导致404，这是预期的
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
             return requests.get(url, params=params, headers=headers, allow_redirects=False)  # 禁用自动重定向
 
         response = make_request_with_retry(request_func)
-        # 允许 200, 301, 302, 307, 429 状态码
-        # 301/302/307 表示重定向，429表示请求过于频繁
-        allowed_status_codes = [200, 301, 302, 307, 429]
-        assert response.status_code in allowed_status_codes, f"Expected {allowed_status_codes}, got {response.status_code}, text: {response.text}"
+        # 允许 200（成功）或 404（图片不存在）状态码
+        assert response.status_code in [200, 404], f"Expected 200 or 404, got {response.status_code}, text: {response.text}"
 
         if response.status_code == 200:
             print("✓ 获取商品图片成功")
-        elif response.status_code in [302, 307]:
-            print(f"⚠ 获取商品图片重定向到: {response.headers.get('Location', '未知位置')}")
-        elif response.status_code == 429:
-            print("⚠ 获取商品图片失败：请求过于频繁（频率限制）")
+        elif response.status_code == 404:
+            print("✓ 图片不存在（测试中未上传图片）")
         else:
             print(f"⚠ 获取商品图片失败（状态码: {response.status_code}）")

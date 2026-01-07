@@ -24,7 +24,7 @@ class TestAdminTagAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401]
+        assert response.status_code == 200
 
     def test_batch_tag_products(self, admin_token):
         """测试批量给商品打标签"""
@@ -39,7 +39,7 @@ class TestAdminTagAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401]
+        assert response.status_code == 200
 
     def test_get_bound_tags(self, admin_token, test_product_id, test_shop_id):
         """测试获取商品已绑定的标签"""

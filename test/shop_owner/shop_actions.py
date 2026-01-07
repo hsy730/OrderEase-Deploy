@@ -31,7 +31,7 @@ def get_shop_detail(shop_owner_token, shop_id):
 
     response = make_request_with_retry(request_func)
     print(f"获取店铺详情响应状态码: {response.status_code}, 响应内容: {response.text}")
-    if response.status_code in [200, 400, 401, 404]:
+    if response.status_code == 200:
         return response.json()
     return None
 
@@ -55,7 +55,7 @@ def get_shop_image(shop_owner_token, shop_id):
 
     response = make_request_with_retry(request_func)
     print(f"获取店铺图片响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code in [200, 400, 401, 404]
+    return response.status_code == 200
 
 
 def update_shop(shop_owner_token, shop_id, name="Updated Shop Name", description="Updated description", owner_username="shop1"):

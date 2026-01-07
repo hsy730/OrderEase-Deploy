@@ -22,7 +22,7 @@ class FrontendShopHelper:
             response: HTTP响应对象
         """
         url = f"{API_BASE_URL}/shop/detail"
-        params = {"id": shop_id}
+        params = {"shop_id": shop_id}
         headers = {"Authorization": f"Bearer {token}"}
 
         def request_func():
@@ -31,18 +31,18 @@ class FrontendShopHelper:
         return make_request_with_retry(request_func)
 
     @staticmethod
-    def get_shop_image(shop_id, token):
+    def get_shop_image(path, token):
         """测试获取店铺图片
 
         Args:
-            shop_id: 店铺ID
+            path: 图片文件路径
             token: 认证token
 
         Returns:
             response: HTTP响应对象
         """
         url = f"{API_BASE_URL}/shop/image"
-        params = {"id": shop_id}
+        params = {"path": path}
         headers = {"Authorization": f"Bearer {token}"}
 
         def request_func():

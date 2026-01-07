@@ -44,7 +44,7 @@ def create_user(shop_owner_token, name=None, password="Admin@123456", user_type=
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    if response.status_code in [200, 400, 401, 409]:
+    if response.status_code == 200:
         data = response.json()
         return data.get("id") or data.get("user_id")
     return None
