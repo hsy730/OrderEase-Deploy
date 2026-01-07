@@ -1,10 +1,12 @@
+# 该文件已被重构为 order_actions.py，仅保留用于参考，不再作为测试执行
+__test__ = False
+
 import pytest
 import requests
 
 from conftest import API_BASE_URL, make_request_with_retry, assert_response_status
 
 
-@pytest.mark.skip(reason="业务流程测试已整合到 test_business_flow.py 中")
 class TestAdminOrderAPI:
     """管理员订单管理接口测试"""
 
@@ -100,7 +102,7 @@ class TestAdminOrderAPI:
         payload = {
             "id": str(test_order_id) if test_order_id else "2006670542223970304",
             "shop_id": int(test_shop_id) if test_shop_id else 7,
-            "next_status": 2
+            "next_status": 10
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
         

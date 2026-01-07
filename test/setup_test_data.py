@@ -56,7 +56,7 @@ def get_admin_token():
     url = f"{API_BASE_URL}/login"
     payload = {
         "username": "admin",
-        "password": "NewPassword@123"
+        "password": "Admin@123456"
     }
     
     def request_func():

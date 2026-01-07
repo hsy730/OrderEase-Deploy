@@ -1,0 +1,315 @@
+{
+  "failed_test_cases_summary": {
+    "total_failed": 42,
+    "report_generated_at": "2026-01-01 21:02:35",
+    "test_run_duration": "00:00:45",
+    "total_tests_run": 88
+  },
+  "failed_test_cases": [
+    {
+      "test_name": "admin/test_order.py::TestAdminOrderAPI::test_toggle_order_status",
+      "status_code": 400,
+      "response_body": "{\"error\":\"无效的请求参数\"}",
+      "url": "http://localhost:8080/api/order-ease/v1/admin/order/toggle-status",
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_get_product_list",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_get_product_detail",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_update_product",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_delete_product",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_upload_product_image",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_toggle_product_status",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_product.py::TestAdminProductAPI::test_get_product_image",
+      "status_code": 429,
+      "response_body": null,
+      "url": null,
+      "error_type": "Too Many Requests"
+    },
+    {
+      "test_name": "admin/test_shop.py::TestAdminShopAPI::test_delete_shop",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_shop.py::TestAdminShopAPI::test_upload_shop_image",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_shop.py::TestAdminShopAPI::test_get_shop_image",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_shop.py::TestAdminShopAPI::test_get_shop_temp_token",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_shop.py::TestAdminShopAPI::test_update_order_status_flow",
+      "status_code": 404,
+      "response_body": null,
+      "url": null,
+      "error_type": "Not Found"
+    },
+    {
+      "test_name": "admin/test_tag.py::TestAdminTagAPI::test_get_bound_tags",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_tag.py::TestAdminTagAPI::test_get_online_products",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_tag.py::TestAdminTagAPI::test_get_unbound_tags",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "admin/test_user.py::TestAdminUserAPI::test_get_user_detail",
+      "status_code": 404,
+      "response_body": null,
+      "url": null,
+      "error_type": "Not Found"
+    },
+    {
+      "test_name": "admin/test_user.py::TestAdminUserAPI::test_update_user",
+      "status_code": 400,
+      "response_body": null,
+      "url": null,
+      "error_type": "Bad Request"
+    },
+    {
+      "test_name": "auth/test_login.py::TestLogin::test_universal_login_shop_owner",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "auth/test_refresh_token.py::TestRefreshToken::test_refresh_shop_token",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "frontend/test_auth.py::TestFrontendAuth::test_frontend_user_login",
+      "status_code": 429,
+      "response_body": null,
+      "url": null,
+      "error_type": "Too Many Requests"
+    },
+    {
+      "test_name": "frontend/test_auth.py::TestFrontendAuth::test_check_username_exists",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "frontend/test_order.py::TestFrontendOrder::test_create_order",
+      "status_code": 401,
+      "response_body": "{\"error\":\"token已失效\"}",
+      "url": "http://localhost:8080/api/order-ease/v1/order/create",
+      "error_type": "Unauthorized - Token Expired"
+    },
+    {
+      "test_name": "frontend/test_order.py::TestFrontendOrder::test_get_user_order_list",
+      "status_code": 401,
+      "response_body": "{\"error\":\"token已失效\"}",
+      "url": "http://localhost:8080/api/order-ease/v1/order/user/list?page=1&pageSize=10",
+      "error_type": "Unauthorized - Token Expired"
+    },
+    {
+      "test_name": "frontend/test_order.py::TestFrontendOrder::test_get_order_detail",
+      "status_code": 401,
+      "response_body": "{\"error\":\"token已失效\"}",
+      "url": "http://localhost:8080/api/order-ease/v1/order/detail?orderId=1",
+      "error_type": "Unauthorized - Token Expired"
+    },
+    {
+      "test_name": "frontend/test_order.py::TestFrontendOrder::test_delete_order",
+      "status_code": 401,
+      "response_body": "{\"error\":\"token已失效\"}",
+      "url": "http://localhost:8080/api/order-ease/v1/order/delete?orderId=1",
+      "error_type": "Unauthorized - Token Expired"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_list",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_detail",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_update_product",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_delete_product",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_upload_product_image",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_toggle_product_status",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_product.py::TestShopOwnerProductAPI::test_get_product_image",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_shop.py::TestShopOwnerShopAPI::test_update_shop",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_shop.py::TestShopOwnerShopAPI::test_update_order_status_flow",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_tag.py::TestShopOwnerTagAPI::test_get_bound_tags",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_tag.py::TestShopOwnerTagAPI::test_get_online_products",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_tag.py::TestShopOwnerTagAPI::test_get_unbound_tags",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_user.py::TestShopOwnerUserAPI::test_get_user_list",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_user.py::TestShopOwnerUserAPI::test_get_user_simple_list",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_user.py::TestShopOwnerUserAPI::test_get_user_detail",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    },
+    {
+      "test_name": "shop_owner/test_user.py::TestShopOwnerUserAPI::test_update_user",
+      "status_code": 401,
+      "response_body": null,
+      "url": null,
+      "error_type": "Unauthorized"
+    }
+  ],
+  "error_summary": {
+    "401_Unauthorized": 26,
+    "400_Bad_Request": 12,
+    "429_Too_Many_Requests": 2,
+    "404_Not_Found": 2
+  },
+  "common_issues": [
+    "Token expiration issues causing 401 errors",
+    "Bad request errors (400) for various admin API endpoints",
+    "Rate limiting causing 429 errors for product image and user login endpoints"
+  ]
+}

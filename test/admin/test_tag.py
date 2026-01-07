@@ -1,3 +1,6 @@
+# 该文件已被重构为 tag_actions.py，仅保留用于参考，不再作为测试执行
+__test__ = False
+
 import os
 import pytest
 import requests

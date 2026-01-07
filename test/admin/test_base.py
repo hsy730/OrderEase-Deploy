@@ -1,3 +1,6 @@
+# 该文件已被重构到 test_business_flow.py 中，仅保留用于参考，不再作为测试执行
+__test__ = False
+
 import pytest
 import requests
 

@@ -1,43 +1,70 @@
-import pytest
+"""
+前端店铺静态方法
+"""
+
 import requests
 
 from conftest import API_BASE_URL, make_request_with_retry
 
 
-class TestFrontendShop:
-    """前端店铺测试"""
+class FrontendShopHelper:
+    """前端店铺辅助类 - 提供静态方法"""
 
-    def test_get_shop_detail(self, admin_token):
-        """测试获取店铺详情"""
+    @staticmethod
+    def get_shop_detail(shop_id, token):
+        """测试获取店铺详情
+
+        Args:
+            shop_id: 店铺ID
+            token: 认证token
+
+        Returns:
+            response: HTTP响应对象
+        """
         url = f"{API_BASE_URL}/shop/detail"
-        params = {"id": 1}
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        
+        params = {"id": shop_id}
+        headers = {"Authorization": f"Bearer {token}"}
+
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
-        response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404]
 
-    def test_get_shop_image(self, admin_token):
-        """测试获取店铺图片"""
+        return make_request_with_retry(request_func)
+
+    @staticmethod
+    def get_shop_image(shop_id, token):
+        """测试获取店铺图片
+
+        Args:
+            shop_id: 店铺ID
+            token: 认证token
+
+        Returns:
+            response: HTTP响应对象
+        """
         url = f"{API_BASE_URL}/shop/image"
-        params = {"id": 1}
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        
+        params = {"id": shop_id}
+        headers = {"Authorization": f"Bearer {token}"}
+
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
-        response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404]
 
-    def test_get_shop_tags(self, admin_token):
-        """测试获取店铺标签列表"""
-        url = f"{API_BASE_URL}/shop/1/tags"
-        headers = {"Authorization": f"Bearer {admin_token}"}
-        
+        return make_request_with_retry(request_func)
+
+    @staticmethod
+    def get_shop_tags(shop_id, token):
+        """测试获取店铺标签列表
+
+        Args:
+            shop_id: 店铺ID
+            token: 认证token
+
+        Returns:
+            response: HTTP响应对象
+        """
+        url = f"{API_BASE_URL}/shop/{shop_id}/tags"
+        headers = {"Authorization": f"Bearer {token}"}
+
         def request_func():
             return requests.get(url, headers=headers)
-        
-        response = make_request_with_retry(request_func)
-        assert response.status_code in [200, 400, 401, 404]
+
+        return make_request_with_retry(request_func)

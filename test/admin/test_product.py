@@ -1,3 +1,6 @@
+# 该文件已被重构为 product_actions.py，仅保留用于参考，不再作为测试执行
+__test__ = False
+
 import os
 import pytest
 import requests
@@ -5,7 +8,6 @@ import requests
 from conftest import API_BASE_URL, make_request_with_retry
 
 
-@pytest.mark.skip(reason="业务流程测试已整合到 test_business_flow.py 中")
 class TestAdminProductAPI:
     """管理员商品管理接口测试"""
 
@@ -69,7 +71,7 @@ class TestAdminProductAPI:
     def test_get_product_detail(self, admin_token, test_product_id, test_shop_id):
         """测试获取商品详情"""
         url = f"{API_BASE_URL}/admin/product/detail"
-        params = {"id": test_product_id if test_product_id else 1, "shop_id": test_shop_id if test_shop_id else 1}
+        params = {"id": test_product_id if test_product_id else 1, "shop_id": int(test_shop_id) if test_shop_id else 1}
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():

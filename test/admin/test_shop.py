@@ -1,3 +1,6 @@
+# 该文件已被重构为 shop_actions.py，仅保留用于参考，不再作为测试执行
+__test__ = False
+
 import os
 import pytest
 import requests
@@ -5,7 +8,6 @@ import requests
 from conftest import API_BASE_URL, make_request_with_retry
 
 
-@pytest.mark.skip(reason="业务流程测试已整合到 test_business_flow.py 中")
 class TestAdminShopAPI:
     """管理员店铺管理接口测试"""
 
@@ -15,7 +17,9 @@ class TestAdminShopAPI:
         payload = {
             "name": f"Test Shop {os.urandom(4).hex()}",
             "description": "Test shop description",
-            "address": "Test address"
+            "address": "Test address",
+            "owner_username": f"shop_owner_{os.urandom(4).hex()}",
+            "owner_password": "TestPassword123"
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
         
@@ -23,6 +27,7 @@ class TestAdminShopAPI:
             return requests.post(url, json=payload, headers=headers)
         
         response = make_request_with_retry(request_func)
+        print(f"创建店铺响应码: {response.status_code}，响应内容: {response.text}")
         assert response.status_code == 200
 
     def test_update_shop(self, admin_token, test_shop_id):
@@ -69,22 +74,6 @@ class TestAdminShopAPI:
         
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
-
-    def test_delete_shop(self, admin_token, test_shop_id):
-        """测试删除店铺"""
-        url = f"{API_BASE_URL}/admin/shop/delete"
-        params = {"shop_id": test_shop_id if test_shop_id else 999}
-        headers = {"Authorization": f"Bearer {admin_token}"}
-            
-        def request_func():
-            return requests.delete(url, params=params, headers=headers)
-            
-        response = make_request_with_retry(request_func)
-        try:
-            assert response.status_code == 200
-        except AssertionError:
-            print(f"删除店铺失败，请求参数: {params}, 状态码: {response.status_code}, 响应内容: {response.text}")
-            raise
 
     def test_upload_shop_image(self, admin_token, test_shop_id):
         """测试上传店铺图片"""
@@ -193,3 +182,64 @@ class TestAdminShopAPI:
         
         response = make_request_with_retry(request_func)
         assert response.status_code == 200
+
+
+    def test_delete_shop(self, admin_token, test_shop_id):
+        """测试删除店铺"""
+        shop_id = test_shop_id if test_shop_id else 999
+        headers = {"Authorization": f"Bearer {admin_token}"}
+
+        # 先删除该店铺下的所有商品
+        product_list_url = f"{API_BASE_URL}/admin/product/list"
+        product_list_params = {
+            "shop_id": shop_id,
+            "page": 1,
+            "pageSize": 100
+        }
+
+        def get_products_func():
+            return requests.get(product_list_url, params=product_list_params, headers=headers)
+
+        product_list_response = make_request_with_retry(get_products_func)
+
+        if product_list_response.status_code == 200:
+            try:
+                products_data = product_list_response.json()
+                products = products_data.get('list', products_data.get('data', []))
+
+                # 删除所有商品
+                for product in products:
+                    product_id = product.get('id')
+                    if product_id:
+                        delete_product_url = f"{API_BASE_URL}/admin/product/delete"
+                        delete_product_params = {
+                            "id": product_id,
+                            "shop_id": shop_id
+                        }
+
+                        def delete_product_func():
+                            return requests.delete(delete_product_url, params=delete_product_params, headers=headers)
+
+                        delete_product_response = make_request_with_retry(delete_product_func)
+                        print(f"删除商品 {product_id}, 状态码: {delete_product_response.status_code}")
+
+                print(f"已删除店铺 {shop_id} 下的所有商品")
+            except Exception as e:
+                print(f"获取或删除商品列表失败: {str(e)}")
+        else:
+            print(f"获取商品列表失败，状态码: {product_list_response.status_code}")
+
+        # 删除店铺
+        url = f"{API_BASE_URL}/admin/shop/delete"
+        params = {"shop_id": shop_id}
+
+        def request_func():
+            return requests.delete(url, params=params, headers=headers)
+
+        response = make_request_with_retry(request_func)
+        try:
+            assert response.status_code == 200
+        except AssertionError:
+            print(f"删除店铺失败，请求参数: {params}, 状态码: {response.status_code}, 响应内容: {response.text}")
+            raise
+
