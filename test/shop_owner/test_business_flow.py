@@ -304,8 +304,8 @@ class TestShopOwnerBusinessFlow:
             assert user_id is not None, "创建用户失败"
             print(f"[OK] 创建用户成功，ID: {user_id}")
         except Exception as e:
-            print(f"[WARN] 创建用户测试跳过: {e}")
-            pytest.skip(f"创建用户测试跳过: {e}")
+            print(f"✗ 创建用户测试失败: {e}")
+            pytest.fail(f"创建用户测试失败: {e}")
 
     def test_get_user_list(self):
         """测试获取用户列表"""
@@ -331,8 +331,8 @@ class TestShopOwnerBusinessFlow:
             assert result is not None, "获取用户详情失败"
             print("[OK] 获取用户详情成功")
         except Exception as e:
-            print(f"[WARN] 获取用户详情测试跳过: {e}")
-            pytest.skip(f"获取用户详情测试跳过: {e}")
+            print(f"✗ 获取用户详情测试失败: {e}")
+            pytest.fail(f"获取用户详情测试失败: {e}")
 
     def test_update_user(self):
         """测试更新用户信息"""

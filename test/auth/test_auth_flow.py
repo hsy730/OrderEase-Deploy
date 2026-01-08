@@ -50,8 +50,8 @@ class TestAuthFlow:
         if response.status_code == 200:
             print("✓ 管理员登录成功")
         elif response.status_code == 429:
-            print("⚠ 管理员登录频率限制，跳过此测试")
-            pytest.skip("登录频率限制，跳过此测试")
+            print("✗ 管理员登录频率限制，测试失败")
+            pytest.fail(f"管理员登录频率限制，测试失败。状态码: {response.status_code}, 响应: {response.text}")
 
     def test_universal_login_shop_owner(self, admin_token):
         """测试商家登录
@@ -126,9 +126,8 @@ class TestAuthFlow:
             TestAuthFlow.shop_owner_token_value = login_data.get("token", "")
             print(f"✓ 商家登录成功，token: {TestAuthFlow.shop_owner_token_value[:20]}...")
         elif response.status_code == 429:
-            print("⚠ 商家登录频率限制，跳过后续依赖此token的测试")
-            # 设置一个虚拟token，让后续测试可以跳过
-            TestAuthFlow.shop_owner_token_value = "dummy_token_for_skip"
+            print("✗ 商家登录频率限制，测试失败")
+            pytest.fail(f"商家登录频率限制，测试失败。状态码: {response.status_code}, 响应: {response.text}")
 
     # ==================== 刷新令牌测试 ====================
 
@@ -151,9 +150,9 @@ class TestAuthFlow:
         使用 test_universal_login_shop_owner 获取的 token
         """
         print("\n========== 刷新商家令牌测试 ==========")
-        if not TestAuthFlow.shop_owner_token_value or TestAuthFlow.shop_owner_token_value == "dummy_token_for_skip":
-            print("⚠ 商家token未设置或为虚拟token，跳过刷新令牌测试")
-            pytest.skip("商家token未设置或为虚拟token，跳过此测试")
+        if not TestAuthFlow.shop_owner_token_value:
+            print("✗ 商家token未设置，测试失败")
+            pytest.fail("商家token未设置，测试失败。请确保test_universal_login_shop_owner测试成功执行")
 
         url = f"{API_BASE_URL}/shop/refresh-token"
         headers = {"Authorization": f"Bearer {TestAuthFlow.shop_owner_token_value}"}
@@ -190,9 +189,9 @@ class TestAuthFlow:
         使用 test_universal_login_shop_owner 获取的 token
         """
         print("\n========== 商家登出测试 ==========")
-        if not TestAuthFlow.shop_owner_token_value or TestAuthFlow.shop_owner_token_value == "dummy_token_for_skip":
-            print("⚠ 商家token未设置或为虚拟token，跳过登出测试")
-            pytest.skip("商家token未设置或为虚拟token，跳过此测试")
+        if not TestAuthFlow.shop_owner_token_value:
+            print("✗ 商家token未设置，测试失败")
+            pytest.fail("商家token未设置，测试失败。请确保test_universal_login_shop_owner测试成功执行")
 
         url = f"{API_BASE_URL}/shopOwner/logout"
         headers = {"Authorization": f"Bearer {TestAuthFlow.shop_owner_token_value}"}
@@ -230,14 +229,14 @@ class TestAuthFlow:
         
         admin_response = make_request_with_retry(admin_request_func)
         if admin_response.status_code != 200:
-            print(f"[WARN] 管理员登录失败: {admin_response.status_code}, {admin_response.text}")
-            pytest.skip("无法获取管理员token，跳过临时令牌测试")
+            print(f"✗ 管理员登录失败: {admin_response.status_code}, {admin_response.text}")
+            pytest.fail(f"无法获取管理员token，测试失败。状态码: {admin_response.status_code}, 响应: {admin_response.text}")
         
         admin_data = admin_response.json()
         admin_token_value = admin_data.get("token", "")
         if not admin_token_value:
-            print("[WARN] 未能获取管理员token")
-            pytest.skip("无法获取管理员token，跳过临时令牌测试")
+            print("✗ 未能获取管理员token")
+            pytest.fail("无法获取管理员token，测试失败")
         
         print(f"[OK] 重新获取管理员token成功")
         
@@ -245,8 +244,8 @@ class TestAuthFlow:
         shop_id = TestAuthFlow.shop_owner_shop_id_value
         token = TestAuthFlow.shop_owner_token_value
         
-        if not shop_id or not token or token == "dummy_token_for_skip":
-            print("[WARN] 店铺ID或token不存在，尝试创建店铺")
+        if not shop_id or not token:
+            print("⚠ 店铺ID或token不存在，尝试创建新店铺...")
             # 创建店铺
             shop_url = f"{API_BASE_URL}/admin/shop/create"
             import os
@@ -272,11 +271,11 @@ class TestAuthFlow:
                 shop_id = shop_data.get("id") or shop_data.get("shop_id") or shop_data.get("data", {}).get("id")
                 print(f"[OK] 成功创建店铺，ID: {shop_id}, 响应: {shop_data}")
                 if not shop_id:
-                    print(f"[WARN] 无法从响应中获取店铺ID，完整响应: {shop_data}")
-                    pytest.skip("无法获取店铺ID，跳过临时令牌测试")
+                    print(f"✗ 无法从响应中获取店铺ID，完整响应: {shop_data}")
+                    pytest.fail(f"无法获取店铺ID，测试失败。完整响应: {shop_data}")
             else:
-                print(f"[WARN] 创建店铺失败: {shop_response.status_code}, {shop_response.text}")
-                pytest.skip("无法创建店铺，跳过临时令牌测试")
+                print(f"✗ 创建店铺失败: {shop_response.status_code}, {shop_response.text}")
+                pytest.fail(f"无法创建店铺，测试失败。状态码: {shop_response.status_code}, 响应: {shop_response.text}")
             
             # 登录获取token
             login_url = f"{API_BASE_URL}/login"
@@ -294,8 +293,8 @@ class TestAuthFlow:
                 token = login_data.get("token", "")
                 print(f"[OK] 成功获取token")
             else:
-                print(f"[WARN] 登录失败: {login_response.status_code}, {login_response.text}")
-                pytest.skip("无法获取token，跳过临时令牌测试")
+                print(f"✗ 登录失败: {login_response.status_code}, {login_response.text}")
+                pytest.fail(f"无法获取token，测试失败。状态码: {login_response.status_code}, 响应: {login_response.text}")
 
         # 尝试商家端点
         url = f"{API_BASE_URL}/shopOwner/shop/temp-token"

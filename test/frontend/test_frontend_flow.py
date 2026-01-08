@@ -399,9 +399,8 @@ class TestFrontendFlow:
 
         # 确保 frontend_shop_id 已被设置
         if not TestFrontendFlow.frontend_shop_id:
-            print("⚠ frontend_shop_id 未设置，跳过此测试")
-            pytest.skip("frontend_shop_id 未设置，请确保 test_create_shop 先执行")
-            return
+            print("✗ frontend_shop_id 未设置，测试失败")
+            pytest.fail("frontend_shop_id 未设置，测试失败。请确保 test_create_shop 先执行")
 
         shop_id = TestFrontendFlow.frontend_shop_id
         url = f"{API_BASE_URL}/shop/{shop_id}/tags"
@@ -427,9 +426,8 @@ class TestFrontendFlow:
 
         # 确保 frontend_shop_id 已被设置
         if not TestFrontendFlow.frontend_shop_id:
-            print("⚠ frontend_shop_id 未设置，跳过此测试")
-            pytest.skip("frontend_shop_id 未设置，请确保 test_create_shop 先执行")
-            return
+            print("✗ frontend_shop_id 未设置，测试失败")
+            pytest.fail("frontend_shop_id 未设置，测试失败。请确保 test_create_shop 先执行")
 
         url = f"{API_BASE_URL}/product/list"
         params = {
