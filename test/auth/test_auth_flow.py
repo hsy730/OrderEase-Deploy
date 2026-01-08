@@ -6,7 +6,7 @@
 2. 店主登录（依赖于 shop_owner_token fixture，它会创建店铺）
 3. 店主刷新令牌
 4. 店主登出
-5. 管理员登出
+5. 管理员登出（最后执行，避免影响其他测试）
 """
 
 import pytest
@@ -170,8 +170,8 @@ class TestAuthFlow:
 
     # ==================== 登出测试 ====================
 
-    def test_admin_logout(self, admin_token):
-        """测试管理员登出"""
+    def test_z_admin_logout(self, admin_token):
+        """测试管理员登出（最后执行）"""
         print("\n========== 管理员登出测试 ==========")
         url = f"{API_BASE_URL}/admin/logout"
         headers = {"Authorization": f"Bearer {admin_token}"}

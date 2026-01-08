@@ -157,3 +157,25 @@ def update_user(admin_token, user_id, name=None, address=None):
     response = make_request_with_retry(request_func)
     print(f"更新用户响应码: {response.status_code}，响应内容: {response.text}")
     return response.status_code == 200
+
+
+def delete_user(admin_token, user_id):
+    """删除用户
+
+    Args:
+        admin_token: 管理员令牌
+        user_id: 用户ID
+
+    Returns:
+        bool: 是否删除成功
+    """
+    url = f"{API_BASE_URL}/admin/user/delete"
+    params = {"id": user_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.delete(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"删除用户响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200

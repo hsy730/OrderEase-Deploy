@@ -193,3 +193,74 @@ def delete_order(admin_token, order_id, shop_id):
     response = make_request_with_retry(request_func)
     print(f"删除订单响应码: {response.status_code}，响应内容: {response.text}")
     return response.status_code == 200
+
+
+def get_order_status_flow(admin_token, order_id, shop_id):
+    """获取订单状态流转
+
+    Args:
+        admin_token: 管理员令牌
+        order_id: 订单ID
+        shop_id: 店铺ID
+
+    Returns:
+        dict: 订单状态流转信息，失败返回None
+    """
+    url = f"{API_BASE_URL}/admin/order/status-flow"
+    params = {"orderId": str(order_id), "shopId": str(shop_id)}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"获取订单状态流转响应码: {response.status_code}，响应内容: {response.text}")
+    if response.status_code == 200:
+        return response.json().get("data")
+    return None
+
+
+def advance_search_order(admin_token, shop_id=None, user_id=None, status=None, 
+                         start_date=None, end_date=None, page=1, page_size=10):
+    """高级搜索订单
+
+    Args:
+        admin_token: 管理员令牌
+        shop_id: 店铺ID（可选）
+        user_id: 用户ID（可选）
+        status: 订单状态（可选）
+        start_date: 开始日期（可选）
+        end_date: 结束日期（可选）
+        page: 页码
+        page_size: 每页数量
+
+    Returns:
+        dict: 搜索结果，失败返回None
+    """
+    url = f"{API_BASE_URL}/admin/order/advance-search"
+    payload = {
+        "page": page,
+        "pageSize": page_size
+    }
+    
+    if shop_id:
+        payload["shop_id"] = str(shop_id)
+    if user_id:
+        payload["user_id"] = str(user_id)
+    if status is not None:
+        payload["status"] = status
+    if start_date:
+        payload["start_date"] = start_date
+    if end_date:
+        payload["end_date"] = end_date
+    
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.post(url, json=payload, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"高级搜索订单响应码: {response.status_code}，响应内容: {response.text}")
+    if response.status_code == 200:
+        return response.json()
+    return None

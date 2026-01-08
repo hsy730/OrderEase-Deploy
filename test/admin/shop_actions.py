@@ -301,3 +301,29 @@ def check_shop_name_exists(admin_token, name):
     if response.status_code == 200:
         return response.json()
     return None
+
+
+def update_order_status_flow(admin_token, shop_id, status_flow):
+    """更新订单状态流转配置
+
+    Args:
+        admin_token: 管理员令牌
+        shop_id: 店铺ID
+        status_flow: 状态流转配置，格式: [{"from_status": 1, "to_status": 2, "condition": ""}, ...]
+
+    Returns:
+        bool: 是否更新成功
+    """
+    url = f"{API_BASE_URL}/admin/shop/update-order-status-flow"
+    payload = {
+        "shop_id": shop_id,
+        "status_flow": status_flow
+    }
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.put(url, json=payload, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"更新订单状态流转响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200

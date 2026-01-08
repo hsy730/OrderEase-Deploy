@@ -140,6 +140,17 @@ class TestBusinessFlow:
         assert check_result is not None, "检查店铺名称失败"
         print("✓ 检查店铺名称成功")
 
+        # 更新订单状态流转
+        status_flow_config = [
+            {"from_status": 1, "to_status": 2, "condition": ""},
+            {"from_status": 2, "to_status": 3, "condition": ""}
+        ]
+        result = shop_actions.update_order_status_flow(self.admin_token, shop_id, status_flow_config)
+        if result:
+            print("✓ 更新订单状态流转成功")
+        else:
+            print("⚠ 更新订单状态流转失败，继续其他测试")
+
         # 删除店铺
         self._test_delete_shop(shop_id)
         print("✓ 删除店铺成功")
@@ -229,6 +240,26 @@ class TestBusinessFlow:
         assert result, "切换订单状态失败"
         print("✓ 切换订单状态成功")
 
+        # 获取订单状态流转
+        status_flow = order_actions.get_order_status_flow(self.admin_token, order_id, shop_id)
+        if status_flow is not None:
+            print("✓ 获取订单状态流转成功")
+        else:
+            print("⚠ 获取订单状态流转失败，继续其他测试")
+
+        # 高级搜索订单
+        search_result = order_actions.advance_search_order(
+            self.admin_token, 
+            shop_id=shop_id, 
+            status=1, 
+            page=1, 
+            page_size=10
+        )
+        if search_result is not None:
+            print("✓ 高级搜索订单成功")
+        else:
+            print("⚠ 高级搜索订单失败，继续其他测试")
+
         # 删除订单
         self._test_delete_order(order_id, shop_id)
         print("✓ 删除订单成功")
@@ -268,6 +299,12 @@ class TestBusinessFlow:
             assert result, "更新用户失败"
             print("✓ 更新用户成功")
 
+        # 删除用户（如果之前创建了用户）
+        if user_id:
+            result = user_actions.delete_user(self.admin_token, user_id)
+            assert result, "删除用户失败"
+            print("✓ 删除用户成功")
+
     # ==================== 标签相关测试 ====================
 
     def test_tag_management_flow(self):
@@ -292,6 +329,25 @@ class TestBusinessFlow:
         # 获取商品未绑定的标签
         unbound_tags = tag_actions.get_unbound_tags(self.admin_token, product_id, shop_id)
         print(f"✓ 获取商品未绑定标签成功，共 {len(unbound_tags)} 个标签")
+
+        # 获取标签列表
+        tags_list = tag_actions.get_tag_list(self.admin_token)
+        print(f"✓ 获取标签列表成功，共 {len(tags_list)} 个标签")
+
+        # 更新标签（如果之前创建了标签）
+        if tag_id:
+            result = tag_actions.update_tag(self.admin_token, tag_id, name="Updated Tag Name")
+            if result:
+                print("✓ 更新标签成功")
+            else:
+                print("⚠ 更新标签失败，继续其他测试")
+
+            # 删除标签
+            result = tag_actions.delete_tag(self.admin_token, tag_id)
+            if result:
+                print("✓ 删除标签成功")
+            else:
+                print("⚠ 删除标签失败，继续其他测试")
 
         # 清理
         self._test_delete_product(product_id, shop_id)

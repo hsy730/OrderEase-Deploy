@@ -141,3 +141,217 @@ def get_unbound_tags(admin_token, product_id, shop_id):
     if response.status_code == 200:
         return response.json().get("data", [])
     return []
+
+
+def get_tag_list(admin_token, page=1, page_size=10):
+    """获取标签列表
+
+    Args:
+        admin_token: 管理员令牌
+        page: 页码
+        page_size: 每页数量
+
+    Returns:
+        list: 标签列表
+    """
+    url = f"{API_BASE_URL}/admin/tag/list"
+    params = {"page": page, "pageSize": page_size}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data", [])
+    return []
+
+
+def get_tag_detail(admin_token, tag_id):
+    """获取标签详情
+
+    Args:
+        admin_token: 管理员令牌
+        tag_id: 标签ID
+
+    Returns:
+        dict: 标签详情，失败返回None
+    """
+    url = f"{API_BASE_URL}/admin/tag/detail"
+    params = {"tagId": tag_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data")
+    return None
+
+
+def update_tag(admin_token, tag_id, name=None):
+    """更新标签信息
+
+    Args:
+        admin_token: 管理员令牌
+        tag_id: 标签ID
+        name: 新的标签名称
+
+    Returns:
+        bool: 是否更新成功
+    """
+    url = f"{API_BASE_URL}/admin/tag/update"
+    payload = {"id": tag_id}
+    if name:
+        payload["name"] = name
+
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.put(url, json=payload, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"更新标签响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200
+
+
+def delete_tag(admin_token, tag_id):
+    """删除标签
+
+    Args:
+        admin_token: 管理员令牌
+        tag_id: 标签ID
+
+    Returns:
+        bool: 是否删除成功
+    """
+    url = f"{API_BASE_URL}/admin/tag/delete"
+    params = {"tagId": tag_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.delete(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"删除标签响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200
+
+
+def batch_tag_product(admin_token, product_id, tag_ids):
+    """批量设置商品标签
+
+    Args:
+        admin_token: 管理员令牌
+        product_id: 商品ID
+        tag_ids: 标签ID列表
+
+    Returns:
+        bool: 是否设置成功
+    """
+    url = f"{API_BASE_URL}/admin/tag/batch-tag-product"
+    payload = {
+        "product_id": product_id,
+        "tag_ids": tag_ids
+    }
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.post(url, json=payload, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"批量设置商品标签响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200
+
+
+def batch_untag_products(admin_token, product_ids, tag_ids):
+    """批量解绑商品标签
+
+    Args:
+        admin_token: 管理员令牌
+        product_ids: 商品ID列表
+        tag_ids: 标签ID列表
+
+    Returns:
+        bool: 是否解绑成功
+    """
+    url = f"{API_BASE_URL}/admin/tag/batch-untag"
+    payload = {
+        "product_ids": product_ids,
+        "tag_ids": tag_ids
+    }
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.delete(url, json=payload, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    print(f"批量解绑商品标签响应码: {response.status_code}，响应内容: {response.text}")
+    return response.status_code == 200
+
+
+def get_unbound_tags_list(admin_token):
+    """获取没有绑定商品的标签列表
+
+    Args:
+        admin_token: 管理员令牌
+
+    Returns:
+        list: 未绑定商品的标签列表
+    """
+    url = f"{API_BASE_URL}/admin/tag/unbound-list"
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data", [])
+    return []
+
+
+def get_unbound_products_for_tag(admin_token, tag_id):
+    """获取标签未绑定的商品列表
+
+    Args:
+        admin_token: 管理员令牌
+        tag_id: 标签ID
+
+    Returns:
+        list: 未绑定的商品列表
+    """
+    url = f"{API_BASE_URL}/admin/tag/unbound-products"
+    params = {"tagId": tag_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data", [])
+    return []
+
+
+def get_tag_bound_products(admin_token, tag_id):
+    """获取标签已绑定的商品列表
+
+    Args:
+        admin_token: 管理员令牌
+        tag_id: 标签ID
+
+    Returns:
+        list: 已绑定的商品列表
+    """
+    url = f"{API_BASE_URL}/admin/tag/bound-products"
+    params = {"tagId": tag_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data", [])
+    return []
