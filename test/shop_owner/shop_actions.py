@@ -36,6 +36,46 @@ def get_shop_detail(shop_owner_token, shop_id):
     return None
 
 
+def upload_shop_image(shop_owner_token, shop_id, image_path=None):
+    """上传店铺图片
+
+    Args:
+        shop_owner_token: 商家令牌
+        shop_id: 店铺ID
+        image_path: 图片文件路径，默认为test.png
+
+    Returns:
+        str: 图片URL，失败返回None
+    """
+    if image_path is None:
+        # 默认使用test.png
+        image_path = Path(__file__).parent.parent / "test.png"
+
+    # 读取图片文件
+    try:
+        with open(image_path, "rb") as f:
+            image_data = f.read()
+    except FileNotFoundError:
+        print(f"图片文件不存在: {image_path}")
+        return None
+
+    url = f"{API_BASE_URL}/shopOwner/shop/upload-image"
+    params = {"id": shop_id}
+    files = {"image": ("test.png", image_data, "image/png")}
+    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+
+    def request_func():
+        return requests.post(url, params=params, files=files, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        response_data = response.json()
+        print(f"上传店铺图片成功，响应内容: {response_data}")
+        return response_data.get("url")
+    print(f"上传店铺图片失败，状态码: {response.status_code}, 响应内容: {response.text}")
+    return None
+
+
 def get_shop_image(shop_owner_token, shop_id):
     """获取店铺图片
 
@@ -46,15 +86,45 @@ def get_shop_image(shop_owner_token, shop_id):
     Returns:
         bool: 成功返回True，失败返回False
     """
-    url = f"{API_BASE_URL}/shopOwner/shop/image"
+    # 先获取店铺详情，获取图片路径
+    detail_url = f"{API_BASE_URL}/shopOwner/shop/detail"
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
     params = {"shop_id": shop_id}
+
+    def detail_func():
+        return requests.get(detail_url, headers=headers, params=params)
+
+    detail_response = make_request_with_retry(detail_func)
+    if detail_response.status_code != 200:
+        print(f"获取店铺详情失败，无法获取图片路径，状态码: {detail_response.status_code}")
+        return False
+
+    detail_data = detail_response.json()
+    # 处理不同的响应格式
+    shop_detail = detail_data.get("data") if isinstance(detail_data, dict) else detail_data
+    if shop_detail is None:
+        shop_detail = detail_data
+
+    image_url = shop_detail.get("image_url") if isinstance(shop_detail, dict) else None
+
+    # 如果没有图片，先上传图片
+    if not image_url:
+        print("店铺没有设置图片，正在上传图片...")
+        image_url = upload_shop_image(shop_owner_token, shop_id)
+        if not image_url:
+            print("上传图片失败")
+            return False
+        print(f"图片上传成功，URL: {image_url}")
+
+    # 获取店铺图片
+    url = f"{API_BASE_URL}/shopOwner/shop/image"
+    params = {"path": image_url}
 
     def request_func():
         return requests.get(url, headers=headers, params=params)
 
     response = make_request_with_retry(request_func)
-    print(f"获取店铺图片响应状态码: {response.status_code}, 响应内容: {response.text}")
+    print(f"获取店铺图片响应状态码: {response.status_code}")
     return response.status_code == 200
 
 

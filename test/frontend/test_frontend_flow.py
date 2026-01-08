@@ -38,6 +38,8 @@ class TestFrontendFlow:
     frontend_shop_id = None
     frontend_product_id = None
     frontend_order_id = None
+    frontend_shop_image_path = None
+    frontend_product_image_path = None
 
     # ==================== 用户认证测试 ====================
 
@@ -147,6 +149,31 @@ class TestFrontendFlow:
         TestFrontendFlow.frontend_shop_id = int(shop_id)
         print(f"✓ 成功创建店铺，ID: {TestFrontendFlow.frontend_shop_id}")
 
+    def test_upload_shop_image(self, admin_token):
+        """测试上传店铺图片"""
+        print("\n========== 上传店铺图片测试 ==========")
+
+        assert TestFrontendFlow.frontend_shop_id, "shop_id 未设置，请确保 test_create_shop 先执行"
+
+        url = f"{API_BASE_URL}/admin/shop/upload-image"
+        params = {"id": TestFrontendFlow.frontend_shop_id}
+        headers = {"Authorization": f"Bearer {admin_token}"}
+
+        # 使用现有的测试图片文件
+        test_image_path = Path(__file__).parent.parent.parent / "test" / "test.png"
+        with open(test_image_path, 'rb') as f:
+            files = {"image": ("test_shop_image.png", f, "image/png")}
+
+            def request_func():
+                return requests.post(url, params=params, headers=headers, files=files)
+
+            response = make_request_with_retry(request_func)
+            assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
+
+            data = response.json()
+            TestFrontendFlow.frontend_shop_image_path = data.get("url")
+            print(f"✓ 成功上传店铺图片，路径: {TestFrontendFlow.frontend_shop_image_path}")
+
     def test_create_product(self, admin_token):
         """测试创建商品（使用管理员权限）"""
         print("\n========== 创建商品测试 ==========")
@@ -175,6 +202,32 @@ class TestFrontendFlow:
         data = response.json()
         TestFrontendFlow.frontend_product_id = int(data.get("id") or data.get("product_id") or data.get("productId"))
         print(f"✓ 成功创建商品，ID: {TestFrontendFlow.frontend_product_id}")
+
+    def test_upload_product_image(self, admin_token):
+        """测试上传商品图片"""
+        print("\n========== 上传商品图片测试 ==========")
+
+        assert TestFrontendFlow.frontend_shop_id, "shop_id 未设置"
+        assert TestFrontendFlow.frontend_product_id, "product_id 未设置，请确保 test_create_product 先执行"
+
+        url = f"{API_BASE_URL}/admin/product/upload-image"
+        params = {"id": TestFrontendFlow.frontend_product_id, "shop_id": TestFrontendFlow.frontend_shop_id}
+        headers = {"Authorization": f"Bearer {admin_token}"}
+
+        # 使用现有的测试图片文件
+        test_image_path = Path(__file__).parent.parent.parent / "test" / "test.png"
+        with open(test_image_path, 'rb') as f:
+            files = {"image": ("test_product_image.png", f, "image/png")}
+
+            def request_func():
+                return requests.post(url, params=params, headers=headers, files=files)
+
+            response = make_request_with_retry(request_func)
+            assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
+
+            data = response.json()
+            TestFrontendFlow.frontend_product_image_path = data.get("url")
+            print(f"✓ 成功上传商品图片，路径: {TestFrontendFlow.frontend_product_image_path}")
 
     # ==================== 订单测试 ====================
 
@@ -325,25 +378,20 @@ class TestFrontendFlow:
         """测试获取店铺图片"""
         print("\n========== 获取店铺图片测试 ==========")
 
-        # 注意：图片接口需要 path 参数，而不是 id
-        # 由于测试中没有上传图片，此测试会返回404，这是预期的
+        assert TestFrontendFlow.frontend_shop_image_path, "shop_image_path 未设置，请确保 test_upload_shop_image 先执行"
+
+        # 图片接口需要 path 参数
         url = f"{API_BASE_URL}/shop/image"
-        params = {"path": ""}  # 空路径会导致404，这是预期的
+        params = {"path": TestFrontendFlow.frontend_shop_image_path}
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        # 允许 200（成功）或 404（图片不存在）状态码
-        assert response.status_code in [200, 404], f"Expected 200 or 404, got {response.status_code}, text: {response.text}"
-
-        if response.status_code == 200:
-            print("✓ 获取店铺图片成功")
-        elif response.status_code == 404:
-            print("✓ 图片不存在（测试中未上传图片）")
-        else:
-            print("⚠ 获取店铺图片失败")
+        # 严格断言：必须成功获取图片
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
+        print(f"✓ 获取店铺图片成功，路径: {TestFrontendFlow.frontend_shop_image_path}")
 
     def test_get_shop_tags(self):
         """测试获取店铺标签列表"""
@@ -440,22 +488,17 @@ class TestFrontendFlow:
         """测试获取商品图片"""
         print("\n========== 获取商品图片测试 ==========")
 
-        # 注意：图片接口需要 path 参数，而不是 id
-        # 由于测试中没有上传图片，此测试会返回404，这是预期的
+        assert TestFrontendFlow.frontend_product_image_path, "product_image_path 未设置，请确保 test_upload_product_image 先执行"
+
+        # 图片接口需要 path 参数
         url = f"{API_BASE_URL}/product/image"
-        params = {"path": ""}  # 空路径会导致404，这是预期的
+        params = {"path": TestFrontendFlow.frontend_product_image_path}
         headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
             return requests.get(url, params=params, headers=headers, allow_redirects=False)  # 禁用自动重定向
 
         response = make_request_with_retry(request_func)
-        # 允许 200（成功）或 404（图片不存在）状态码
-        assert response.status_code in [200, 404], f"Expected 200 or 404, got {response.status_code}, text: {response.text}"
-
-        if response.status_code == 200:
-            print("✓ 获取商品图片成功")
-        elif response.status_code == 404:
-            print("✓ 图片不存在（测试中未上传图片）")
-        else:
-            print(f"⚠ 获取商品图片失败（状态码: {response.status_code}）")
+        # 严格断言：必须成功获取图片
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
+        print(f"✓ 获取商品图片成功，路径: {TestFrontendFlow.frontend_product_image_path}")

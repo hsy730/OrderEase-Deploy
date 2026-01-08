@@ -78,20 +78,54 @@ def update_shop(admin_token, shop_id, name=None, description=None):
     Returns:
         bool: 是否更新成功
     """
+    # 先获取店铺详情，获取 owner_username
+    url = f"{API_BASE_URL}/admin/shop/detail"
+    params = {"shop_id": shop_id}
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def get_detail_func():
+        return requests.get(url, params=params, headers=headers)
+
+    detail_response = make_request_with_retry(get_detail_func)
+    if detail_response.status_code != 200:
+        print(f"获取店铺详情失败，响应码：{detail_response.status_code}，响应内容: {detail_response.text}")
+        return False
+
+    detail_data = detail_response.json()
+    # 处理不同的响应格式
+    shop_detail = detail_data.get("data") if isinstance(detail_data, dict) else None
+    if shop_detail is None:
+        # 如果没有 data 字段，直接使用 detail_data
+        if isinstance(detail_data, dict) and "owner_username" in detail_data:
+            shop_detail = detail_data
+        elif isinstance(detail_data, list) and len(detail_data) > 0:
+            shop_detail = detail_data[0]
+
+    if shop_detail is None:
+        print(f"无法解析店铺详情，响应内容: {detail_response.text}")
+        return False
+
+    owner_username = shop_detail.get("owner_username")
+    if not owner_username:
+        print(f"店铺详情中没有 owner_username，响应内容: {detail_response.text}")
+        return False
+
+    # 更新店铺信息
     url = f"{API_BASE_URL}/admin/shop/update"
-    params = {"id": shop_id}
-    payload = {}
+    payload = {
+        "id": shop_id,
+        "owner_username": owner_username
+    }
     if name:
         payload["name"] = name
     if description:
         payload["description"] = description
 
-    headers = {"Authorization": f"Bearer {admin_token}"}
-
     def request_func():
-        return requests.put(url, params=params, json=payload, headers=headers)
+        return requests.put(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
+    print(f"更新店铺，响应码：{response.status_code}，响应内容: {response.text}")
     return response.status_code == 200
 
 
