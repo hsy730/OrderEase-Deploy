@@ -269,6 +269,42 @@ class TestShopOwnerBusinessFlow:
         assert result, "更新店铺信息失败"
         print("[OK] 更新店铺信息成功")
 
+    def test_get_shop_temp_token(self):
+        """测试获取店铺临时令牌"""
+        result = shop_actions.get_shop_temp_token(
+            TestShopOwnerBusinessFlow.shop_owner_token,
+            self.resources['shop_id']
+        )
+        assert result is not None, "获取店铺临时令牌失败"
+        assert 'token' in result, "响应中缺少token字段"
+        assert 'shop_id' in result, "响应中缺少shop_id字段"
+        assert 'expires_at' in result, "响应中缺少expires_at字段"
+        print(f"[OK] 获取店铺临时令牌成功，令牌: {result.get('token')}")
+        # 保存临时令牌供后续测试使用
+        self.resources['temp_token'] = result.get('token')
+
+    def test_temp_login(self):
+        """测试使用临时令牌登录"""
+        # 先获取临时令牌
+        temp_token_result = shop_actions.get_shop_temp_token(
+            TestShopOwnerBusinessFlow.shop_owner_token,
+            self.resources['shop_id']
+        )
+        assert temp_token_result is not None, "获取店铺临时令牌失败"
+        temp_token = temp_token_result.get('token')
+        
+        # 使用临时令牌登录
+        login_result = shop_actions.temp_login(
+            self.resources['shop_id'],
+            temp_token
+        )
+        assert login_result is not None, "临时令牌登录失败"
+        assert 'token' in login_result, "登录响应中缺少token字段"
+        assert 'user_info' in login_result, "登录响应中缺少user_info字段"
+        assert 'role' in login_result, "登录响应中缺少role字段"
+        assert login_result['role'] == 'user', "登录角色应为user"
+        print(f"[OK] 临时令牌登录成功，用户信息: {login_result.get('user_info')}")
+
     # ==================== 用户测试 ====================
 
     def test_create_user(self):

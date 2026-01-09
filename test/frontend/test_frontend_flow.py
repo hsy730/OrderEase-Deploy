@@ -319,7 +319,6 @@ class TestFrontendFlow:
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        # 允许 400, 401, 404 状态码，因为订单可能不存在
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
         if response.status_code == 200:

@@ -46,21 +46,6 @@ class TestBusinessFlow:
                 print(f"清理资源时出错: {e}")
         print("=== 测试结束 ===\n")
 
-    # ==================== 基础功能测试 ====================
-
-    def test_change_admin_password(self):
-        """测试修改管理员密码"""
-        print("\n========== 修改管理员密码测试 ==========")
-        url = f"{API_BASE_URL}/admin/change-password"
-        payload = {
-            "old_password": "Admin@123456",
-            "new_password": "Admin@123456"
-        }
-        headers = {"Authorization": f"Bearer {self.admin_token}"}
-        response = requests.post(url, json=payload, headers=headers)
-        assert response.status_code == 200, f"修改密码失败，状态码: {response.status_code}"
-        print("✓ 修改管理员密码测试通过")
-
     # ==================== 完整业务流程测试 ====================
 
     def test_complete_business_flow(self):

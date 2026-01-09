@@ -463,6 +463,8 @@ def pytest_collection_modifyitems(config, items):
         "admin/test_business_flow.py": 20,    # 管理员业务流程
         "test_auth_flow.py": 100,             # 最后执行 - 会登出token
         "test_unauthorized.py": 110,          # 最后执行 - 不依赖token
+        "test_password_change_final.py": 120, # 最后执行 - 独立密码修改测试
+        "test_shop_owner_password_change.py": 140  # 最后执行 - 独立密码修改测试
     }
     
     # 定义认证测试内部方法优先级映射

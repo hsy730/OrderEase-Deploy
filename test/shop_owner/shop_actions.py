@@ -227,3 +227,55 @@ def change_shop_password(shop_owner_token, shop_id, old_password="Admin@123456",
     response = make_request_with_retry(request_func)
     print(f"修改密码响应状态码: {response.status_code}, 响应内容: {response.text}")
     return response.status_code == 200
+
+
+def get_shop_temp_token(shop_owner_token, shop_id):
+    """获取店铺临时令牌
+
+    Args:
+        shop_owner_token: 商家令牌
+        shop_id: 店铺ID
+
+    Returns:
+        dict: 包含临时令牌的响应数据，失败返回None
+        格式: {"shop_id": int, "token": str, "expires_at": str}
+    """
+    url = f"{API_BASE_URL}/shopOwner/shop/temp-token"
+    headers = {"Authorization": f"Bearer {shop_owner_token}"}
+    params = {"shop_id": shop_id}
+
+    def request_func():
+        return requests.get(url, headers=headers, params=params)
+
+    response = make_request_with_retry(request_func)
+    print(f"获取店铺临时令牌响应状态码: {response.status_code}, 响应内容: {response.text}")
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+
+def temp_login(shop_id, temp_token):
+    """使用临时令牌登录
+
+    Args:
+        shop_id: 店铺ID
+        temp_token: 临时令牌（6位数字）
+
+    Returns:
+        dict: 登录成功的响应数据，失败返回None
+        格式: {"role": str, "user_info": dict, "token": str, "expiredAt": int}
+    """
+    url = f"{API_BASE_URL}/shop/temp-login"
+    payload = {
+        "shop_id": shop_id,
+        "token": temp_token
+    }
+
+    def request_func():
+        return requests.post(url, json=payload)
+
+    response = make_request_with_retry(request_func)
+    print(f"临时令牌登录响应状态码: {response.status_code}, 响应内容: {response.text}")
+    if response.status_code == 200:
+        return response.json()
+    return None

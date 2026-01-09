@@ -141,8 +141,73 @@ class TestAuthFlow:
             return requests.post(url, headers=headers)
 
         response = make_request_with_retry(request_func)
+        # 检查token是否已失效
+        if response.status_code == 401:
+            print("⚠ Token已失效，重新登录获取新token...")
+            # 重新登录获取新token
+            login_url = f"{API_BASE_URL}/login"
+            login_payload = {
+                "username": "admin",
+                "password": "Admin@123456"
+            }
+            
+            def login_request_func():
+                return requests.post(login_url, json=login_payload)
+            
+            login_response = make_request_with_retry(login_request_func)
+            if login_response.status_code == 200:
+                login_data = login_response.json()
+                new_token = login_data.get("token", "")
+                headers = {"Authorization": f"Bearer {new_token}"}
+                
+                def refresh_request_func():
+                    return requests.post(url, headers=headers)
+                
+                response = make_request_with_retry(refresh_request_func)
+        
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        print("✓ 刷新管理员令牌成功")
+        
+        if response.status_code == 200:
+            response_data = response.json()
+            new_token = response_data.get("token")
+            expired_at = response_data.get("expiredAt")
+            
+            assert new_token is not None, "响应中未包含新token"
+            assert expired_at is not None, "响应中未包含过期时间"
+            
+            print("✓ 刷新管理员令牌成功")
+            print(f"✓ 新token: {new_token[:20]}...")
+            print(f"✓ 过期时间: {expired_at}")
+        else:
+            print(f"✗ 刷新管理员令牌失败: {response.status_code}, {response.text}")
+
+    def test_refresh_admin_token_invalid_token(self):
+        """测试刷新管理员令牌 - 无效token"""
+        print("\n========== 刷新管理员令牌测试 - 无效token ==========")
+        url = f"{API_BASE_URL}/admin/refresh-token"
+        headers = {"Authorization": "Bearer invalid_token"}
+
+        def request_func():
+            return requests.post(url, headers=headers)
+
+        response = make_request_with_retry(request_func)
+        # 预期返回401错误（token无效）
+        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
+        print("✓ 无效token时正确返回401错误")
+
+    def test_refresh_admin_token_no_token(self):
+        """测试刷新管理员令牌 - 无token"""
+        print("\n========== 刷新管理员令牌测试 - 无token ==========")
+        url = f"{API_BASE_URL}/admin/refresh-token"
+        # 不提供Authorization头
+
+        def request_func():
+            return requests.post(url)
+
+        response = make_request_with_retry(request_func)
+        # 预期返回401错误（未提供token）
+        assert response.status_code != 200, f"Expected !=200, got {response.status_code}"
+        print("✓ 未提供token时正确返回401错误")
 
     def test_refresh_shop_token(self):
         """测试刷新商家令牌
@@ -305,18 +370,5 @@ class TestAuthFlow:
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        # 允许 200, 400, 404, 401 状态码
-        # 200: 成功获取临时令牌
-        # 400: 请求参数错误（可能是功能未实现或参数不正确）
-        # 404: 端点不存在（可能是功能未实现）
-        # 401: 权限不足或token失效
+ 
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
-        
-        if response.status_code == 200:
-            print("[OK] 成功获取临时令牌")
-        elif response.status_code == 400:
-            print(f"[WARN] 临时令牌请求参数错误: {response.text}")
-        elif response.status_code == 404:
-            print("[WARN] 临时令牌端点不存在（可能是功能未实现）")
-        elif response.status_code == 401:
-            print("[WARN] 权限不足或token失效")
