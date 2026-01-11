@@ -213,8 +213,9 @@ jobs:
 
           docker run -d \
             --name orderease-app \
+            --network ${{ job.container.network }} \
             -p 8080:8080 \
-            -e DB_HOST=127.0.0.1 \
+            -e DB_HOST=mysql \
             -e DB_PORT=3306 \
             -e DB_USERNAME=root \
             -e DB_PASSWORD=${{ env.MYSQL_ROOT_PASSWORD }} \
