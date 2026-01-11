@@ -81,6 +81,8 @@ jobs:
     outputs:
       image-tag: ${{ steps.set-tag.outputs.tag }}
       image-digest: ${{ steps.build.outputs.digest }}
+    env:
+      FIRST_TAG: ""
     steps:
       - name: Checkout Deploy Repository
         uses: actions/checkout@v4
@@ -137,11 +139,10 @@ jobs:
       - name: Set Image Tag Output
         id: set-tag
         run: |
-          TAGS="${{ steps.meta.outputs.tags }}"
-          FIRST_TAG=$(echo "$TAGS" | head -n1)
-          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
-          echo "Image tag set to: $FIRST_TAG"
-        shell: bash
+          FIRST_TAG="${{ steps.meta.outputs.tags }}"
+          FIRST_TAG=$(echo "$FIRST_TAG" | head -n1)
+          echo "tag=${FIRST_TAG}" >> $GITHUB_OUTPUT
+          echo "Image tag set to: ${FIRST_TAG}"
 
       - name: Export Image to TAR
         run: |
