@@ -109,16 +109,20 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract Metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_IMAGE }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
+      - name: Set Image Tag
+        id: set-tag
+        run: |
+          # Set a consistent tag based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            TAG="${{ env.DOCKER_IMAGE }}:pr-${{ github.event.pull_request.number }}"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            TAG="${{ env.DOCKER_IMAGE }}:latest"
+          else
+            BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
+            TAG="${{ env.DOCKER_IMAGE }}:${BRANCH_NAME}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Image tag set to: ${TAG}"
 
       - name: Build Docker Image
         id: build
@@ -128,21 +132,18 @@ jobs:
           file: ./OrderEase-Deploy/build/Dockerfile
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.set-tag.outputs.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=${{ github.sha }}
 
-      - name: Set Image Tag Output
-        id: set-tag
+      - name: Verify Image Tag
         run: |
-          FIRST_TAG="${{ steps.meta.outputs.tags }}"
-          FIRST_TAG=$(echo "$FIRST_TAG" | head -n1)
-          echo "tag=${FIRST_TAG}" >> $GITHUB_OUTPUT
-          echo "Image tag set to: ${FIRST_TAG}"
+          TAG="${{ steps.set-tag.outputs.tag }}"
+          echo "Built image with tag: ${TAG}"
+          docker images | grep orderease
 
       - name: Export Image to TAR
         run: |
@@ -313,10 +314,9 @@ jobs:
 
       - name: Push Image to Docker Hub
         run: |
-          for tag in ${{ needs.build-image.outputs.image-tag }}; do
-            echo "Pushing $tag"
-            docker push "$tag"
-          done
+          TAG="${{ needs.build-image.outputs.image-tag }}"
+          echo "Pushing ${TAG}"
+          docker push "${TAG}"
 
       - name: Image Digest
         run: |
