@@ -135,7 +135,7 @@ jobs:
 
       - name: Export Image to TAR
         run: |
-          docker image save ${{ steps.meta.outputs.tags }} -o orderease-image.tar
+          docker image save ${{ env.DOCKER_IMAGE }}:latest -o orderease-image.tar
 
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v4
