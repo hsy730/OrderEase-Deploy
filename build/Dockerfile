@@ -18,7 +18,7 @@ COPY OrderEase-FrontUI/ .
 RUN npm run build
 
 # 阶段3: 构建Go后端
-FROM golang:1.21-alpine AS go-builder
+FROM golang:1.22-alpine AS go-builder
 WORKDIR /app/src
 COPY OrderEase-Golang/src/ .
 ENV GOPROXY=https://goproxy.cn,direct
