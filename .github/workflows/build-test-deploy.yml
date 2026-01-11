@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       skip_tests:
-        description: '跳过测试（不推荐）'
+        description: "跳过测试（不推荐）"
         required: false
         type: boolean
         default: false
@@ -19,8 +19,8 @@ on:
 
 env:
   DOCKER_IMAGE: docker.io/hsy730/orderease
-  PYTHON_VERSION: '3.11'
-  MYSQL_VERSION: '8.0'
+  PYTHON_VERSION: "3.11"
+  MYSQL_VERSION: "8.0"
 
 jobs:
   # ============================================
@@ -147,17 +147,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-image
     if: github.event.inputs.skip_tests != 'true'
+    env:
+      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ env.MYSQL_ROOT_PASSWORD }}
           MYSQL_DATABASE: mysql
           TZ: Asia/Shanghai
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          --health-cmd="mysqladmin ping -h localhost -u root -p${{ env.MYSQL_ROOT_PASSWORD }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -203,7 +205,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+          cache: "pip"
           cache-dependency-path: OrderEase-Deploy/test/requirements.txt
 
       - name: Install Test Dependencies
