@@ -72,12 +72,62 @@ jobs:
           retention-days: 1
 
   # ============================================
+  # Job 1.5: Go 单元测试
+  # ============================================
+  go-test:
+    name: Go Unit Tests
+    runs-on: ubuntu-latest
+    needs: checkout-repos
+    steps:
+      - name: Checkout Golang Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-Golang
+          ref: master
+          path: OrderEase-Golang
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+          cache-dependency-path: OrderEase-Golang/src/go.sum
+
+      - name: Download Dependencies
+        working-directory: OrderEase-Golang/src
+        run: go mod download
+
+      - name: Run Go Tests
+        id: go-test
+        working-directory: OrderEase-Golang/src
+        run: |
+          echo "Running Go unit tests..."
+          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Generate Coverage Report
+        working-directory: OrderEase-Golang/src
+        run: go tool cover -html=coverage.out -o coverage.html
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-coverage-report
+          path: OrderEase-Golang/src/coverage.html
+          retention-days: 7
+
+      - name: Print Coverage Summary
+        working-directory: OrderEase-Golang/src
+        run: |
+          echo "=== Coverage Summary ==="
+          go tool cover -func=coverage.out | tail -n 1
+
+  # ============================================
   # Job 2: 构建多阶段 Docker 镜像
   # ============================================
   build-image:
     name: Build All-in-One Docker Image
     runs-on: ubuntu-latest
-    needs: checkout-repos
+    needs: [checkout-repos, go-test]
     outputs:
       image-tag: ${{ steps.set-tag.outputs.tag }}
       image-digest: ${{ steps.build.outputs.digest }}

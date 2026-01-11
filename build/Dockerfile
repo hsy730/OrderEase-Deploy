@@ -23,6 +23,7 @@ WORKDIR /app/src
 COPY OrderEase-Golang/src/ .
 ENV GOPROXY=https://goproxy.cn,direct
 RUN go mod tidy
+RUN go test -v ./...  # 运行 Go 单元测试
 RUN CGO_ENABLED=0 GOOS=linux go build -o ../orderease main.go
 
 # 阶段4: 最终运行阶段
