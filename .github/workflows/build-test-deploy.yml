@@ -18,7 +18,7 @@ on:
     types: [triggered-by-code-change]
 
 env:
-  DOCKER_IMAGE: docker.io/hsy730/orderease
+  DOCKER_IMAGE: docker.io/siyuanh640/orderease
   PYTHON_VERSION: "3.11"
   MYSQL_VERSION: "8.0"
 
