@@ -18,7 +18,7 @@ on:
     types: [triggered-by-code-change]
 
 env:
-  DOCKER_IMAGE: docker.io/siyuanh640/orderease
+  DOCKER_IMAGE: docker.io/siyuanh640/orderease:latest
   PYTHON_VERSION: "3.11"
   MYSQL_VERSION: "8.0"
 
@@ -135,7 +135,7 @@ jobs:
 
       - name: Export Image to TAR
         run: |
-          docker image save ${{ env.DOCKER_IMAGE }}:latest -o orderease-image.tar
+          docker image save ${{ env.DOCKER_IMAGE }} -o orderease-image.tar
 
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v4
