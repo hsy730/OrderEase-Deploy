@@ -113,11 +113,6 @@ jobs:
         id: set-tag
         run: |
           DOCKER_IMAGE="${{ env.DOCKER_IMAGE }}"
-          echo "DOCKER_IMAGE=${DOCKER_IMAGE}"
-          echo "Event name: ${{ github.event_name }}"
-          echo "Ref: ${{ github.ref }}"
-          echo "Ref name: ${{ github.ref_name }}"
-
           # Set a consistent tag based on event type
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             TAG="${DOCKER_IMAGE}:pr-${{ github.event.pull_request.number }}"
@@ -127,16 +122,7 @@ jobs:
             BRANCH_NAME=$(echo "${{ github.ref_name }}" | sed 's/\//-/g')
             TAG="${DOCKER_IMAGE}:${BRANCH_NAME}"
           fi
-
-          echo "Final tag: ${TAG}"
-          # Safely write to GITHUB_OUTPUT
-          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}" 2>/dev/null || echo "Failed to write to GITHUB_OUTPUT"
-          echo "Set output completed"
-
-      - name: Debug - Verify Output
-        run: |
-          echo "Tag from output: '${{ steps.set-tag.outputs.tag }}'"
-          echo "Set output completed"
+          echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
 
       - name: Build Docker Image
         id: build
@@ -152,12 +138,6 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=${{ github.sha }}
-
-      - name: Verify Image Tag
-        run: |
-          TAG="${{ steps.set-tag.outputs.tag }}"
-          echo "Built image with tag: ${TAG}"
-          docker images | grep orderease
 
       - name: Export Image to TAR
         run: |
@@ -213,33 +193,10 @@ jobs:
       - name: Load Docker Image
         run: |
           docker image load -i orderease-image.tar
-          docker images
-
-      - name: Debug - Print Job Outputs
-        run: |
-          echo "=== Job Outputs from build-image ==="
-          echo "image-tag: '${{ needs.build-image.outputs.image-tag }}'"
-          echo "image-digest: '${{ needs.build-image.outputs.image-digest }}'"
 
       - name: Start OrderEase Application Container
         run: |
           IMAGE_TAG="${{ needs.build-image.outputs.image-tag }}"
-          echo "Debug: IMAGE_TAG='$IMAGE_TAG'"
-
-          # Fallback: if IMAGE_TAG is empty, get it from docker images
-          if [ -z "$IMAGE_TAG" ]; then
-            echo "Warning: IMAGE_TAG from job output is empty, trying to get tag from docker images..."
-            IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "siyuanh640/orderease" | head -n1)
-            echo "Debug: Fallback IMAGE_TAG='$IMAGE_TAG'"
-          fi
-
-          if [ -z "$IMAGE_TAG" ]; then
-            echo "Error: IMAGE_TAG is still empty after fallback!"
-            docker images
-            exit 1
-          fi
-
-          echo "Starting container with tag: $IMAGE_TAG"
           docker run -d \
             --name orderease-app \
             -p 8080:8080 \
