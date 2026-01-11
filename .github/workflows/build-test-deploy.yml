@@ -118,13 +118,6 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Set Image Tag Output
-        id: set-tag
-        run: |
-          TAGS="${{ steps.meta.outputs.tags }}"
-          FIRST_TAG=$(echo "$TAGS" | head -n1)
-          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
-
       - name: Build Docker Image
         id: build
         uses: docker/build-push-action@v5
@@ -140,6 +133,14 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=${{ github.sha }}
+
+      - name: Set Image Tag Output
+        id: set-tag
+        run: |
+          TAGS="${{ steps.meta.outputs.tags }}"
+          FIRST_TAG=$(echo "$TAGS" | head -n1)
+          echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
+          echo "Image tag set to: $FIRST_TAG"
 
       - name: Export Image to TAR
         run: |
