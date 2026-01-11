@@ -1,0 +1,296 @@
+name: OrderEase Build, Test and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: '跳过测试（不推荐）'
+        required: false
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [triggered-by-code-change]
+
+env:
+  DOCKER_IMAGE: docker.io/hsy730/orderease
+  PYTHON_VERSION: '3.11'
+  MYSQL_VERSION: '8.0'
+
+jobs:
+  # ============================================
+  # Job 1: 检出所有仓库代码
+  # ============================================
+  checkout-repos:
+    name: Checkout All Repositories
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Deploy Repository
+        uses: actions/checkout@v4
+        with:
+          path: OrderEase-Deploy
+
+      - name: Checkout FrontUI Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-FrontUI
+          ref: main
+          path: OrderEase-FrontUI
+
+      - name: Checkout BackedUI Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-BackedUI
+          ref: master
+          path: OrderEase-BackedUI
+
+      - name: Checkout Golang Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-Golang
+          ref: master
+          path: OrderEase-Golang
+
+      - name: Prepare Build Context
+        run: |
+          # 创建构建目录结构
+          mkdir -p build-context
+          cp -r OrderEase-FrontUI build-context/
+          cp -r OrderEase-BackedUI build-context/
+          cp -r OrderEase-Golang build-context/
+
+      - name: Upload Build Context
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-context
+          path: build-context/
+          retention-days: 1
+
+  # ============================================
+  # Job 2: 构建多阶段 Docker 镜像
+  # ============================================
+  build-image:
+    name: Build All-in-One Docker Image
+    runs-on: ubuntu-latest
+    needs: checkout-repos
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - name: Checkout Deploy Repository
+        uses: actions/checkout@v4
+        with:
+          path: OrderEase-Deploy
+
+      - name: Download Build Context
+        uses: actions/download-artifact@v4
+        with:
+          name: build-context
+          path: .
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build Docker Image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./OrderEase-Deploy/build/Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BUILD_DATE=${{ github.event.repository.updated_at }}
+            VERSION=${{ github.sha }}
+
+      - name: Export Image to TAR
+        run: |
+          docker image save ${{ steps.meta.outputs.tags }} -o orderease-image.tar
+
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: orderease-docker-image
+          path: orderease-image.tar
+          retention-days: 1
+
+  # ============================================
+  # Job 3: 启动服务容器并执行测试
+  # ============================================
+  integration-test:
+    name: Integration Tests with Pytest
+    runs-on: ubuntu-latest
+    needs: build-image
+    if: github.event.inputs.skip_tests != 'true'
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: mysql
+          TZ: Asia/Shanghai
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -u root -p${{ secrets.MYSQL_ROOT_PASSWORD }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          --health-start-period=30s
+    steps:
+      - name: Checkout Deploy Repository
+        uses: actions/checkout@v4
+        with:
+          path: OrderEase-Deploy
+
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: orderease-docker-image
+          path: .
+
+      - name: Load Docker Image
+        run: |
+          docker image load -i orderease-image.tar
+
+      - name: Start OrderEase Application Container
+        run: |
+          docker run -d \
+            --name orderease-app \
+            -p 8080:8080 \
+            -e DB_HOST=127.0.0.1 \
+            -e DB_PORT=3306 \
+            -e DB_USERNAME=root \
+            -e DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
+            -e DB_NAME=mysql \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e TZ=Asia/Shanghai \
+            -e GIN_MODE=release \
+            ${{ needs.build-image.outputs.image-tag }}
+
+      - name: Wait for Application to be Ready
+        run: |
+          echo "Waiting for OrderEase to start..."
+          timeout 120 bash -c 'until curl -f http://localhost:8080/order-ease-iui/; do sleep 2; done'
+          echo "OrderEase is ready!"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: OrderEase-Deploy/test/requirements.txt
+
+      - name: Install Test Dependencies
+        run: |
+          pip install -r OrderEase-Deploy/test/requirements.txt
+
+      - name: Create Test Environment File
+        working-directory: OrderEase-Deploy/test
+        run: |
+          cat > .env << EOF
+          API_BASE_URL=http://localhost:8080/api/order-ease/v1
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_USER=root
+          DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DB_NAME=mysql
+          EOF
+
+      - name: Run Pytest Tests
+        id: pytest
+        working-directory: OrderEase-Deploy/test
+        env:
+          API_BASE_URL: http://localhost:8080/api/order-ease/v1
+        run: |
+          pytest -v --html=report.html --self-contained-html \
+            --junitxml=test-results.xml
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: OrderEase-Deploy/test/report.html
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: OrderEase-Deploy/test/test-results.xml
+
+      - name: Print Application Logs on Failure
+        if: failure()
+        run: |
+          echo "=== OrderEase Application Logs ==="
+          docker logs orderease-app || true
+
+      - name: Cleanup Containers
+        if: always()
+        run: |
+          docker stop orderease-app || true
+          docker rm orderease-app || true
+
+  # ============================================
+  # Job 4: 推送镜像到 Docker Hub (仅在测试通过后)
+  # ============================================
+  push-to-registry:
+    name: Push Image to Docker Hub
+    runs-on: ubuntu-latest
+    needs: [build-image, integration-test]
+    if: |
+      always() &&
+      needs.integration-test.result == 'success'
+    steps:
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: orderease-docker-image
+          path: .
+
+      - name: Load Docker Image
+        run: |
+          docker image load -i orderease-image.tar
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Image to Docker Hub
+        run: |
+          for tag in ${{ needs.build-image.outputs.image-tag }}; do
+            echo "Pushing $tag"
+            docker push "$tag"
+          done
+
+      - name: Image Digest
+        run: |
+          echo "Image pushed with digest: ${{ needs.build-image.outputs.image-digest }}"
