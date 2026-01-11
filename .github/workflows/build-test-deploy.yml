@@ -129,9 +129,21 @@ jobs:
           fi
 
           echo "Final tag: ${TAG}"
-          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          {
+            echo "tag=${TAG}"
+          } >> "$GITHUB_OUTPUT"
           # Also save to env file for debugging
           echo "IMAGE_TAG=${TAG}" >> $GITHUB_ENV
+
+      - name: Debug - GITHUB_OUTPUT File
+        run: |
+          echo "GITHUB_OUTPUT path: $GITHUB_OUTPUT"
+          if [ -f "$GITHUB_OUTPUT" ]; then
+            echo "GITHUB_OUTPUT contents:"
+            cat "$GITHUB_OUTPUT"
+          else
+            echo "GITHUB_OUTPUT file does not exist!"
+          fi
 
       - name: Debug - Verify Output
         run: |
