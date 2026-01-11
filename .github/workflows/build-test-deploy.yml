@@ -327,6 +327,20 @@ jobs:
       - name: Push Image to Docker Hub
         run: |
           TAG="${{ needs.build-image.outputs.image-tag }}"
+
+          # Fallback: if TAG is empty, get it from docker images
+          if [ -z "$TAG" ]; then
+            echo "Warning: TAG from job output is empty, getting tag from docker images..."
+            TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "siyuanh640/orderease" | head -n1)
+            echo "Using tag: $TAG"
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "Error: TAG is still empty after fallback!"
+            docker images
+            exit 1
+          fi
+
           echo "Pushing ${TAG}"
           docker push "${TAG}"
 
