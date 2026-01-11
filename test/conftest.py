@@ -476,6 +476,7 @@ def pytest_collection_modifyitems(config, items):
         "test_admin_logout": 4,
         "test_shop_owner_logout": 5,
         "test_get_temp_token": 6,
+        "test_z_admin_logout": 7,  # 确保最后执行
     }
     
     def get_test_priority(item):
