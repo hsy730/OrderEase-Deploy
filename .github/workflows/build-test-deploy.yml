@@ -224,6 +224,14 @@ jobs:
             -e GIN_MODE=release \
             "$IMAGE_TAG"
 
+      - name: Check Container Status
+        run: |
+          echo "=== Docker Container Status ==="
+          docker ps -a
+          echo ""
+          echo "=== OrderEase App Container Logs ==="
+          docker logs orderease-app
+
       - name: Wait for Application to be Ready
         run: |
           echo "Waiting for OrderEase to start..."
