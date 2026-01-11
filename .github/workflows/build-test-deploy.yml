@@ -197,6 +197,20 @@ jobs:
       - name: Start OrderEase Application Container
         run: |
           IMAGE_TAG="${{ needs.build-image.outputs.image-tag }}"
+
+          # Fallback: if IMAGE_TAG is empty, get it from docker images
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "Warning: IMAGE_TAG from job output is empty, getting tag from docker images..."
+            IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep "siyuanh640/orderease" | head -n1)
+            echo "Using tag: $IMAGE_TAG"
+          fi
+
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "Error: IMAGE_TAG is still empty after fallback!"
+            docker images
+            exit 1
+          fi
+
           docker run -d \
             --name orderease-app \
             -p 8080:8080 \
