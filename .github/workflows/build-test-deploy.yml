@@ -149,6 +149,7 @@ jobs:
     if: github.event.inputs.skip_tests != 'true'
     env:
       MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
     services:
       mysql:
         image: mysql:8.0
@@ -188,9 +189,9 @@ jobs:
             -e DB_HOST=127.0.0.1 \
             -e DB_PORT=3306 \
             -e DB_USERNAME=root \
-            -e DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} \
+            -e DB_PASSWORD=${{ env.MYSQL_ROOT_PASSWORD }} \
             -e DB_NAME=mysql \
-            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e JWT_SECRET=${{ env.JWT_SECRET }} \
             -e TZ=Asia/Shanghai \
             -e GIN_MODE=release \
             ${{ needs.build-image.outputs.image-tag }}
@@ -220,7 +221,7 @@ jobs:
           DB_HOST=127.0.0.1
           DB_PORT=3306
           DB_USER=root
-          DB_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DB_PASSWORD=${{ env.MYSQL_ROOT_PASSWORD }}
           DB_NAME=mysql
           EOF
 
