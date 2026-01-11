@@ -439,14 +439,14 @@ def shop_owner_tag_id(shop_owner_token, shop_owner_shop_id):
 def pytest_collection_modifyitems(config, items):
     """
     调整测试执行顺序，确保测试按正确的业务顺序执行
-    
+
     优先级顺序：
     1. 前端测试 (test_frontend_flow.py) - 需要有效的admin_token
-    2. 商家业务流程测试 (test_business_flow.py) - 需要有效的admin_token和shop_owner_token
-    3. 管理员业务流程测试 (admin/test_business_flow.py) - 需要有效的admin_token
+    2. 管理员业务流程测试 (admin/test_business_flow.py) - 需要有效的admin_token
+    3. 商家业务流程测试 (shop_owner/test_business_flow.py) - 需要有效的admin_token和shop_owner_token
     4. 认证测试 (test_auth_flow.py) - 会登出token，放在最后
     5. 未授权访问测试 (test_unauthorized.py) - 不依赖token，可以放在最后
-    
+
     对于认证测试内部，确保按正确的业务顺序执行：
     1. 管理员登录
     2. 商家登录
@@ -459,8 +459,8 @@ def pytest_collection_modifyitems(config, items):
     # 定义文件优先级映射，数值越小优先级越高
     file_priority_map = {
         "test_frontend_flow.py": 0,           # 最先执行 - 前端业务流程
-        "shop_owner/test_business_flow.py": 10, # 商家业务流程
-        "admin/test_business_flow.py": 20,    # 管理员业务流程
+        "admin/test_business_flow.py": 10,    # 管理员业务流程
+        "shop_owner/test_business_flow.py": 20, # 商家业务流程
         "test_auth_flow.py": 100,             # 最后执行 - 会登出token
         "test_unauthorized.py": 110,          # 最后执行 - 不依赖token
         "test_password_change_final.py": 120, # 最后执行 - 独立密码修改测试
