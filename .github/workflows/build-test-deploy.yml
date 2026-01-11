@@ -141,6 +141,7 @@ jobs:
           FIRST_TAG=$(echo "$TAGS" | head -n1)
           echo "tag=$FIRST_TAG" >> $GITHUB_OUTPUT
           echo "Image tag set to: $FIRST_TAG"
+        shell: bash
 
       - name: Export Image to TAR
         run: |
