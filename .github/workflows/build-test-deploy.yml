@@ -148,7 +148,7 @@ jobs:
     needs: build-image
     if: github.event.inputs.skip_tests != 'true'
     env:
-      MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: RootPassword123!
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
     services:
       mysql:
