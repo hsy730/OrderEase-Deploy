@@ -200,6 +200,12 @@ jobs:
 
       - name: Start OrderEase Application Container
         run: |
+          IMAGE_TAG="${{ needs.build-image.outputs.image-tag }}"
+          echo "Debug: IMAGE_TAG='$IMAGE_TAG'"
+          if [ -z "$IMAGE_TAG" ]; then
+            echo "Error: IMAGE_TAG is empty!"
+            exit 1
+          fi
           docker run -d \
             --name orderease-app \
             -p 8080:8080 \
@@ -211,7 +217,7 @@ jobs:
             -e JWT_SECRET=${{ env.JWT_SECRET }} \
             -e TZ=Asia/Shanghai \
             -e GIN_MODE=release \
-            ${{ needs.build-image.outputs.image-tag }}
+            "$IMAGE_TAG"
 
       - name: Wait for Application to be Ready
         run: |
