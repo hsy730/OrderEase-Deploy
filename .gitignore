@@ -5,7 +5,9 @@ __pycache__/
 *.so
 *.pyc
 .Python
-build/
+# Python build directories (but not the Docker build directory)
+**/build/lib/
+**/build/bdist.*/
 develop-eggs/
 dist/
 downloads/

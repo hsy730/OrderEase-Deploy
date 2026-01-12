@@ -7,6 +7,9 @@ WORKDIR /app/backend-ui
 COPY OrderEase-BackedUI/package*.json ./
 RUN npm install
 COPY OrderEase-BackedUI/ .
+# 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
+RUN echo "VITE_API_BASE_URL=" > .env && \
+    echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
 RUN npm run build
 
 # 阶段2: 构建前台UI
