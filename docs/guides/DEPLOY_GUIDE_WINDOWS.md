@@ -24,7 +24,28 @@ docker --version
 docker info
 ```
 
-### 3. 准备部署文件
+### 3. 配置 PowerShell 执行策略
+Windows PowerShell 默认禁止运行未签名的脚本，需要先配置执行策略。
+
+打开 **PowerShell（以管理员身份运行）**，执行以下命令：
+
+```powershell
+# 查看当前执行策略
+Get-ExecutionPolicy
+
+# 临时允许当前会话运行脚本（推荐，仅对当前窗口有效）
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 或者永久修改执行策略（需要管理员权限）
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+**执行策略说明**：
+- `Bypass` - 不阻止任何脚本，临时使用推荐
+- `RemoteSigned` - 允许运行本地脚本，远程脚本需要签名（推荐用于日常开发）
+- `Restricted` - 默认策略，不允许运行任何脚本
+
+### 4. 准备部署文件
 确保你已经获取了 `OrderEase-Deploy` 目录，其中包含：
 - `deploy.ps1` - 自动部署脚本
 
@@ -32,11 +53,42 @@ docker info
 
 ## 快速开始
 
+### 前置步骤：允许脚本执行
+
+**首次运行前，必须在 PowerShell 窗口中执行以下命令**：
+
+```powershell
+# 临时允许当前会话运行脚本（推荐方式）
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+> ⚠️ **注意**：此命令仅对当前 PowerShell 窗口有效，关闭窗口后失效。每次重新打开 PowerShell 运行脚本前都需要执行此命令。
+
 ### 方法一：全自动部署（推荐）
 打开 PowerShell，进入部署目录，运行：
 ```powershell
 cd D:\local_code_repo\OrderEase-Deploy
+
+# 首次运行前执行此命令
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 然后运行部署脚本
 .\deploy.ps1
+```
+
+### 如果遇到执行策略错误
+如果看到错误提示 **"无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本"**，说明执行策略限制生效。
+
+**解决方案**：
+```powershell
+# 方案 A：临时绕过（推荐，安全）
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 方案 B：使用 PowerShell 的 -ExecutionPolicy 参数
+powershell -ExecutionPolicy Bypass -File .\deploy.ps1
+
+# 方案 C：永久修改为允许本地脚本（需要管理员权限）
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
 脚本将自动完成：
@@ -221,7 +273,26 @@ docker exec -it orderease-mysql bash
 mysql -u root -p
 ```
 
-### 6. 中文乱码问题
+### 6. 脚本执行权限问题
+**错误信息**：`无法加载文件 deploy.ps1，因为在此系统上禁止运行脚本`
+
+**原因**：Windows PowerShell 默认执行策略为 `Restricted`，禁止运行未签名脚本。
+
+**解决方案**：
+```powershell
+# 方案 A：临时允许（推荐，每次打开 PowerShell 都要执行）
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# 方案 B：直接用参数绕过执行策略
+powershell -ExecutionPolicy Bypass -File .\deploy.ps1
+
+# 方案 C：永久修改用户级策略
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+**推荐使用方案 A 或 B**，安全性更高且不影响系统全局设置。
+
+### 7. 中文乱码问题
 如果脚本执行时出现中文乱码：
 
 ```powershell
