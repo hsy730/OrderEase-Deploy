@@ -35,7 +35,8 @@ def create_product(admin_token, shop_id, name=None, price=100, description=None,
         "shop_id": int(shop_id),
         "name": name,
         "price": price,
-        "description": description
+        "description": description,
+        "stock": stock
     }
     if stock is not None:
         payload["stock"] = stock

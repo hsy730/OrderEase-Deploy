@@ -359,7 +359,8 @@ class TestBusinessFlow:
             shop_id,
             name=f"Test Product for Flow",
             price=100,
-            description="Product created for flow testing"
+            description="Product created for flow testing",
+            stock=100
         )
         if product_id:
             self.cleanup_resources.append(lambda: product_actions.delete_product(self.admin_token, product_id, shop_id))
