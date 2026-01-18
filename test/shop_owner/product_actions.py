@@ -13,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from conftest import API_BASE_URL, make_request_with_retry
 
 
-def create_product(shop_owner_token, shop_id, name=None, price=100, description="Test product description"):
+def create_product(shop_owner_token, shop_id, name=None, price=100, description="Test product description", stock=100):
     """创建商品
 
     Args:
@@ -34,7 +34,8 @@ def create_product(shop_owner_token, shop_id, name=None, price=100, description=
         "shop_id": shop_id,
         "name": name,
         "price": price,
-        "description": description
+        "description": description,
+        "stock": stock
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
 
