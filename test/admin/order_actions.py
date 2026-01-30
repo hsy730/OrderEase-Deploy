@@ -7,9 +7,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_order(admin_token, shop_id, user_id, items):
@@ -26,7 +28,7 @@ def create_order(admin_token, shop_id, user_id, items):
     """
     url = f"{API_BASE_URL}/admin/order/create"
     payload = {
-        "shop_id": int(shop_id),
+        "shop_id": str(shop_id),
         "user_id": str(user_id),
         "items": items
     }
@@ -36,11 +38,20 @@ def create_order(admin_token, shop_id, user_id, items):
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建订单响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
-        data = response.json()
-        return data.get("order_id") or data.get("id") or data.get("orderId")
-    return None
+        # 使用 ResponseValidator 提取 ID
+        validator = ResponseValidator(response)
+        order_id = validator.extract_id()
+        if order_id:
+            print(f"✓ 创建订单成功，ID: {order_id}")
+            return order_id
+        else:
+            print(f"⚠ 创建订单成功但无法提取ID，响应: {response.text}")
+            return None
+    else:
+        print(f"✗ 创建订单失败，状态码: {response.status_code}, 响应: {response.text}")
+        return None
 
 
 def get_order_list(admin_token, shop_id=None, page=1, page_size=10):
@@ -66,10 +77,15 @@ def get_order_list(admin_token, shop_id=None, page=1, page_size=10):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
+
     if response.status_code == 200:
         data = response.json()
-        return data.get("data", data.get("orders", []))
-    return []
+        orders = data.get("data", data.get("orders", []))
+        print(f"✓ 获取订单列表成功，数量: {len(orders) if isinstance(orders, list) else 0}")
+        return orders
+    else:
+        print(f"✗ 获取订单列表失败，状态码: {response.status_code}, 响应: {response.text}")
+        return []
 
 
 def get_order_detail(admin_token, order_id, shop_id):
@@ -91,14 +107,20 @@ def get_order_detail(admin_token, order_id, shop_id):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"获取订单详情响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
         json_data = response.json()
         # 处理不同的响应格式
         if isinstance(json_data, dict):
-            return json_data.get("data")
+            result = json_data.get("data")
+            if result:
+                print(f"✓ 获取订单详情成功，ID: {order_id}")
+                return result
         elif isinstance(json_data, list) and len(json_data) > 0:
+            print(f"✓ 获取订单详情成功，ID: {order_id}")
             return json_data[0]
+    else:
+        print(f"✗ 获取订单详情失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -125,7 +147,7 @@ def update_order(admin_token, order_id, shop_id, user_id=None, total_price=None,
     if user_id:
         payload["user_id"] = str(user_id)
     if shop_id:
-        payload["shop_id"] = int(shop_id)
+        payload["shop_id"] = str(shop_id)
     if total_price:
         payload["total_price"] = total_price
     if status is not None:
@@ -141,8 +163,13 @@ def update_order(admin_token, order_id, shop_id, user_id=None, total_price=None,
         return requests.put(url, params=params, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"更新订单响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 更新订单成功，ID: {order_id}")
+        return True
+    else:
+        print(f"✗ 更新订单失败，ID: {order_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def toggle_order_status(admin_token, order_id, shop_id, next_status):
@@ -160,7 +187,7 @@ def toggle_order_status(admin_token, order_id, shop_id, next_status):
     url = f"{API_BASE_URL}/admin/order/toggle-status"
     payload = {
         "id": str(order_id),
-        "shop_id": int(shop_id),
+        "shop_id": str(shop_id),
         "next_status": next_status
     }
     headers = {"Authorization": f"Bearer {admin_token}"}
@@ -191,8 +218,13 @@ def delete_order(admin_token, order_id, shop_id):
         return requests.delete(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除订单响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 删除订单成功，ID: {order_id}")
+        return True
+    else:
+        print(f"✗ 删除订单失败，ID: {order_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def get_order_status_flow(admin_token, order_id, shop_id):

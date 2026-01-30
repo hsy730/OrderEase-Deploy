@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_shop(admin_token, name=None, description=None, address=None,
@@ -31,16 +33,29 @@ def create_shop(admin_token, name=None, description=None, address=None,
     Returns:
         shop_id: 店铺ID，失败返回None
     """
-    if not name:
-        name = f"Test Shop {os.urandom(4).hex()}"
-    if not owner_username:
-        owner_username = f"shop_owner_{os.urandom(4).hex()}"
-    if not owner_password:
-        owner_password = "TestPassword123"
-    if not contact_phone:
-        contact_phone = "13800138000"
-    if not contact_email:
-        contact_email = f"shop_{os.urandom(4).hex()}@test.com"
+    # 如果没有提供参数，使用测试数据配置生成
+    if not name and not owner_username:
+        # 使用 test_data 生成完整的店铺数据
+        shop_data = test_data.generate_shop_data()
+        name = shop_data["name"]
+        owner_username = shop_data["owner_username"]
+        owner_password = shop_data["owner_password"]
+        contact_phone = shop_data["contact_phone"]
+        contact_email = shop_data["contact_email"]
+        description = description or shop_data["description"]
+        address = address or shop_data["address"]
+    else:
+        # 兼容旧的调用方式
+        if not name:
+            name = f"Test Shop {os.urandom(4).hex()}"
+        if not owner_username:
+            owner_username = f"shop_owner_{os.urandom(4).hex()}"
+        if not owner_password:
+            owner_password = "TestPassword123"
+        if not contact_phone:
+            contact_phone = "13800138000"
+        if not contact_email:
+            contact_email = f"shop_{os.urandom(4).hex()}@test.com"
 
     url = f"{API_BASE_URL}/admin/shop/create"
     payload = {
@@ -59,11 +74,30 @@ def create_shop(admin_token, name=None, description=None, address=None,
 
     response = make_request_with_retry(request_func)
     print(f"创建店铺响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
-        data = response.json()
-        shop_data = data.get("data", {})
-        return shop_data.get("id") or data.get("id") or data.get("shop_id") or data.get("shopId")
-    return None
+        # 使用 ResponseValidator 提取 ID
+        validator = ResponseValidator(response)
+        shop_id = validator.extract_id()
+        if shop_id:
+            # 验证返回的店铺名称是否匹配
+            try:
+                data = response.json()
+                shop_data = data.get("data", data)
+                returned_name = shop_data.get("name") or shop_data.get("Name")
+                if returned_name and returned_name == name:
+                    print(f"[OK] 创建店铺成功，ID: {shop_id}, 名称: {returned_name}")
+                else:
+                    print(f"[WARN] 创建店铺成功但名称不匹配，期望: {name}, 返回: {returned_name}")
+            except:
+                print(f"[OK] 创建店铺成功，ID: {shop_id}")
+            return shop_id
+        else:
+            print(f"[WARN] 创建店铺成功但无法提取ID，响应: {response.text}")
+            return None
+    else:
+        print(f"[FAIL] 创建店铺失败，状态码: {response.status_code}, 响应: {response.text}")
+        return None
 
 
 def update_shop(admin_token, shop_id, name=None, description=None):
@@ -96,7 +130,7 @@ def update_shop(admin_token, shop_id, name=None, description=None):
     shop_detail = detail_data.get("data") if isinstance(detail_data, dict) else None
     if shop_detail is None:
         # 如果没有 data 字段，直接使用 detail_data
-        if isinstance(detail_data, dict) and "owner_username" in detail_data:
+        if isinstance(detail_data, dict) and ("OwnerUsername" in detail_data or "owner_username" in detail_data or "ID" in detail_data):
             shop_detail = detail_data
         elif isinstance(detail_data, list) and len(detail_data) > 0:
             shop_detail = detail_data[0]
@@ -105,7 +139,7 @@ def update_shop(admin_token, shop_id, name=None, description=None):
         print(f"无法解析店铺详情，响应内容: {detail_response.text}")
         return False
 
-    owner_username = shop_detail.get("owner_username")
+    owner_username = shop_detail.get("OwnerUsername") or shop_detail.get("owner_username")
     if not owner_username:
         print(f"店铺详情中没有 owner_username，响应内容: {detail_response.text}")
         return False
@@ -147,14 +181,23 @@ def get_shop_detail(admin_token, shop_id):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"获取店铺详情响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
+        validator = ResponseValidator(response)
         json_data = response.json()
         # 处理不同的响应格式
         if isinstance(json_data, dict):
-            return json_data.get("data")
+            # 先尝试获取data字段，如果没有则直接使用json_data
+            result = json_data.get("data")
+            if result is None:
+                result = json_data
+            print(f"[OK] 获取店铺详情成功: {result.get('name') if isinstance(result, dict) else result}")
+            return result
         elif isinstance(json_data, list) and len(json_data) > 0:
+            print(f"[OK] 获取店铺详情成功: {json_data[0]}")
             return json_data[0]
+    else:
+        print(f"[FAIL] 获取店铺详情失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -177,10 +220,21 @@ def get_shop_list(admin_token, page=1, page_size=10):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
+
     if response.status_code == 200:
         data = response.json()
-        return data.get("data", data.get("shops", []))
-    return []
+        # 处理不同的响应格式
+        result = data.get("Data", data.get("data", data.get("shops", [])))
+        if isinstance(result, dict) and "Data" in result:
+            result = result["Data"]
+        elif isinstance(result, dict) and "data" in result:
+            result = result["data"]
+        shops = result if isinstance(result, list) else []
+        print(f"[OK] 获取店铺列表成功，数量: {len(shops)}")
+        return shops
+    else:
+        print(f"[FAIL] 获取店铺列表失败，状态码: {response.status_code}, 响应: {response.text}")
+        return []
 
 
 def delete_shop(admin_token, shop_id):
@@ -201,8 +255,13 @@ def delete_shop(admin_token, shop_id):
         return requests.delete(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除店铺响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"[OK] 删除店铺成功，ID: {shop_id}")
+        return True
+    else:
+        print(f"[FAIL] 删除店铺失败，ID: {shop_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def upload_shop_image(admin_token, shop_id, image_data=None):

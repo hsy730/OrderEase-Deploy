@@ -7,9 +7,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry, assert_response_status
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_order(shop_owner_token, shop_id, user_id, items):
@@ -26,7 +28,7 @@ def create_order(shop_owner_token, shop_id, user_id, items):
     """
     url = f"{API_BASE_URL}/shopOwner/order/create"
     payload = {
-        "shop_id": shop_id,
+        "shop_id": str(shop_id),
         "user_id": user_id,
         "items": items
     }
@@ -36,10 +38,12 @@ def create_order(shop_owner_token, shop_id, user_id, items):
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建订单响应状态码: {response.status_code}, 响应内容: {response.text}")
+    validator = ResponseValidator(response)
     if response.status_code == 200:
-        data = response.json()
-        return data.get("order_id") or data.get("id") or data.get("orderId")
+        order_id = validator.extract_id()
+        print(f"[OK] 创建订单成功，ID: {order_id}")
+        return order_id
+    print(f"[FAIL] 创建订单失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -86,7 +90,7 @@ def get_order_detail(shop_owner_token, order_id, shop_id):
     url = f"{API_BASE_URL}/shopOwner/order/detail"
     params = {
         "id": order_id,
-        "shop_id": int(shop_id) if shop_id else 1
+        "shop_id": str(shop_id) if shop_id else "1"
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
 
@@ -116,7 +120,7 @@ def update_order(shop_owner_token, order_id, shop_id, user_id, items):
     url = f"{API_BASE_URL}/shopOwner/order/update"
     params = {"id": order_id}
     payload = {
-        "shop_id": int(shop_id) if shop_id else 1,
+        "shop_id": str(shop_id) if shop_id else "1",
         "user_id": user_id,
         "items": items
     }
@@ -145,7 +149,7 @@ def toggle_order_status(shop_owner_token, order_id, shop_id, next_status=10):
     url = f"{API_BASE_URL}/shopOwner/order/toggle-status"
     payload = {
         "id": order_id,
-        "shop_id": int(shop_id) if shop_id else 1,
+        "shop_id": str(shop_id) if shop_id else "1",
         "next_status": next_status
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
@@ -174,7 +178,7 @@ def delete_order(shop_owner_token, order_id, shop_id):
     url = f"{API_BASE_URL}/shopOwner/order/delete"
     params = {
         "id": order_id,
-        "shop_id": int(shop_id) if shop_id else 1
+        "shop_id": str(shop_id) if shop_id else "1"
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
 
@@ -182,5 +186,8 @@ def delete_order(shop_owner_token, order_id, shop_id):
         return requests.delete(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除订单响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code == 200
+    if response.status_code == 200:
+        print(f"[OK] 删除订单成功，ID: {order_id}")
+        return True
+    print(f"[FAIL] 删除订单失败，ID: {order_id}, 状态码: {response.status_code}, 响应: {response.text}")
+    return False

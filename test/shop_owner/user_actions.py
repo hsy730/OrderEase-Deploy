@@ -8,28 +8,36 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
-def create_user(shop_owner_token, name=None, password="Admin@123456", user_type="delivery", phone="13800138000", address="Test address"):
+def create_user(shop_owner_token, name=None, password=None, user_type="delivery", phone=None, address="Test address"):
     """创建用户
 
     Args:
         shop_owner_token: 商家令牌
         name: 用户名称，如果为None则生成随机名称
-        password: 密码
+        password: 密码，如果为None则使用测试数据配置
         user_type: 用户类型，默认"delivery"
-        phone: 电话
+        phone: 电话，如果为None则使用测试数据配置
         address: 地址
 
     Returns:
         user_id: 用户ID，失败返回None
     """
+    # 使用测试数据配置生成数据
+    user_data = test_data.generate_user_data()
     if name is None:
-        name = f"Test User {os.urandom(4).hex()}"
-    
+        name = user_data["name"]
+    if password is None:
+        password = user_data["password"]
+    if phone is None:
+        phone = user_data["phone"]
+
     url = f"{API_BASE_URL}/shopOwner/user/create"
     payload = {
         "name": name,
@@ -44,9 +52,12 @@ def create_user(shop_owner_token, name=None, password="Admin@123456", user_type=
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
+    validator = ResponseValidator(response)
     if response.status_code == 200:
-        data = response.json()
-        return data.get("id") or data.get("user_id")
+        user_id = validator.extract_id()
+        print(f"[OK] 创建用户成功，名称: {name}, ID: {user_id}")
+        return user_id
+    print(f"[FAIL] 创建用户失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -150,4 +161,8 @@ def update_user(shop_owner_token, user_id, name="Updated User Name", address="Up
         return requests.put(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    return response.status_code == 200
+    if response.status_code == 200:
+        print(f"[OK] 更新用户成功，ID: {user_id}, 新名称: {name}")
+        return True
+    print(f"[FAIL] 更新用户失败，ID: {user_id}, 状态码: {response.status_code}, 响应: {response.text}")
+    return False

@@ -25,7 +25,7 @@ class FrontendOrderHelper:
         """
         url = f"{API_BASE_URL}/order/create"
         payload = {
-            "shop_id": int(shop_id),
+            "shop_id": str(shop_id),
             "user_id": str(user_id),
             "items": [
                 {

@@ -16,7 +16,7 @@ class TestAdminTagAPI:
         url = f"{API_BASE_URL}/admin/tag/create"
         payload = {
             "name": f"Test Tag {os.urandom(4).hex()}",
-            "shop_id": 1
+            "shop_id": "1"
         }
         headers = {"Authorization": f"Bearer {admin_token}"}
         

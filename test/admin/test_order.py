@@ -14,7 +14,7 @@ class TestAdminOrderAPI:
         """测试创建订单"""
         url = f"{API_BASE_URL}/admin/order/create"
         payload = {
-            "shop_id": int(test_shop_id) if test_shop_id else 7,
+            "shop_id": str(test_shop_id) if test_shop_id else "7",
             "user_id": str(test_user_id) if test_user_id else "2006633621737181184",
             "items": [
                 {
@@ -73,7 +73,7 @@ class TestAdminOrderAPI:
         payload = {
             "id": str(test_order_id) if test_order_id else "2006670542223970304",
             "user_id": str(test_user_id) if test_user_id else "2006633621737181184",
-            "shop_id": int(test_shop_id) if test_shop_id else 7,
+            "shop_id": str(test_shop_id) if test_shop_id else "7",
             "total_price": "100.00",
             "status": 1,
             "remark": "44",
@@ -101,7 +101,7 @@ class TestAdminOrderAPI:
         url = f"{API_BASE_URL}/admin/order/toggle-status"
         payload = {
             "id": str(test_order_id) if test_order_id else "2006670542223970304",
-            "shop_id": int(test_shop_id) if test_shop_id else 7,
+            "shop_id": str(test_shop_id) if test_shop_id else "7",
             "next_status": 10
         }
         headers = {"Authorization": f"Bearer {admin_token}"}

@@ -8,12 +8,14 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
-def create_tag(admin_token, name=None, shop_id=1):
+def create_tag(admin_token, name=None, shop_id="1"):
     """创建标签
 
     Args:
@@ -24,13 +26,15 @@ def create_tag(admin_token, name=None, shop_id=1):
     Returns:
         tag_id: 标签ID，失败返回None
     """
+    # 如果没有提供名称，使用测试数据配置生成
     if not name:
-        name = f"Test Tag {os.urandom(4).hex()}"
+        tag_data = test_data.generate_tag_data(shop_id)
+        name = tag_data["name"]
 
     url = f"{API_BASE_URL}/admin/tag/create"
     payload = {
         "name": name,
-        "shop_id": shop_id
+        "shop_id": str(shop_id)
     }
     headers = {"Authorization": f"Bearer {admin_token}"}
 
@@ -38,11 +42,30 @@ def create_tag(admin_token, name=None, shop_id=1):
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建标签响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
-        data = response.json()
-        return data.get("id") or data.get("tag_id") or data.get("tagId")
-    return None
+        # 使用 ResponseValidator 提取 ID
+        validator = ResponseValidator(response)
+        tag_id = validator.extract_id()
+        if tag_id:
+            # 验证返回的标签名称是否匹配
+            try:
+                data = response.json()
+                tag_response = data.get("data", data)
+                returned_name = tag_response.get("name") or tag_response.get("Name")
+                if returned_name and returned_name == name:
+                    print(f"✓ 创建标签成功，ID: {tag_id}, 名称: {returned_name}")
+                else:
+                    print(f"⚠ 创建标签成功但名称不匹配，期望: {name}, 返回: {returned_name}")
+            except:
+                print(f"✓ 创建标签成功，ID: {tag_id}")
+            return tag_id
+        else:
+            print(f"⚠ 创建标签成功但无法提取ID，响应: {response.text}")
+            return None
+    else:
+        print(f"✗ 创建标签失败，状态码: {response.status_code}, 响应: {response.text}")
+        return None
 
 
 def batch_tag_products(admin_token, product_ids, tag_ids):
@@ -83,7 +106,7 @@ def get_bound_tags(admin_token, product_id, shop_id):
         list: 已绑定的标签列表
     """
     url = f"{API_BASE_URL}/admin/tag/bound-tags"
-    params = {"product_id": product_id, "shop_id": shop_id}
+    params = {"product_id": product_id, "shop_id": str(shop_id)}
     headers = {"Authorization": f"Bearer {admin_token}"}
 
     def request_func():
@@ -107,7 +130,7 @@ def get_online_products(admin_token, tag_id, shop_id):
         list: 商品列表
     """
     url = f"{API_BASE_URL}/admin/tag/online-products"
-    params = {"tag_id": tag_id, "shop_id": shop_id}
+    params = {"tag_id": tag_id, "shop_id": str(shop_id)}
     headers = {"Authorization": f"Bearer {admin_token}"}
 
     def request_func():
@@ -131,7 +154,7 @@ def get_unbound_tags(admin_token, product_id, shop_id):
         list: 未绑定的标签列表
     """
     url = f"{API_BASE_URL}/admin/tag/unbound-tags"
-    params = {"product_id": product_id, "shop_id": shop_id}
+    params = {"product_id": product_id, "shop_id": str(shop_id)}
     headers = {"Authorization": f"Bearer {admin_token}"}
 
     def request_func():
@@ -162,9 +185,14 @@ def get_tag_list(admin_token, page=1, page_size=10):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
+
     if response.status_code == 200:
-        return response.json().get("data", [])
-    return []
+        tags = response.json().get("data", [])
+        print(f"✓ 获取标签列表成功，数量: {len(tags) if isinstance(tags, list) else 0}")
+        return tags
+    else:
+        print(f"✗ 获取标签列表失败，状态码: {response.status_code}, 响应: {response.text}")
+        return []
 
 
 def get_tag_detail(admin_token, tag_id):
@@ -212,8 +240,13 @@ def update_tag(admin_token, tag_id, name=None):
         return requests.put(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"更新标签响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 更新标签成功，ID: {tag_id}")
+        return True
+    else:
+        print(f"✗ 更新标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def delete_tag(admin_token, tag_id):
@@ -234,8 +267,13 @@ def delete_tag(admin_token, tag_id):
         return requests.delete(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除标签响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 删除标签成功，ID: {tag_id}")
+        return True
+    else:
+        print(f"✗ 删除标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def batch_tag_product(admin_token, product_id, tag_ids):

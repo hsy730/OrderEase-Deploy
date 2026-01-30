@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_product(shop_owner_token, shop_id, name=None, price=100, description="Test product description", stock=100):
@@ -26,9 +28,13 @@ def create_product(shop_owner_token, shop_id, name=None, price=100, description=
     Returns:
         product_id: 商品ID，失败返回None
     """
+    # 使用测试数据配置生成数据
+    product_data = test_data.generate_product_data(shop_id)
     if name is None:
-        name = f"Test Product {os.urandom(4).hex()}"
-    
+        name = product_data["name"]
+    if price == 100:
+        price = product_data["price"]
+
     url = f"{API_BASE_URL}/shopOwner/product/create"
     payload = {
         "shop_id": shop_id,
@@ -43,10 +49,12 @@ def create_product(shop_owner_token, shop_id, name=None, price=100, description=
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建商品响应状态码: {response.status_code}, 响应内容: {response.text}")
+    validator = ResponseValidator(response)
     if response.status_code == 200:
-        data = response.json()
-        return data.get("id") or data.get("product_id") or data.get("productId")
+        product_id = validator.extract_id()
+        print(f"[OK] 创建商品成功，名称: {name}, ID: {product_id}")
+        return product_id
+    print(f"[FAIL] 创建商品失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -248,7 +256,7 @@ def delete_product(shop_owner_token, product_id, shop_id):
     url = f"{API_BASE_URL}/shopOwner/product/delete"
     payload = {
         "id": product_id,
-        "shop_id": int(shop_id)
+        "shop_id": str(shop_id)
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
 
@@ -256,5 +264,8 @@ def delete_product(shop_owner_token, product_id, shop_id):
         return requests.delete(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除商品响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code == 200
+    if response.status_code == 200:
+        print(f"[OK] 删除商品成功，ID: {product_id}")
+        return True
+    print(f"[FAIL] 删除商品失败，ID: {product_id}, 状态码: {response.status_code}, 响应: {response.text}")
+    return False

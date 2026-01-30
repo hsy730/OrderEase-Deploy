@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_tag(shop_owner_token, shop_id, name=None):
@@ -24,9 +26,10 @@ def create_tag(shop_owner_token, shop_id, name=None):
     Returns:
         tag_id: 标签ID，失败返回None
     """
+    # 使用测试数据配置生成数据
     if name is None:
-        name = f"Test Tag {os.urandom(4).hex()}"
-    
+        name = test_data.generate_tag_data(shop_id)["name"]
+
     url = f"{API_BASE_URL}/shopOwner/tag/create"
     payload = {
         "name": name,
@@ -38,10 +41,12 @@ def create_tag(shop_owner_token, shop_id, name=None):
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建标签响应状态码: {response.status_code}, 响应内容: {response.text}")
+    validator = ResponseValidator(response)
     if response.status_code == 200:
-        data = response.json()
-        return data.get("id") or data.get("tag_id") or data.get("tagId")
+        tag_id = validator.extract_id()
+        print(f"[OK] 创建标签成功，名称: {name}, ID: {tag_id}")
+        return tag_id
+    print(f"[FAIL] 创建标签失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -200,5 +205,8 @@ def delete_tag(shop_owner_token, tag_id, shop_id):
         return requests.delete(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除标签响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code == 200
+    if response.status_code == 200:
+        print(f"[OK] 删除标签成功，ID: {tag_id}")
+        return True
+    print(f"[FAIL] 删除标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
+    return False

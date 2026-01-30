@@ -7,9 +7,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def get_shop_detail(shop_owner_token, shop_id):
@@ -30,9 +32,16 @@ def get_shop_detail(shop_owner_token, shop_id):
         return requests.get(url, headers=headers, params=params)
 
     response = make_request_with_retry(request_func)
-    print(f"获取店铺详情响应状态码: {response.status_code}, 响应内容: {response.text}")
+
     if response.status_code == 200:
-        return response.json()
+        json_data = response.json()
+        # 处理不同的响应格式
+        if isinstance(json_data, dict):
+            result = json_data.get("data", json_data)
+            print(f"[OK] 获取店铺详情成功，名称: {result.get('name') if isinstance(result, dict) else 'N/A'}")
+            return result
+    else:
+        print(f"[FAIL] 获取店铺详情失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -154,8 +163,13 @@ def update_shop(shop_owner_token, shop_id, name="Updated Shop Name", description
         return requests.put(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"更新店铺响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"[OK] 更新店铺成功，ID: {shop_id}, 新名称: {name}")
+        return True
+    else:
+        print(f"[FAIL] 更新店铺失败，ID: {shop_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def update_order_status_flow(shop_owner_token, shop_id):
@@ -211,9 +225,6 @@ def change_shop_password(shop_owner_token, shop_id, old_password="Admin@123456",
     Returns:
         bool: 成功返回True，失败返回False
     """
-    print(f"店铺ID: {shop_id}, 类型: {type(shop_id)}")
-    
-    # 直接修改密码
     url = f"{API_BASE_URL}/shopOwner/change-password"
     payload = {
         "old_password": old_password,
@@ -225,8 +236,13 @@ def change_shop_password(shop_owner_token, shop_id, old_password="Admin@123456",
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"修改密码响应状态码: {response.status_code}, 响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"[OK] 修改店铺密码成功，ID: {shop_id}")
+        return True
+    else:
+        print(f"[FAIL] 修改店铺密码失败，ID: {shop_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def get_shop_temp_token(shop_owner_token, shop_id):
@@ -275,7 +291,7 @@ def temp_login(shop_id, temp_token):
         return requests.post(url, json=payload)
 
     response = make_request_with_retry(request_func)
-    print(f"临时令牌登录响应状态码: {response.status_code}, 响应内容: {response.text}")
     if response.status_code == 200:
         return response.json()
+    print(f"临时令牌登录失败, 请求参数: {payload}, 状态码: {response.status_code}, 响应内容: {response.text}")
     return None

@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 
 # 添加当前目录到 sys.path，以便导入 conftest
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from conftest import API_BASE_URL, make_request_with_retry
+from utils.response_validator import ResponseValidator
+from config.test_data import test_data
 
 
 def create_product(admin_token, shop_id, name=None, price=100, description=None, stock=None):
@@ -27,19 +29,25 @@ def create_product(admin_token, shop_id, name=None, price=100, description=None,
     Returns:
         product_id: 商品ID，失败返回None
     """
+    # 如果没有提供名称，使用测试数据配置生成
     if not name:
-        name = f"Test Product {os.urandom(4).hex()}"
+        product_data = test_data.generate_product_data(shop_id)
+        name = product_data["name"]
+        description = description or product_data["description"]
+        price = price or product_data["price"]
+        stock = stock if stock is not None else product_data["stock"]
+    else:
+        if stock is None:
+            stock = 100
 
     url = f"{API_BASE_URL}/admin/product/create"
     payload = {
-        "shop_id": int(shop_id),
+        "shop_id": str(shop_id),
         "name": name,
         "price": price,
         "description": description,
         "stock": stock
     }
-    if stock is not None:
-        payload["stock"] = stock
 
     headers = {"Authorization": f"Bearer {admin_token}"}
 
@@ -47,11 +55,30 @@ def create_product(admin_token, shop_id, name=None, price=100, description=None,
         return requests.post(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"创建商品响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
-        data = response.json()
-        return data.get("id") or data.get("product_id") or data.get("productId")
-    return None
+        # 使用 ResponseValidator 提取 ID
+        validator = ResponseValidator(response)
+        product_id = validator.extract_id()
+        if product_id:
+            # 验证返回的商品名称是否匹配
+            try:
+                data = response.json()
+                product_response = data.get("data", data)
+                returned_name = product_response.get("name") or product_response.get("Name")
+                if returned_name and returned_name == name:
+                    print(f"✓ 创建商品成功，ID: {product_id}, 名称: {returned_name}")
+                else:
+                    print(f"⚠ 创建商品成功但名称不匹配，期望: {name}, 返回: {returned_name}")
+            except:
+                print(f"✓ 创建商品成功，ID: {product_id}")
+            return product_id
+        else:
+            print(f"⚠ 创建商品成功但无法提取ID，响应: {response.text}")
+            return None
+    else:
+        print(f"✗ 创建商品失败，状态码: {response.status_code}, 响应: {response.text}")
+        return None
 
 
 def get_product_list(admin_token, shop_id=None, page=1, page_size=10):
@@ -77,10 +104,15 @@ def get_product_list(admin_token, shop_id=None, page=1, page_size=10):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
+
     if response.status_code == 200:
         data = response.json()
-        return data.get("data", data.get("products", []))
-    return []
+        products = data.get("data", data.get("products", []))
+        print(f"✓ 获取商品列表成功，数量: {len(products) if isinstance(products, list) else 0}")
+        return products
+    else:
+        print(f"✗ 获取商品列表失败，状态码: {response.status_code}, 响应: {response.text}")
+        return []
 
 
 def get_product_detail(admin_token, product_id, shop_id):
@@ -102,14 +134,20 @@ def get_product_detail(admin_token, product_id, shop_id):
         return requests.get(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"获取商品详情响应码: {response.status_code}，响应内容: {response.text}")
+
     if response.status_code == 200:
         json_data = response.json()
         # 处理不同的响应格式
         if isinstance(json_data, dict):
-            return json_data.get("data")
+            result = json_data.get("data")
+            if result:
+                print(f"✓ 获取商品详情成功: {result.get('name') if isinstance(result, dict) else result}")
+                return result
         elif isinstance(json_data, list) and len(json_data) > 0:
+            print(f"✓ 获取商品详情成功: {json_data[0]}")
             return json_data[0]
+    else:
+        print(f"✗ 获取商品详情失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
 
 
@@ -140,7 +178,13 @@ def update_product(admin_token, product_id, shop_id, name=None, price=None):
         return requests.put(url, params=params, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 更新商品成功，ID: {product_id}")
+        return True
+    else:
+        print(f"✗ 更新商品失败，ID: {product_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def delete_product(admin_token, product_id, shop_id):
@@ -162,8 +206,13 @@ def delete_product(admin_token, product_id, shop_id):
         return requests.delete(url, params=params, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"删除商品响应码: {response.status_code}，响应内容: {response.text}")
-    return response.status_code == 200
+
+    if response.status_code == 200:
+        print(f"✓ 删除商品成功，ID: {product_id}")
+        return True
+    else:
+        print(f"✗ 删除商品失败，ID: {product_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        return False
 
 
 def upload_product_image(admin_token, product_id, shop_id, image_data=None):

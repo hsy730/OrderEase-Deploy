@@ -71,7 +71,7 @@ class TestAdminProductAPI:
     def test_get_product_detail(self, admin_token, test_product_id, test_shop_id):
         """测试获取商品详情"""
         url = f"{API_BASE_URL}/admin/product/detail"
-        params = {"id": test_product_id if test_product_id else 1, "shop_id": int(test_shop_id) if test_shop_id else 1}
+        params = {"id": test_product_id if test_product_id else 1, "shop_id": str(test_shop_id) if test_shop_id else "1"}
         headers = {"Authorization": f"Bearer {admin_token}"}
         
         def request_func():
