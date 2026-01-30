@@ -293,7 +293,15 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
-        print("✓ 获取用户订单列表成功")
+        # 验证响应数据结构
+        data = response.json()
+        orders = data.get("data", data.get("orders", data.get("list", [])))
+        assert isinstance(orders, list), "订单列表应为列表类型"
+        # 验证订单列表元素包含必需字段（如果有订单的话）
+        for order in orders:
+            assert isinstance(order, dict), "订单应为字典类型"
+            assert "id" in order, "订单应包含id字段"
+        print(f"✓ 获取用户订单列表成功，共 {len(orders)} 个订单")
 
     def test_get_order_detail(self):
         """测试获取订单详情"""
@@ -425,7 +433,16 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
-        print("✓ 获取商品列表成功")
+        # 验证响应数据结构
+        data = response.json()
+        products = data.get("data", data.get("products", data.get("list", [])))
+        assert isinstance(products, list), "商品列表应为列表类型"
+        # 验证商品列表元素包含必需字段（如果有商品的话）
+        for product in products:
+            assert isinstance(product, dict), "商品应为字典类型"
+            assert "id" in product, "商品应包含id字段"
+            assert "name" in product, "商品应包含name字段"
+        print(f"✓ 获取商品列表成功，共 {len(products)} 个商品")
 
     def test_get_product_detail(self):
         """测试获取商品详情"""

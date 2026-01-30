@@ -364,12 +364,23 @@ class TestShopOwnerBusinessFlow:
         """测试获取用户列表"""
         users = user_actions.get_user_list(TestShopOwnerBusinessFlow.shop_owner_token, page=1, page_size=10)
         assert isinstance(users, list), "获取用户列表失败"
+        assert len(users) > 0, "用户列表不应为空"
+        # 验证用户列表包含必需字段
+        for user in users:
+            assert isinstance(user, dict), "用户应为字典类型"
+            assert "id" in user, "用户应包含id字段"
+            assert "name" in user, "用户应包含name字段"
         print(f"[OK] 获取用户列表成功，共 {len(users)} 个用户")
 
     def test_get_user_simple_list(self):
         """测试获取用户简单列表"""
         users = user_actions.get_user_simple_list(TestShopOwnerBusinessFlow.shop_owner_token)
         assert isinstance(users, list), "获取用户简单列表失败"
+        assert len(users) > 0, "用户简单列表不应为空"
+        # 验证简单列表包含必需字段
+        for user in users:
+            assert isinstance(user, dict), "用户应为字典类型"
+            assert "id" in user, "用户应包含id字段"
         print(f"[OK] 获取用户简单列表成功，共 {len(users)} 个用户")
 
     def test_get_user_detail(self):
@@ -409,6 +420,12 @@ class TestShopOwnerBusinessFlow:
             page_size=10
         )
         assert isinstance(products, list), "获取商品列表失败"
+        assert len(products) > 0, "商品列表不应为空"
+        # 验证商品列表包含必需字段
+        for product in products:
+            assert isinstance(product, dict), "商品应为字典类型"
+            assert "id" in product, "商品应包含id字段"
+            assert "name" in product, "商品应包含name字段"
         print(f"[OK] 获取商品列表成功，共 {len(products)} 个商品")
 
     def test_get_product_detail(self):
@@ -478,6 +495,11 @@ class TestShopOwnerBusinessFlow:
             page_size=10
         )
         assert isinstance(orders, list), "获取订单列表失败"
+        # 订单列表可能为空（刚创建的店铺可能没有订单），所以不强制要求非空
+        # 验证订单列表元素包含必需字段（如果有订单的话）
+        for order in orders:
+            assert isinstance(order, dict), "订单应为字典类型"
+            assert "id" in order, "订单应包含id字段"
         print(f"[OK] 获取订单列表成功，共 {len(orders)} 个订单")
 
     def test_get_order_detail(self):
@@ -540,6 +562,11 @@ class TestShopOwnerBusinessFlow:
             self.resources['shop_id']
         )
         assert isinstance(tags, list), "获取商品已绑定标签失败"
+        # 验证标签列表元素包含必需字段（如果有标签的话）
+        for tag in tags:
+            assert isinstance(tag, dict), "标签应为字典类型"
+            assert "id" in tag, "标签应包含id字段"
+            assert "name" in tag, "标签应包含name字段"
         print(f"[OK] 获取商品已绑定标签成功，共 {len(tags)} 个标签")
 
     def test_get_online_products(self):
@@ -550,6 +577,10 @@ class TestShopOwnerBusinessFlow:
             self.resources['shop_id']
         )
         assert isinstance(products, list), "获取标签关联商品失败"
+        # 验证商品列表元素包含必需字段（如果有商品的话）
+        for product in products:
+            assert isinstance(product, dict), "商品应为字典类型"
+            assert "id" in product, "商品应包含id字段"
         print(f"[OK] 获取标签关联商品成功，共 {len(products)} 个商品")
 
     def test_get_unbound_tags(self):
@@ -560,6 +591,11 @@ class TestShopOwnerBusinessFlow:
             self.resources['shop_id']
         )
         assert isinstance(tags, list), "获取商品未绑定标签失败"
+        # 验证标签列表元素包含必需字段（如果有标签的话）
+        for tag in tags:
+            assert isinstance(tag, dict), "标签应为字典类型"
+            assert "id" in tag, "标签应包含id字段"
+            assert "name" in tag, "标签应包含name字段"
         print(f"[OK] 获取商品未绑定标签成功，共 {len(tags)} 个标签")
 
     # ==================== 完整业务流程测试 ====================
