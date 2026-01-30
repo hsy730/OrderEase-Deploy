@@ -19,3 +19,7 @@ test_results.*
 
 # Environment
 .env.local
+# Backup files
+*.bak
+*.bakup
+*.tmp
