@@ -78,7 +78,8 @@ class TestShopOwnerBusinessFlow:
                     shop_id,
                     name=f"Test Product {os.urandom(4).hex()}",
                     price=100,
-                    description="Test product description"
+                    description="Test product description",
+                    stock=100
                 )
                 if product_id is None:
                     # 使用管理员token创建商品
@@ -89,7 +90,8 @@ class TestShopOwnerBusinessFlow:
                         shop_id,
                         name=f"Test Product {os.urandom(4).hex()}",
                         price=100,
-                        description="Test product description"
+                        description="Test product description",
+                        stock=100
                     )
             except Exception as e:
                 print(f"创建商品时发生异常: {e}")
@@ -100,7 +102,8 @@ class TestShopOwnerBusinessFlow:
                     shop_id,
                     name=f"Test Product {os.urandom(4).hex()}",
                     price=100,
-                    description="Test product description"
+                    description="Test product description",
+                    stock=100
                 )
             
             assert product_id is not None, "创建商品失败"
@@ -309,39 +312,53 @@ class TestShopOwnerBusinessFlow:
 
     def test_create_user(self):
         """测试创建用户 - 商家可能没有权限，使用管理员token"""
-        try:
-            # 生成唯一的11位手机号，避免409冲突
-            import random
-            unique_phone = f"1{random.randint(1000000000, 9999999999)}"
-            
-            # 先尝试使用商家token
-            user_id = user_actions.create_user(
-                TestShopOwnerBusinessFlow.shop_owner_token,
-                name=f"Test User {os.urandom(4).hex()}",
-                password="Admin@123456",
-                user_type="delivery",
-                phone=unique_phone,
-                address="Test address"
-            )
-            if user_id is None:
-                # 使用管理员token创建用户
-                print("[WARN] 商家创建用户失败，尝试使用管理员token创建用户")
-                import admin.user_actions as admin_user_actions
-                # 生成另一个唯一的11位手机号
+        import time
+        import random
+
+        user_id = None
+        max_retries = 3
+
+        for attempt in range(max_retries):
+            time.sleep(1)  # 添加延迟避免速率限制
+            try:
+                # 生成唯一的11位手机号，避免409冲突
                 unique_phone = f"1{random.randint(1000000000, 9999999999)}"
-                user_id = admin_user_actions.create_user(
-                    TestShopOwnerBusinessFlow.admin_token,
-                    name=f"Test User {os.urandom(4).hex()}",
-                    password="Admin@123456",
+
+                # 先尝试使用商家token
+                user_id = user_actions.create_user(
+                    TestShopOwnerBusinessFlow.shop_owner_token,
+                    name=f"TestUser{os.urandom(2).hex()}",
+                    password="Test123456!",  # 强密码：8+位，大小写+数字+特殊字符
                     user_type="delivery",
                     phone=unique_phone,
                     address="Test address"
                 )
-            assert user_id is not None, "创建用户失败"
-            print(f"[OK] 创建用户成功，ID: {user_id}")
-        except Exception as e:
-            print(f"✗ 创建用户测试失败: {e}")
-            pytest.fail(f"创建用户测试失败: {e}")
+
+                if user_id is None:
+                    # 使用管理员token创建用户
+                    print(f"[WARN] 尝试 {attempt + 1}: 商家创建用户失败，尝试使用管理员token")
+                    import admin.user_actions as admin_user_actions
+                    unique_phone = f"1{random.randint(1000000000, 9999999999)}"
+                    user_id = admin_user_actions.create_user(
+                        TestShopOwnerBusinessFlow.admin_token,
+                        name=f"TestUser{os.urandom(2).hex()}",
+                        password="Test123456!",  # 强密码：8+位，大小写+数字+特殊字符
+                        user_type="delivery",
+                        phone=unique_phone,
+                        address="Test address"
+                    )
+
+                if user_id is not None:
+                    print(f"[OK] 创建用户成功，ID: {user_id}")
+                    break
+                else:
+                    print(f"[WARN] 尝试 {attempt + 1}/{max_retries}: 创建用户返回None")
+
+            except Exception as e:
+                print(f"[WARN] 尝试 {attempt + 1}/{max_retries}: 创建用户异常 - {e}")
+
+        # 严格断言：必须成功创建用户
+        assert user_id is not None, "创建用户失败"
 
     def test_get_user_list(self):
         """测试获取用户列表"""
@@ -367,7 +384,7 @@ class TestShopOwnerBusinessFlow:
             assert result is not None, "获取用户详情失败"
             print("[OK] 获取用户详情成功")
         except Exception as e:
-            print(f"✗ 获取用户详情测试失败: {e}")
+            print(f"[FAIL] 获取用户详情测试失败: {e}")
             pytest.fail(f"获取用户详情测试失败: {e}")
 
     def test_update_user(self):

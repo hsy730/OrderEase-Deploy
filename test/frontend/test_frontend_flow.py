@@ -62,12 +62,9 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
-        if response.status_code == 200:
-            data = response.json()
-            TestFrontendFlow.frontend_user_id = int(data.get("user", {}).get("id") or data.get("id"))
-            print(f"✓ 前端用户注册成功，用户名: {TestFrontendFlow.frontend_username}, ID: {TestFrontendFlow.frontend_user_id}")
-        else:
-            print("⚠ 用户名已存在，继续其他测试")
+        data = response.json()
+        TestFrontendFlow.frontend_user_id = str(data.get("user", {}).get("id") or data.get("id"))
+        print(f"✓ 前端用户注册成功，用户名: {TestFrontendFlow.frontend_username}, ID: {TestFrontendFlow.frontend_user_id}")
 
     def test_frontend_user_login(self):
         """测试前端用户登录"""
@@ -185,7 +182,7 @@ class TestFrontendFlow:
 
         url = f"{API_BASE_URL}/admin/product/create"
         payload = {
-            "shop_id": int(TestFrontendFlow.frontend_shop_id),
+            "shop_id": str(TestFrontendFlow.frontend_shop_id),
             "name": f"Frontend Test Product {unique_suffix}",
             "price": 100,
             "description": "Product created for frontend testing",
@@ -241,7 +238,7 @@ class TestFrontendFlow:
 
         # 确保所有ID都是整数类型
         user_id = str(TestFrontendFlow.frontend_user_id)
-        shop_id = int(TestFrontendFlow.frontend_shop_id)
+        shop_id = str(TestFrontendFlow.frontend_shop_id)
         product_id = str(TestFrontendFlow.frontend_product_id)
 
         url = f"{API_BASE_URL}/admin/order/create"
@@ -296,10 +293,7 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 获取用户订单列表成功")
-        else:
-            print("⚠ 获取用户订单列表失败（token可能已失效）")
+        print("✓ 获取用户订单列表成功")
 
     def test_get_order_detail(self):
         """测试获取订单详情"""
@@ -321,10 +315,7 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}，text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 获取订单详情成功")
-        else:
-            print(f"⚠ 获取订单详情失败（状态码: {response.status_code}）")
+        print("✓ 获取订单详情成功")
 
     def test_delete_order(self):
         """测试删除订单"""
@@ -342,15 +333,13 @@ class TestFrontendFlow:
 
         def request_func():
             return requests.delete(url, params=params, headers=headers)
+        
+        print(f"删除订单，params: {params}")
 
         response = make_request_with_retry(request_func)
-        # 允许 200, 401, 404 状态码，因为订单可能不存在或已删除
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 删除订单成功")
-        else:
-            print(f"⚠ 删除订单失败（状态码: {response.status_code}）")
+        print("✓ 删除订单成功")
 
     # ==================== 店铺和商品查询测试 ====================
 
@@ -368,10 +357,7 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 获取店铺详情成功")
-        else:
-            print("⚠ 获取店铺详情失败")
+        print("✓ 获取店铺详情成功")
 
     def test_get_shop_image(self):
         """测试获取店铺图片"""
@@ -414,10 +400,7 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 获取店铺标签成功")
-        else:
-            print("⚠ 获取店铺标签失败")
+        print("✓ 获取店铺标签成功")
 
     def test_get_product_list(self):
         """测试获取商品列表"""
@@ -442,10 +425,7 @@ class TestFrontendFlow:
         response = make_request_with_retry(request_func)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
 
-        if response.status_code == 200:
-            print("✓ 获取商品列表成功")
-        else:
-            print("⚠ 获取商品列表失败")
+        print("✓ 获取商品列表成功")
 
     def test_get_product_detail(self):
         """测试获取商品详情"""
@@ -461,25 +441,21 @@ class TestFrontendFlow:
             return requests.get(url, params=params, headers=headers)
 
         response = make_request_with_retry(request_func)
-        print(f"获取商品详情响应码: {response.status_code}，响应内容: {response.text}")
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
 
-        if response.status_code == 200:
-            json_data = response.json()
-            # 处理不同的响应格式
-            product_detail = None
-            if isinstance(json_data, dict):
-                product_detail = json_data.get("data") or json_data
-            elif isinstance(json_data, list) and len(json_data) > 0:
-                product_detail = json_data[0]
+        json_data = response.json()
+        # 处理不同的响应格式
+        product_detail = None
+        if isinstance(json_data, dict):
+            product_detail = json_data.get("data") or json_data
+        elif isinstance(json_data, list) and len(json_data) > 0:
+            product_detail = json_data[0]
 
-            if product_detail:
-                product_name = product_detail.get("name", "未知")
-                print(f"✓ 获取商品详情成功，商品名称: {product_name}")
-            else:
-                print("✓ 获取商品详情成功，但响应格式无法解析")
+        if product_detail:
+            product_name = product_detail.get("name", "未知")
+            print(f"✓ 获取商品详情成功，商品名称: {product_name}")
         else:
-            print("⚠ 获取商品详情失败（商品可能不存在）")
+            print("✓ 获取商品详情成功，但响应格式无法解析")
 
     def test_get_product_image(self):
         """测试获取商品图片"""
