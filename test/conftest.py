@@ -5,6 +5,10 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv
 
+# 导入测试验证工具
+from utils.response_validator import ResponseValidator, validate_response, assert_success_response, assert_error_response
+from config.test_data import test_data
+
 load_dotenv()
 
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080/api/order-ease/v1")
@@ -228,7 +232,7 @@ def test_product_id(admin_token, test_shop_id):
     url = f"{API_BASE_URL}/admin/product/create"
     unique_suffix = os.urandom(4).hex()
     payload = {
-        "shop_id": int(test_shop_id),
+        "shop_id": str(test_shop_id),
         "name": f"Test Product {unique_suffix}",
         "price": 100,
         "description": "Product created for testing",
@@ -389,7 +393,7 @@ def shop_owner_order_id(shop_owner_token, shop_owner_shop_id, shop_owner_user_id
         
     url = f"{API_BASE_URL}/shopOwner/order/create"
     payload = {
-        "shop_id": int(shop_owner_shop_id),
+        "shop_id": str(shop_owner_shop_id),
         "user_id": str(shop_owner_user_id),
         "items": [
             {
@@ -422,7 +426,7 @@ def shop_owner_tag_id(shop_owner_token, shop_owner_shop_id):
     tag_name = f"Test Tag {random.randint(1000, 9999)}"
     payload = {
         "name": tag_name,
-        "shop_id": shop_owner_shop_id
+        "shop_id": str(shop_owner_shop_id)
     }
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
     

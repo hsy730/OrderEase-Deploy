@@ -165,7 +165,7 @@ class TestAuthFlow:
                 
                 response = make_request_with_retry(refresh_request_func)
         
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}, text: {response.text}"
         
         if response.status_code == 200:
             response_data = response.json()
