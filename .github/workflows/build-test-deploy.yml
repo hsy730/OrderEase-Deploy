@@ -53,7 +53,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hsy730/OrderEase-Golang
-          ref: master
+          ref: main
           path: OrderEase-Golang
 
       - name: Prepare Build Context

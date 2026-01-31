@@ -23,3 +23,10 @@ test_results.*
 *.bak
 *.bakup
 *.tmp
+
+# Test logs
+test/*.log
+
+# Deployment scripts (contains runtime data)
+orderease-deploy/
+docs/scripts/orderease-deploy/
