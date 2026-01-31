@@ -46,7 +46,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hsy730/OrderEase-BackedUI
-          ref: master
+          ref: main
           path: OrderEase-BackedUI
 
       - name: Checkout Golang Repository
@@ -83,7 +83,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: hsy730/OrderEase-Golang
-          ref: master
+          ref: main
           path: OrderEase-Golang
 
       - name: Set up Go

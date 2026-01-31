@@ -140,14 +140,14 @@ steps:
   - uses: actions/checkout@v4
     with:
       repository: hsy730/OrderEase-BackedUI
-      ref: master
+      ref: main
       path: OrderEase-BackedUI
 
   # 4. 检出 OrderEase-Golang（外部仓库）
   - uses: actions/checkout@v4
     with:
       repository: hsy730/OrderEase-Golang
-      ref: master
+      ref: main
       path: OrderEase-Golang
 
   # 5. 准备构建上下文
@@ -730,7 +730,7 @@ integration-test:
 - uses: actions/checkout@v4
   with:
     repository: hsy730/OrderEase-Golang  # 外部仓库（可选）
-    ref: master                           # 分支/标签（可选）
+    ref: main                             # 分支/标签（可选）
     path: OrderEase-Golang                # 目标路径（可选）
     token: ${{ secrets.GITHUB_TOKEN }}     # 认证 token（可选）
 ```
