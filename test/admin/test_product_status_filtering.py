@@ -18,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from conftest import API_BASE_URL, make_request_with_retry
 import admin.shop_actions as admin_shop_actions
 import admin.product_actions as admin_product_actions
+import admin.tag_actions as admin_tag_actions
 
 
 class TestProductStatusFiltering:
@@ -61,6 +62,31 @@ class TestProductStatusFiltering:
         )
         print(f"[OK] 创建 pending 商品，ID: {cls.test_data['pending_product_id']}")
 
+        # 创建标签用于测试标签过滤
+        tag_id = admin_tag_actions.create_tag(
+            admin_token,
+            name=f"Test Tag {unique_suffix}",
+            shop_id=shop_id
+        )
+        assert tag_id is not None, "创建标签失败"
+        cls.test_data['tag_id'] = tag_id
+        print(f"[OK] 创建标签，ID: {tag_id}")
+
+        # 为所有商品绑定标签
+        product_ids = [
+            cls.test_data['online_product_id'],
+            cls.test_data['offline_product_id'],
+            cls.test_data['pending_product_id']
+        ]
+        result = admin_tag_actions.batch_tag_products(
+            admin_token,
+            product_ids,
+            tag_id,  # tag_id 参数（单个）
+            shop_id  # shop_id 参数
+        )
+        assert result, "绑定标签失败"
+        print(f"[OK] 为所有商品绑定标签")
+
         # 创建前端用户和 token
         frontend_username = f"frontend_user_{unique_suffix}"
         register_url = f"{API_BASE_URL}/user/register"
@@ -96,6 +122,11 @@ class TestProductStatusFiltering:
 
         # 清理测试数据
         print("\n===== 清理商品状态过滤测试数据 =====")
+        try:
+            admin_tag_actions.delete_tag(admin_token, tag_id)
+        except:
+            pass
+
         try:
             admin_product_actions.delete_product(admin_token, cls.test_data['pending_product_id'], shop_id)
         except:
@@ -318,3 +349,105 @@ class TestProductStatusFiltering:
             "客户端不应该能看到 pending 商品"
 
         print(f"[OK] 管理端比客户端多看到 {len(admin_products) - len(frontend_products)} 个非 online 商品")
+
+    # ==================== 标签过滤状态测试 ====================
+
+    def test_admin_tag_filter_returns_all_status_products(self):
+        """测试管理端通过标签过滤返回所有状态的商品"""
+        print("\n========== 测试管理端通过标签过滤返回所有状态商品 ==========")
+
+        # 管理端通过标签获取商品
+        products = admin_tag_actions.get_tag_bound_products(
+            self.admin_token,
+            self.test_data['tag_id'],
+            self.test_data['shop_id']
+        )
+
+        # 提取商品ID列表
+        product_ids = [p.get("id") or p.get("ID") for p in products]
+
+        # 验证所有状态的商品都在列表中
+        assert str(self.test_data['online_product_id']) in product_ids, \
+            "管理端通过标签应该能看到 online 状态的商品"
+        assert str(self.test_data['offline_product_id']) in product_ids, \
+            "管理端通过标签应该能看到 offline 状态的商品"
+        assert str(self.test_data['pending_product_id']) in product_ids, \
+            "管理端通过标签应该能看到 pending 状态的商品"
+
+        print(f"[OK] 管理端通过标签过滤包含所有状态商品，共 {len(products)} 个")
+
+    def test_frontend_tag_filter_only_returns_online_products(self):
+        """测试客户端通过标签过滤只返回 online 状态的商品"""
+        print("\n========== 测试客户端通过标签过滤只返回 online 商品 ==========")
+
+        assert 'frontend_token' in self.test_data, "缺少前端用户 token"
+
+        # 客户端通过标签获取商品
+        products = admin_tag_actions.get_tag_bound_products_frontend(
+            self.test_data['frontend_token'],
+            self.test_data['tag_id'],
+            self.test_data['shop_id']
+        )
+
+        # 提取商品ID列表
+        product_ids = [p.get("id") or p.get("ID") for p in products]
+
+        # 验证只有 online 状态的商品在列表中
+        assert str(self.test_data['online_product_id']) in product_ids, \
+            "客户端通过标签应该能看到 online 状态的商品"
+        assert str(self.test_data['offline_product_id']) not in product_ids, \
+            "客户端通过标签不应该能看到 offline 状态的商品"
+        assert str(self.test_data['pending_product_id']) not in product_ids, \
+            "客户端通过标签不应该能看到 pending 状态的商品"
+
+        # 验证所有返回的商品都是 online 状态
+        for product in products:
+            status = product.get("status") or product.get("Status", "")
+            assert status != "offline", f"客户端通过标签不应该看到 offline 状态的商品: {product.get('name')}"
+            assert status != "pending", f"客户端通过标签不应该看到 pending 状态的商品: {product.get('name')}"
+
+        print(f"[OK] 客户端通过标签过滤正确，共 {len(products)} 个商品，都是 online 状态")
+
+    def test_tag_filter_status_count_difference(self):
+        """测试管理端和客户端通过标签过滤的商品数量差异"""
+        print("\n========== 测试管理端和客户端通过标签过滤的商品数量差异 ==========")
+
+        assert 'frontend_token' in self.test_data, "缺少前端用户 token"
+
+        # 获取管理端通过标签获取的商品
+        admin_products = admin_tag_actions.get_tag_bound_products(
+            self.admin_token,
+            self.test_data['tag_id'],
+            self.test_data['shop_id']
+        )
+
+        # 获取客户端通过标签获取的商品
+        frontend_products = admin_tag_actions.get_tag_bound_products_frontend(
+            self.test_data['frontend_token'],
+            self.test_data['tag_id'],
+            self.test_data['shop_id']
+        )
+
+        admin_product_ids = [p.get("id") or p.get("ID") for p in admin_products]
+        frontend_product_ids = [p.get("id") or p.get("ID") for p in frontend_products]
+
+        print(f"[INFO] 管理端通过标签看到 {len(admin_products)} 个商品")
+        print(f"[INFO] 客户端通过标签看到 {len(frontend_products)} 个商品")
+
+        # 管理端应该比客户端看到更多商品（因为包含 offline 和 pending）
+        assert len(admin_products) > len(frontend_products), \
+            "管理端通过标签应该看到比客户端更多的商品（包含 offline 和 pending）"
+
+        # 验证管理端看到 offline 和 pending 商品，但客户端看不到
+        assert str(self.test_data['offline_product_id']) in admin_product_ids, \
+            "管理端通过标签应该能看到 offline 商品"
+        assert str(self.test_data['offline_product_id']) not in frontend_product_ids, \
+            "客户端通过标签不应该能看到 offline 商品"
+
+        assert str(self.test_data['pending_product_id']) in admin_product_ids, \
+            "管理端通过标签应该能看到 pending 商品"
+        assert str(self.test_data['pending_product_id']) not in frontend_product_ids, \
+            "客户端通过标签不应该能看到 pending 商品"
+
+        print(f"[OK] 管理端通过标签比客户端多看到 {len(admin_products) - len(frontend_products)} 个非 online 商品")
+

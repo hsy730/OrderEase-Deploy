@@ -68,13 +68,14 @@ def create_tag(admin_token, name=None, shop_id="1"):
         return None
 
 
-def batch_tag_products(admin_token, product_ids, tag_ids):
+def batch_tag_products(admin_token, product_ids, tag_id, shop_id):
     """批量给商品打标签
 
     Args:
         admin_token: 管理员令牌
         product_ids: 商品ID列表
-        tag_ids: 标签ID列表
+        tag_id: 标签ID（单个）
+        shop_id: 店铺ID
 
     Returns:
         bool: 是否打标签成功
@@ -82,7 +83,8 @@ def batch_tag_products(admin_token, product_ids, tag_ids):
     url = f"{API_BASE_URL}/admin/tag/batch-tag"
     payload = {
         "product_ids": product_ids,
-        "tag_ids": tag_ids
+        "tag_id": tag_id,
+        "shop_id": str(shop_id)
     }
     headers = {"Authorization": f"Bearer {admin_token}"}
 
@@ -372,19 +374,44 @@ def get_unbound_products_for_tag(admin_token, tag_id):
     return []
 
 
-def get_tag_bound_products(admin_token, tag_id):
-    """获取标签已绑定的商品列表
+def get_tag_bound_products(admin_token, tag_id, shop_id):
+    """获取标签已绑定的商品列表（管理端）
 
     Args:
         admin_token: 管理员令牌
         tag_id: 标签ID
+        shop_id: 店铺ID
 
     Returns:
         list: 已绑定的商品列表
     """
     url = f"{API_BASE_URL}/admin/tag/bound-products"
-    params = {"tagId": tag_id}
+    params = {"tag_id": tag_id, "shop_id": str(shop_id)}
     headers = {"Authorization": f"Bearer {admin_token}"}
+
+    def request_func():
+        return requests.get(url, params=params, headers=headers)
+
+    response = make_request_with_retry(request_func)
+    if response.status_code == 200:
+        return response.json().get("data", [])
+    return []
+
+
+def get_tag_bound_products_frontend(frontend_token, tag_id, shop_id):
+    """获取标签已绑定的商品列表（客户端）
+
+    Args:
+        frontend_token: 前端用户令牌
+        tag_id: 标签ID
+        shop_id: 店铺ID
+
+    Returns:
+        list: 已绑定的商品列表（仅 online 状态）
+    """
+    url = f"{API_BASE_URL}/tag/bound-products"
+    params = {"tag_id": tag_id, "shop_id": str(shop_id)}
+    headers = {"Authorization": f"Bearer {frontend_token}"}
 
     def request_func():
         return requests.get(url, params=params, headers=headers)
