@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# 文档
+*.md
+LICENSE
+
+# 测试
+test/
+*_test.go
+*.test
+coverage.out
+
+# 日志
+*.log
+logs/
+
+# 临时文件
+.tmp/
+temp/
+*.tmp
+*.bak
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Node modules (前端会单独构建)
+node_modules/
+npm-debug.log
+
+# 构建产物
+dist/
+*.exe
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# CI/CD
+.github/
