@@ -115,7 +115,7 @@ def get_product_detail(shop_owner_token, product_id, shop_id):
     return None
 
 
-def update_product(shop_owner_token, product_id, shop_id, name="Updated Product Name", price=150):
+def update_product(shop_owner_token, product_id, shop_id, name="Updated Product Name", price=150, stock=None):
     """更新商品信息
 
     Args:
@@ -124,6 +124,7 @@ def update_product(shop_owner_token, product_id, shop_id, name="Updated Product 
         shop_id: 店铺ID
         name: 新名称
         price: 新价格
+        stock: 新库存（可选，如果不传则不更新库存）
 
     Returns:
         bool: 成功返回True，失败返回False
@@ -138,11 +139,15 @@ def update_product(shop_owner_token, product_id, shop_id, name="Updated Product 
         "name": name,
         "price": price
     }
+    # 只有在明确指定 stock 时才更新（避免默认值 0 覆盖原库存）
+    if stock is not None:
+        payload["stock"] = stock
+
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
- 
+
     def request_func():
         return requests.put(url, params=params, json=payload, headers=headers)
- 
+
     response = make_request_with_retry(request_func)
     print(f"更新商品响应状态码: {response.status_code}, 响应内容: {response.text}")
     return response.status_code == 200

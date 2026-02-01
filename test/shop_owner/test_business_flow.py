@@ -514,18 +514,27 @@ class TestShopOwnerBusinessFlow:
 
     def test_update_order(self):
         """测试更新订单信息"""
+        import time
+        time.sleep(1)  # 添加延迟避免速率限制
+
         items = [{
             "product_id": str(self.resources['product_id']),
             "quantity": 1,
-            "price": 100
+            "price": 100,
+            "options": []  # 添加 options 字段，与界面请求一致
         }]
+
+        # 使用商家token更新订单
         result = order_actions.update_order(
             TestShopOwnerBusinessFlow.shop_owner_token,
             self.resources['order_id'],
             self.resources['shop_id'],
             self.resources['user_id'],
-            items
+            items,
+            status=1,  # 添加 status 字段
+            remark=""  # 添加 remark 字段
         )
+
         assert result, "更新订单信息失败"
         print("[OK] 更新订单信息成功")
 

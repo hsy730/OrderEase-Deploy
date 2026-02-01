@@ -104,7 +104,7 @@ def get_order_detail(shop_owner_token, order_id, shop_id):
     return None
 
 
-def update_order(shop_owner_token, order_id, shop_id, user_id, items):
+def update_order(shop_owner_token, order_id, shop_id, user_id, items, status=None, remark=""):
     """更新订单信息
 
     Args:
@@ -113,17 +113,25 @@ def update_order(shop_owner_token, order_id, shop_id, user_id, items):
         shop_id: 店铺ID
         user_id: 用户ID
         items: 订单项列表
+        status: 订单状态（可选）
+        remark: 备注（可选）
 
     Returns:
         bool: 成功返回True，失败返回False
     """
     url = f"{API_BASE_URL}/shopOwner/order/update"
     params = {"id": order_id}
+    # 确保使用字符串类型（与界面请求一致）
     payload = {
         "shop_id": str(shop_id) if shop_id else "1",
-        "user_id": user_id,
-        "items": items
+        "user_id": str(user_id) if user_id else "1",
+        "items": items,
+        "remark": remark,
     }
+    # 只有在明确指定 status 时才添加
+    if status is not None:
+        payload["status"] = status
+
     headers = {"Authorization": f"Bearer {shop_owner_token}"}
 
     def request_func():
