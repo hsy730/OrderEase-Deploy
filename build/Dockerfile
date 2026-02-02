@@ -72,9 +72,10 @@ COPY --from=go-builder --chown=orderease:orderease /app/src/config/ ./config/
 COPY --from=backend-ui-build --chown=orderease:orderease /app/backend-ui/dist ./static/order-ease-adminiui/
 COPY --from=frontend-ui-build --chown=orderease:orderease /app/frontend-ui/dist ./static/order-ease-iui/
 
-# 创建必要的目录并设置权限
-RUN mkdir -p uploads/products logs && \
-    chown -R orderease:orderease /app
+# 创建必要的目录并设置权限（在切换用户前以root身份执行）
+RUN mkdir -p uploads/products uploads/shops logs && \
+    chmod -R 755 uploads && \
+    chown -R orderease:orderease /app/uploads /app/logs
 
 # 切换到非 root 用户
 USER orderease
