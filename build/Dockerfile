@@ -2,7 +2,7 @@
 # 构建命令: docker build -t orderease:latest -f Dockerfile ../../
 
 # 阶段1: 构建后台管理UI
-FROM node:16-alpine AS backend-ui-build
+FROM node:20-alpine AS backend-ui-build
 WORKDIR /app/backend-ui
 COPY OrderEase-BackedUI/package*.json ./
 RUN npm ci --production=false && npm cache clean --force
@@ -13,7 +13,7 @@ RUN echo "VITE_API_BASE_URL=" > .env && \
 RUN npm run build
 
 # 阶段2: 构建前台UI
-FROM node:18-alpine AS frontend-ui-build
+FROM node:20-alpine AS frontend-ui-build
 WORKDIR /app/frontend-ui
 COPY OrderEase-FrontUI/package*.json ./
 RUN npm ci --production=false && npm cache clean --force
@@ -74,7 +74,7 @@ COPY --from=frontend-ui-build --chown=orderease:orderease /app/frontend-ui/dist 
 
 # 创建必要的目录并设置权限（在切换用户前以root身份执行）
 RUN mkdir -p uploads/products uploads/shops logs && \
-    chmod -R 755 uploads && \
+    chmod -R 750 uploads && \
     chown -R orderease:orderease /app/uploads /app/logs
 
 # 切换到非 root 用户

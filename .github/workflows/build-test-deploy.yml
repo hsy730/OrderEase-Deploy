@@ -202,6 +202,25 @@ jobs:
           path: orderease-image.tar
           retention-days: 1
 
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.set-tag.outputs.tag }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy Results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Print Trivy Summary
+        run: |
+          echo "=== Trivy Vulnerability Scan Summary ==="
+          cat trivy-results.sarif | jq -r '.runs[0].results | length' | xargs -I {} echo "Found {} vulnerabilities"
+
   # ============================================
   # Job 3: 启动服务容器并执行测试
   # ============================================

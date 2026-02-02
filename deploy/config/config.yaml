@@ -12,7 +12,7 @@ database:
   host: mysql
   port: 3306
   username: root
-  password: 123456
+  password: ${DB_PASSWORD}
   dbname: orderease
   charset: utf8mb4
   parseTime: true
@@ -20,5 +20,5 @@ database:
   logLevel: 4 # 1=Silent, 2=Error, 3=Warn, 4=Info, 5=Debug
 
 jwt:
-  secret: "e6jf493kdhbms9ew6mv2v1a4dx2"
+  secret: ${JWT_SECRET}
   expiration: 7200
