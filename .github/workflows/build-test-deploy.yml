@@ -17,6 +17,11 @@ on:
   repository_dispatch:
     types: [triggered-by-code-change]
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 env:
   DOCKER_IMAGE: docker.io/siyuanh640/orderease
   PYTHON_VERSION: "3.11"
@@ -215,6 +220,7 @@ jobs:
         if: always()
         with:
           sarif_file: 'trivy-results.sarif'
+          category: 'trivy'
 
       - name: Print Trivy Summary
         run: |
