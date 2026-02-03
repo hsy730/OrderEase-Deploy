@@ -4,6 +4,7 @@
 - [前置要求](#前置要求)
 - [快速开始](#快速开始)
 - [详细说明](#详细说明)
+- [环境变量配置](#环境变量配置)
 - [常用操作](#常用操作)
 - [故障排查](#故障排查)
 
@@ -263,6 +264,82 @@ database:
   username: root
   password: 你的密码  # 修改密码
 ```
+
+---
+
+## 环境变量配置
+
+> **📖 详细指南**: 完整的环境变量配置说明请参考 [docs/guides/ENV_CONFIGURATION_GUIDE.md](docs/guides/ENV_CONFIGURATION_GUIDE.md)
+>
+> 该指南包含：
+> - 完整的环境变量列表和说明
+> - 安全密钥生成方法
+> - 本地/测试/生产环境配置示例
+> - CI/CD (GitHub Actions) 配置步骤
+> - 常见问题排查
+
+### 快速配置
+
+#### 1. 创建 .env 文件
+
+```powershell
+# 进入部署目录
+cd deploy
+
+# 从模板复制
+Copy-Item .env.template .env
+
+# 编辑文件
+notepad .env
+```
+
+#### 2. 编辑 .env 文件
+
+```powershell
+# 最小必需配置
+DB_PASSWORD=YourStrongPassword123!        # 数据库密码（≥16位）
+JWT_SECRET=your_jwt_secret_minimum_32_bytes_long  # JWT密钥（≥32字节）
+```
+
+#### 3. 生成安全密钥（使用 PowerShell）
+
+```powershell
+# 生成数据库密码（≥16位）
+$password = -join ((48..57) + (65..90) + (97..122) + ([char[]]'!@#$%^&*') | Get-Random -Count 20 | ForEach-Object { [char]$_ })
+Write-Host "Database Password: $password"
+
+# 生成 JWT 密钥（≥32字节）
+$jwtSecret = -join ((48..57) + (65..90) + (97..122) + ([char[]]'!@#$%^&*_') | Get-Random -Count 43 | ForEach-Object { [char]$_ })
+Write-Host "JWT_SECRET: $jwtSecret"
+```
+
+或使用在线工具：
+- [Generate Random API Key](https://generate-random.org/api-key-generator)
+- [RandomKeygen](https://randomkeygen.com/)
+
+### 环境变量说明
+
+| 变量名 | 说明 | 示例值 | 是否必需 |
+|--------|------|--------|----------|
+| `DB_HOST` | 数据库主机 | `mysql` | 是 |
+| `DB_PORT` | 数据库端口 | `3306` | 是 |
+| `DB_USERNAME` | 数据库用户名 | `root` | 是 |
+| `DB_PASSWORD` | 数据库密码 | `YourPassword123!` | **是（需配置）** |
+| `DB_NAME` | 数据库名称 | `orderease` | 是 |
+| `JWT_SECRET` | JWT签名密钥 | `≥32字节随机字符串` | **是（需配置）** |
+| `JWT_EXPIRATION` | JWT过期时间（秒） | `7200` | 否 |
+| `TZ` | 时区 | `Asia/Shanghai` | 否 |
+
+### CI/CD 环境变量配置
+
+如果使用 GitHub Actions 进行 CI/CD，需要在 GitHub 仓库中配置 Secrets：
+
+1. 进入仓库：`Settings → Secrets and variables → Actions`
+2. 点击 "New repository secret"
+3. 添加以下 Secrets：
+   - `JWT_SECRET` - JWT 签名密钥（使用上方 PowerShell 脚本或在线工具生成）
+   - `DOCKER_USERNAME` - Docker Hub 用户名
+   - `DOCKER_PASSWORD` - Docker Hub 密码/Token
 
 ---
 

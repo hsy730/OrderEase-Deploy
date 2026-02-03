@@ -4,11 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-OrderEase-Deploy is a deployment and testing repository for the OrderEase e-commerce management system. It combines multiple components into a unified Docker deployment:
-- **Backend API**: Go-based REST API (from OrderEase-Golang repository)
-- **Admin UI**: Vue.js admin dashboard (from OrderEase-BackedUI repository)
-- **Frontend UI**: Customer-facing web interface (from OrderEase-FrontUI repository)
-- **Database**: MySQL 8.0
+OrderEase-Deploy is a unified deployment and comprehensive testing repository for the OrderEase e-commerce management system. It combines multiple components into a single Docker-based deployment:
+- **Backend API**: Go-based REST API with DDD architecture (from OrderEase-Golang repository)
+- **Admin UI**: Vue 3 admin dashboard for shop owners and administrators (from OrderEase-BackedUI repository)
+- **Frontend UI**: Vue 3 mobile-first customer interface (from OrderEase-FrontUI repository)
+- **Database**: MySQL 8.0 for data persistence
+
+**Repository Relationships**:
+- This repository depends on three separate source repositories checked out during CI/CD
+- The multi-stage Docker build copies source code from sibling directories
 
 ## Build and Deploy Commands
 
@@ -26,6 +30,18 @@ chmod +x build.sh && ./build.sh
 
 # Direct Docker build
 docker build -t orderease:latest -f build/Dockerfile ../..
+```
+
+**Windows Deployment**:
+```powershell
+# Automated deployment (generates config, pulls image, starts services)
+.\deploy.ps1
+
+# Skip image pull if already available
+.\deploy.ps1 -SkipPull
+
+# Override existing configuration
+.\deploy.ps1 -OverrideConfig
 ```
 
 ### Running the Application
@@ -109,11 +125,17 @@ Tests execute in priority order (defined in `conftest.py::pytest_collection_modi
 
 ### Multi-Stage Docker Build
 
-The `build/Dockerfile` uses a 4-stage build:
-1. Stage 1: Build Backend UI (Node 16 Alpine)
-2. Stage 2: Build Frontend UI (Node 18 Alpine)
-3. Stage 3: Build Go backend (Go 1.22 Alpine)
-4. Stage 4: Final runtime image - copies Go binary and UI static files
+The `build/Dockerfile` uses a 4-stage build with extreme optimization:
+1. **Stage 1**: Build Backend UI (Node 20 Alpine) - creates admin dashboard
+2. **Stage 2**: Build Frontend UI (Node 20 Alpine) - creates customer interface
+3. **Stage 3**: Build Go backend (Go 1.24 Alpine) - compiles with UPX compression
+4. **Stage 4**: Final runtime (Alpine 3.19) - minimal ~36MB image
+
+**Build Optimizations**:
+- UPX binary compression (`upx --best --lzma`) reduces Go binary size significantly
+- Go build flags: `-ldflags="-s -w -buildid="` removes symbols and debug info
+- Non-root user execution (uid 1000)
+- Health checks using wget for container monitoring
 
 ### Unified Deployment
 
@@ -126,6 +148,15 @@ Single Docker image serves all components:
 
 ### Configuration
 
+> **📖 环境变量配置指南**: 详见 [docs/guides/ENV_CONFIGURATION_GUIDE.md](docs/guides/ENV_CONFIGURATION_GUIDE.md)
+>
+> 该指南包含：
+> - 完整的环境变量列表和说明
+> - 本地部署环境变量配置步骤
+> - CI/CD (GitHub Actions) 环境变量配置
+> - 安全密钥生成方法
+> - 常见问题排查
+
 **Environment Variables** (`deploy/.env`):
 - `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD`, `DB_NAME` - Database connection
 - `JWT_SECRET`, `JWT_EXPIRATION` - Authentication
@@ -137,12 +168,52 @@ Single Docker image serves all components:
 - `database.*`: MySQL connection settings
 - `jwt.*`: JWT authentication settings
 
+### Environment Variable Setup
+
+**Quick Setup for Local Deployment**:
+```bash
+# 1. Copy the template
+cd deploy
+cp .env.template .env
+
+# 2. Edit with your values
+# Required minimum:
+#   DB_PASSWORD=YourStrongPassword123!
+#   JWT_SECRET=your_jwt_secret_minimum_32_bytes_long
+```
+
+**CI/CD Required Secrets** (GitHub Repository Settings):
+- `JWT_SECRET` - JWT signing key (≥32 bytes)
+- `DOCKER_USERNAME` - Docker Hub username
+- `DOCKER_PASSWORD` - Docker Hub password/token
+
+See [ENV_CONFIGURATION_GUIDE.md](docs/guides/ENV_CONFIGURATION_GUIDE.md) for detailed setup instructions.
+
 ### CI/CD Pipeline
 
 Located in `.github/workflows/build-test-deploy.yml`:
-1. **Build Phase**: Multi-stage Docker build with image tagging
-2. **Test Phase**: Starts MySQL, runs Docker image, executes pytest suite
-3. **Deploy Phase**: Pushes to `docker.io/siyuanh640/orderease` (only if tests pass)
+
+**Job 1: Checkout Repositories**
+- Checks out all 4 repositories (Deploy, FrontUI, BackedUI, Golang)
+- Creates build context artifact for downstream jobs
+
+**Job 2: Go Unit Tests**
+- Runs Go tests with race detection and coverage reporting
+- Uploads coverage report as artifact
+
+**Job 3: Build Docker Image**
+- Multi-stage Docker build with GitHub Actions caching
+- Runs Trivy vulnerability scanner (CRITICAL, HIGH severity)
+- Uploads SARIF results to GitHub Security tab
+
+**Job 4: Integration Tests**
+- Starts MySQL service container with health checks
+- Loads and runs Docker image
+- Executes pytest suite with HTML and JUnit reports
+
+**Job 5: Push to Registry**
+- Only runs if all tests pass
+- Pushes to `docker.io/siyuanh640/orderease`
 
 ## Testing Conventions
 
@@ -178,6 +249,27 @@ response = make_request_with_retry(request_func)
 - Use function-scoped fixtures for test-specific resources
 - Automatic cleanup in fixture teardown
 
+### Testing Utilities
+
+**ResponseValidator** (`test/utils/response_validator.py`):
+- Chainable validation API for API responses
+- Handles multiple naming conventions (PascalCase, camelCase, snake_case)
+- Common validations: status codes, field existence, field values, list lengths
+
+**FieldResolver** (`test/utils/field_resolver.py`):
+- Extracts nested fields from JSON responses using dot notation
+- Auto-handles ID field variants (`ID`, `id`, `Id`, `shopId`, `shop_id`, etc.)
+- Normalizes keys between naming conventions
+
+Usage example:
+```python
+ResponseValidator(response)
+    .status(200)
+    .has_data()
+    .field_equals("data.name", "Expected Name")
+    .list_length("data.products", min_length=1)
+```
+
 ## Database Operations
 
 ```bash
@@ -211,3 +303,13 @@ Stored in `deploy/data/`:
 **Frontend not accessible**:
 - Check static files: `docker exec orderease-app ls -la /app/static/`
 - Test health: `curl http://localhost:8080/order-ease-iui/`
+
+## Cross-Repository Context
+
+This repository is part of a larger OrderEase project. The parent-level `CLAUDE.md` (at `D:\local_code_repo\OrderEase\CLAUDE.md`) provides:
+- Overall architecture overview across all repositories
+- Backend (Go) DDD architecture patterns
+- Frontend Vue 3 architecture and conventions
+- Key concepts like multi-tenant shop context, ID handling, authentication flows
+
+When working on features that span multiple repositories (e.g., adding a new API endpoint), consult the parent CLAUDE.md for the full context.
