@@ -29,10 +29,10 @@ from conftest import API_BASE_URL, make_request_with_retry
 class TestShopOwnerPasswordChangeFinal:
     """商家密码修改最终测试类 - 最后执行的独立密码修改测试"""
 
-    # 定义初始密码
+    # 定义初始密码 (密码长度必须在8-20位之间)
     INITIAL_PASSWORD = "TestPassword@123"
-    FIRST_NEW_PASSWORD = "NewShopOwner@123456"
-    SECOND_NEW_PASSWORD = "AnotherShopOwner@123456"
+    FIRST_NEW_PASSWORD = "NewShopOwner@12"
+    SECOND_NEW_PASSWORD = "AnotherShopOwner@12"
     ADMIN_USERNAME = "admin"
     ADMIN_PASSWORD = "Admin@123456"
 
