@@ -11,6 +11,12 @@ COPY OrderEase-BackedUI/ .
 RUN echo "VITE_API_BASE_URL=" > .env && \
     echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
 RUN npm run build
+RUN echo "=== Debug: Checking backend dist directory ===" && \
+    ls -la dist/ && \
+    if [ ! -f dist/index.html ]; then \
+        echo "ERROR: backend dist/index.html not found! Build may have failed."; \
+        exit 1; \
+    fi
 
 # 阶段2: 构建前台UI
 FROM node:20-alpine AS frontend-ui-build
@@ -23,6 +29,12 @@ RUN echo "=== Debug: Listing files after COPY scripts ===" && \
 RUN npm ci --production=false && npm cache clean --force
 COPY OrderEase-FrontUI/ ./
 RUN npm run build:h5
+RUN echo "=== Debug: Checking dist directory ===" && \
+    ls -la dist/ && \
+    if [ ! -f dist/index.html ]; then \
+        echo "ERROR: dist/index.html not found! Build may have failed."; \
+        exit 1; \
+    fi
 
 # 阶段3: 构建Go后端 - 极致优化
 FROM golang:1.24-alpine AS go-builder
@@ -75,6 +87,17 @@ COPY --from=go-builder --chown=orderease:orderease /app/src/config/ ./config/
 # 从UI构建阶段复制静态文件
 COPY --from=backend-ui-build --chown=orderease:orderease /app/backend-ui/dist ./static/order-ease-adminiui/
 COPY --from=frontend-ui-build --chown=orderease:orderease /app/frontend-ui/dist ./static/order-ease-iui/
+
+# 验证静态文件是否存在
+RUN echo "=== Verifying static files ===" && \
+    ls -la static/ && \
+    ls -la static/order-ease-iui/ && \
+    ls -la static/order-ease-adminiui/ && \
+    if [ ! -f static/order-ease-iui/index.html ]; then \
+        echo "WARNING: order-ease-iui/index.html not found, creating placeholder"; \
+        mkdir -p static/order-ease-iui && \
+        echo '<!DOCTYPE html><html><head><title>OrderEase</title></head><body><h1>Frontend build failed</h1></body></html>' > static/order-ease-iui/index.html; \
+    fi
 
 # 创建必要的目录并设置权限（在切换用户前以root身份执行）
 RUN mkdir -p uploads/products uploads/shops logs && \
