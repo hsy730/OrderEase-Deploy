@@ -69,6 +69,14 @@ jobs:
           cp -r OrderEase-BackedUI build-context/
           cp -r OrderEase-Golang build-context/
 
+      - name: Debug - Verify FrontUI Files
+        run: |
+          echo "=== OrderEase-FrontUI/scripts directory ==="
+          ls -la OrderEase-FrontUI/scripts/ || echo "scripts directory not found in checkout"
+          echo ""
+          echo "=== build-context/OrderEase-FrontUI/scripts directory ==="
+          ls -la build-context/OrderEase-FrontUI/scripts/ || echo "scripts directory not found in build-context"
+
       - name: Upload Build Context
         uses: actions/upload-artifact@v4
         with:
@@ -149,6 +157,26 @@ jobs:
         with:
           name: build-context
           path: .
+
+      - name: Debug - List Build Context Files
+        run: |
+          echo "=== Build Context Structure ==="
+          ls -la
+          echo ""
+          echo "=== Current Directory Contents (recursive) ==="
+          find . -maxdepth 3 -type d | head -50
+          echo ""
+          echo "=== OrderEase-FrontUI Structure ==="
+          ls -la OrderEase-FrontUI/ || echo "OrderEase-FrontUI not found"
+          echo ""
+          echo "=== OrderEase-FrontUI/scripts Structure ==="
+          ls -la OrderEase-FrontUI/scripts/ || echo "scripts directory not found"
+          echo ""
+          echo "=== OrderEase-FrontUI/scripts/postinstall.js content ==="
+          cat OrderEase-FrontUI/scripts/postinstall.js | head -20 || echo "postinstall.js not found"
+          echo ""
+          echo "=== OrderEase-FrontUI/package.json ==="
+          cat OrderEase-FrontUI/package.json || echo "package.json not found"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

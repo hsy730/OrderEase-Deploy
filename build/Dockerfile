@@ -17,8 +17,11 @@ FROM node:20-alpine AS frontend-ui-build
 WORKDIR /app/frontend-ui
 COPY OrderEase-FrontUI/package*.json ./
 COPY OrderEase-FrontUI/scripts ./scripts
+RUN echo "=== Debug: Listing files after COPY scripts ===" && \
+    ls -la && \
+    ls -la scripts/ || echo "scripts directory not found"
 RUN npm ci --production=false && npm cache clean --force
-COPY OrderEase-FrontUI/ .
+COPY OrderEase-FrontUI/ ./
 RUN npm run build:h5
 
 # 阶段3: 构建Go后端 - 极致优化
