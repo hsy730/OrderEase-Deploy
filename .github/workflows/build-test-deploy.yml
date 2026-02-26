@@ -297,6 +297,20 @@ jobs:
         run: |
           docker image load -i orderease-image.tar
 
+      - name: Debug - Show Docker Networks and Containers
+        run: |
+          echo "=== Docker Networks ==="
+          docker network ls
+          echo ""
+          echo "=== Running Containers ==="
+          docker ps
+          echo ""
+          echo "=== MySQL Container Network Info ==="
+          MYSQL_CONTAINER_ID=$(docker ps -q -f ancestor=mysql:8.0)
+          if [ -n "$MYSQL_CONTAINER_ID" ]; then
+            docker inspect $MYSQL_CONTAINER_ID | jq '.[0].NetworkSettings.Networks'
+          fi
+
       - name: Start OrderEase Application Container
         run: |
           IMAGE_TAG="${{ needs.build-image.outputs.image-tag }}"
@@ -314,9 +328,14 @@ jobs:
             exit 1
           fi
 
+          # Get the network that MySQL is connected to
+          MYSQL_CONTAINER_ID=$(docker ps -q -f ancestor=mysql:8.0)
+          MYSQL_NETWORK=$(docker inspect $MYSQL_CONTAINER_ID | jq -r '.[0].NetworkSettings.Networks | keys[0]')
+          echo "MySQL is on network: $MYSQL_NETWORK"
+
           docker run -d \
             --name orderease-app \
-            --network ${{ job.container.network }} \
+            --network "$MYSQL_NETWORK" \
             -p 8080:8080 \
             -e DB_HOST=mysql \
             -e DB_PORT=3306 \
@@ -334,13 +353,50 @@ jobs:
           docker ps -a
           echo ""
           echo "=== OrderEase App Container Logs ==="
-          docker logs orderease-app
+          docker logs orderease-app 2>&1 || echo "No logs available yet"
 
       - name: Wait for Application to be Ready
         run: |
           echo "Waiting for OrderEase to start..."
-          timeout 120 bash -c 'until curl -f http://localhost:8080/order-ease-iui/; do sleep 2; done'
-          echo "OrderEase is ready!"
+          
+          # Wait up to 120 seconds for the app to be ready
+          MAX_ATTEMPTS=60
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT of $MAX_ATTEMPTS..."
+            
+            # Check if container is still running
+            if ! docker ps | grep -q orderease-app; then
+              echo "ERROR: Container orderease-app is not running!"
+              echo "=== Container Logs ==="
+              docker logs orderease-app 2>&1
+              exit 1
+            fi
+            
+            # Try to connect
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/order-ease-iui/ 2>/dev/null || echo "000")
+            echo "HTTP Response Code: $HTTP_CODE"
+            
+            if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
+              echo "OrderEase is ready!"
+              exit 0
+            fi
+            
+            # Show logs every 10 attempts
+            if [ $((ATTEMPT % 10)) -eq 0 ]; then
+              echo "=== Recent Container Logs ==="
+              docker logs --tail 20 orderease-app 2>&1
+            fi
+            
+            sleep 2
+          done
+          
+          echo "ERROR: Application did not become ready within timeout"
+          echo "=== Final Container Logs ==="
+          docker logs orderease-app 2>&1
+          exit 1
 
       - name: Set up Python
         uses: actions/setup-python@v5
