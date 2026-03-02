@@ -33,6 +33,10 @@ services:
       - SERVER_HOST=${SERVER_HOST}
       - SERVER_PORT=${SERVER_PORT}
 
+      # 前端 UI API 配置
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_API_PREFIX=${VITE_API_PREFIX}
+
       # 时区配置
       - TZ=${TZ}
     volumes:
