@@ -13,7 +13,7 @@ mkdir -p ~/haproxy-config
 ```
 
 ### 2. 配置文件模板（安全版本）
-仅转发8080端口
+监听80端口，转发到后端应用8080端口
 ```bash
 cat > ~/haproxy-config/haproxy.cfg <<'EOF'
 global
@@ -35,7 +35,7 @@ defaults
     timeout http-request 5s
 
 frontend web_front
-    bind *:8080
+    bind *:80
     default_backend app_backend
 
 backend app_backend
@@ -53,7 +53,7 @@ EOF
 docker run -d \
   --name haproxy-dynamic \
   --restart unless-stopped \
-  -p 8080:8080 \
+  -p 80:80 \
   -v ~/haproxy-config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro \
   haproxy:latest
 ```
@@ -66,7 +66,7 @@ docker ps
 docker logs haproxy-dynamic
 
 # 测试访问
-curl http://localhost:8080
+curl http://localhost:80
 ```
 
 ## 二、踩过的坑及解决方案
@@ -161,7 +161,7 @@ screen -r haproxy-install  # 重新连接
 -p 8000-9000:8000-9000
 
 # ✅ 正确：明确列出端口
--p 8080:8080 -p 8443:8443
+-p 80:80 -p 443:443
 ```
 
 ### 2. 白名单配置模板
@@ -169,13 +169,13 @@ screen -r haproxy-install  # 重新连接
 ```bash
 frontend web_front
     # 明确列出每个端口
-    bind *:8080 name app1
-    bind *:8081 name app2
-    # bind *:8082 name app3  # 需要时取消注释
+    bind *:80 name app1
+    bind *:443 name app2 ssl crt /etc/ssl/certs/server.pem
+    # bind *:8081 name app3  # 需要时取消注释
     
     # 根据端口选择后端
-    use_backend backend_app1 if { dst_port 8080 }
-    use_backend backend_app2 if { dst_port 8081 }
+    use_backend backend_app1 if { dst_port 80 }
+    use_backend backend_app2 if { dst_port 443 }
 ```
 
 ### 3. 完整的工作流程
@@ -195,13 +195,13 @@ docker rm haproxy-dynamic
 docker run -d \
   --name haproxy-dynamic \
   --restart unless-stopped \
-  -p 8080:8080 \
+  -p 80:80 \
   -v ~/haproxy-config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro \
   haproxy:latest
 
 # 5. 验证运行
 docker logs haproxy-dynamic --tail 20
-curl http://localhost:8080
+curl http://localhost:80
 ```
 
 ### 4. 监控和维护
@@ -214,7 +214,7 @@ docker logs -f haproxy-dynamic
 docker exec -it haproxy-dynamic sh
 
 # 检查端口监听
-netstat -tlnp | grep 8080
+netstat -tlnp | grep :80
 
 # 备份配置
 cp ~/haproxy-config/haproxy.cfg ~/haproxy-config/haproxy.cfg.$(date +%Y%m%d)
@@ -273,12 +273,12 @@ defaults
     timeout server 30s
 
 frontend web_front
-    bind *:8080
+    bind *:80
     default_backend app_backend
     
     # 需要添加新端口时，在这里添加 bind 行
+    # bind *:443 ssl crt /etc/ssl/certs/server.pem
     # bind *:8081
-    # bind *:8082
 
 backend app_backend
     mode http
@@ -296,7 +296,7 @@ EOF
 docker run -d \
   --name haproxy-dynamic \
   --restart unless-stopped \
-  -p 8080:8080 \
+  -p 80:80 \
   -v ~/haproxy-config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro \
   haproxy:latest
 ```
