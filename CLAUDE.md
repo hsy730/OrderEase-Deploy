@@ -11,38 +11,51 @@ OrderEase-Deploy is a unified deployment and comprehensive testing repository fo
 - **Database**: MySQL 8.0 for data persistence
 
 **Repository Relationships**:
-- This repository depends on three separate source repositories checked out during CI/CD
-- The multi-stage Docker build copies source code from sibling directories
+- This repository depends on three separate source repositories checked out during CI/CD:
+  - `hsy730/OrderEase-Golang` - Go backend
+  - `hsy730/OrderEase-BackedUI` - Admin UI
+  - `hsy730/OrderEase-FrontUI` - Customer UI
+- The multi-stage Docker build copies source code from sibling directories (or artifact from CI/CD)
 
 ## Build and Deploy Commands
 
 ### Building the Docker Image
 
+**Using docker-compose**:
 ```bash
 cd build
 docker-compose build
 ```
 
-Alternative build methods:
-```bash
-# Using build script (Linux/Mac)
-chmod +x build.sh && ./build.sh
+**Using PowerShell deploy script** (Windows):
+```powershell
+cd scripts
+# First, allow script execution:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+# Then deploy:
+.\deploy.ps1
+```
 
-# Direct Docker build
+**Using Bash deploy script** (Linux/Mac):
+```bash
+cd scripts
+chmod +x deploy.sh
+./deploy.sh
+```
+
+**Direct Docker build** (for manual builds with sibling source repos):
+```bash
 docker build -t orderease:latest -f build/Dockerfile ../..
 ```
 
-**Windows Deployment**:
-```powershell
-# Automated deployment (generates config, pulls image, starts services)
-.\deploy.ps1
+**Deploy script options** (Windows PowerShell):
+- `.\deploy.ps1` - Full deployment with image pull
+- `.\deploy.ps1 -SkipPull` - Skip image pull if already available
+- `.\deploy.ps1 -OverrideConfig` - Override existing configuration
 
-# Skip image pull if already available
-.\deploy.ps1 -SkipPull
-
-# Override existing configuration
-.\deploy.ps1 -OverrideConfig
-```
+**Deploy script options** (Linux/Mac Bash):
+- `./deploy.sh` - Interactive deployment with image source selection
+- `./deploy.sh --skip-pull` - Skip image pull
 
 ### Running the Application
 
@@ -126,16 +139,23 @@ Tests execute in priority order (defined in `conftest.py::pytest_collection_modi
 ### Multi-Stage Docker Build
 
 The `build/Dockerfile` uses a 4-stage build with extreme optimization:
-1. **Stage 1**: Build Backend UI (Node 20 Alpine) - creates admin dashboard
-2. **Stage 2**: Build Frontend UI (Node 20 Alpine) - creates customer interface
+1. **Stage 1**: Build Backend UI (Node 20 Alpine) - creates admin dashboard at `dist/`
+2. **Stage 2**: Build Frontend UI (Node 20 Alpine) - creates customer interface at `dist/build/h5/`
 3. **Stage 3**: Build Go backend (Go 1.24 Alpine) - compiles with UPX compression
 4. **Stage 4**: Final runtime (Alpine 3.19) - minimal ~36MB image
 
 **Build Optimizations**:
 - UPX binary compression (`upx --best --lzma`) reduces Go binary size significantly
 - Go build flags: `-ldflags="-s -w -buildid="` removes symbols and debug info
-- Non-root user execution (uid 1000)
+- `--trimpath` removes file path information
+- Non-root user execution (uid 1000, group orderease)
 - Health checks using wget for container monitoring
+
+**Static File Paths** (in final image):
+- `/app/static/order-ease-adminiui/` - Admin UI
+- `/app/static/order-ease-iui/` - Customer UI
+- `/app/uploads/` - User uploads
+- `/app/logs/` - Application logs
 
 ### Unified Deployment
 
@@ -194,26 +214,39 @@ See [ENV_CONFIGURATION_GUIDE.md](docs/guides/ENV_CONFIGURATION_GUIDE.md) for det
 Located in `.github/workflows/build-test-deploy.yml`:
 
 **Job 1: Checkout Repositories**
-- Checks out all 4 repositories (Deploy, FrontUI, BackedUI, Golang)
+- Checks out all 4 repositories from `hsy730/` org:
+  - OrderEase-Deploy
+  - OrderEase-FrontUI
+  - OrderEase-BackedUI
+  - OrderEase-Golang
 - Creates build context artifact for downstream jobs
 
 **Job 2: Go Unit Tests**
-- Runs Go tests with race detection and coverage reporting
-- Uploads coverage report as artifact
+- Uses Go 1.22 with GOMODCACHE
+- Runs Go tests with race detection (`-race`) and coverage reporting
+- Uploads coverage report (`coverage.html`) as artifact (7-day retention)
 
 **Job 3: Build Docker Image**
-- Multi-stage Docker build with GitHub Actions caching
+- Multi-stage Docker build with GitHub Actions caching (type=gha)
 - Runs Trivy vulnerability scanner (CRITICAL, HIGH severity)
 - Uploads SARIF results to GitHub Security tab
+- Exports image as TAR artifact for downstream jobs
 
 **Job 4: Integration Tests**
-- Starts MySQL service container with health checks
-- Loads and runs Docker image
-- Executes pytest suite with HTML and JUnit reports
+- Requires `build-image` job to succeed
+- Uses GitHub Actions MySQL 8.0 service with health checks
+- Loads Docker image from artifact and starts container
+- Waits up to 120 seconds for application to be ready
+- Executes pytest suite with HTML and JUnit XML reports
 
 **Job 5: Push to Registry**
-- Only runs if all tests pass
-- Pushes to `docker.io/siyuanh640/orderease`
+- Only runs if all tests pass (`needs.integration-test.result == 'success'`)
+- Loads image from artifact
+- Pushes to `docker.io/siyuanh640/orderease:latest` (or PR-specific tag)
+
+**Manual Trigger Options**:
+- `skip_tests` input - Skip integration tests (not recommended)
+- `workflow_dispatch` - Manual trigger from GitHub Actions UI
 
 ## Testing Conventions
 
@@ -290,19 +323,49 @@ Stored in `deploy/data/`:
 - `logs/` - Application logs
 - `mysql/` - Database data
 
+## Additional Deployment Options
+
+### HAProxy Reverse Proxy
+
+For production deployments requiring SSL termination or load balancing, HAProxy can be used as a reverse proxy in front of the OrderEase container.
+
+**See**: `docs/haproxy/HAProxy-Docker-QuickStart.md` for complete guide
+
+**Key Points**:
+- HAProxy listens on port 80, forwards to backend port 8080
+- Linux deployments: use `docker0` bridge IP (e.g., `10.255.0.1`) instead of `host.docker.internal`
+- Always validate HAProxy configuration before starting container:
+  ```bash
+  docker run --rm -v ~/haproxy-config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro \
+    haproxy:latest haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
+  ```
+- Use specific port bindings (not ranges) to avoid blocking ports like SSH 22
+
 ## Troubleshooting
 
 **Container won't start**:
-- Check port conflicts: `netstat -ano | findstr ":8080"`
+- Check port conflicts: `netstat -ano | findstr ":8080"` (Windows) or `lsof -i :8080` (Linux)
 - View container logs: `docker-compose logs orderease-app`
+- Check Docker is running: `docker info`
 
 **Database connection issues**:
 - Check MySQL container: `docker-compose ps mysql`
-- Test connection: `docker exec orderease-mysql mysql -u root -p123456 -e "SELECT 1"`
+- Test connection: `docker exec orderease-mysql mysql -u` root -p<password> -e "SELECT 1"`
+- Verify network: `docker network inspect deploy_orderease-network`
 
 **Frontend not accessible**:
 - Check static files: `docker exec orderease-app ls -la /app/static/`
 - Test health: `curl http://localhost:8080/order-ease-iui/`
+- Verify health check: `docker inspect orderease-app | jq '.[0].State.Health'`
+
+**PowerShell script execution policy error**:
+- Error: "无法加载文件 xxx.ps1，因为在此系统上禁止运行脚本"
+- Solution: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+
+**CI/CD integration test timeout**:
+- Check MySQL service health in GitHub Actions logs
+- Verify app container startup: look for "服务器启动" message
+- Check API base URL is correct in test environment
 
 ## Cross-Repository Context
 
