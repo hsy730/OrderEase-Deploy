@@ -107,17 +107,151 @@ check_ports() {
     fi
 }
 
+# 检查现有容器
+check_existing_containers() {
+    local app_exists=$(docker ps -a --filter "name=orderease-app" --format "{{.Names}}" 2>/dev/null)
+    local mysql_exists=$(docker ps -a --filter "name=orderease-mysql" --format "{{.Names}}" 2>/dev/null)
+    
+    if [ -n "$app_exists" ] || [ -n "$mysql_exists" ]; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
+# 检查数据库数据是否存在
+check_database_data() {
+    if [ -d "$DEPLOY_DIR/data/mysql" ] && [ "$(ls -A $DEPLOY_DIR/data/mysql 2>/dev/null)" ]; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+
+# 小程序相关环境变量
+WECHAT_MINIPROGRAM_ENABLED=""
+WECHAT_MINIPROGRAM_APP_ID=""
+WECHAT_MINIPROGRAM_APP_SECRET=""
+
+# 读取现有配置
+load_existing_config() {
+    if [ -f "$DEPLOY_DIR/.env" ]; then
+        print_info "检测到现有配置文件，加载中..."
+        source "$DEPLOY_DIR/.env"
+        MYSQL_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
+        
+        # 加载小程序配置（如果存在）
+        WECHAT_MINIPROGRAM_ENABLED="${WECHAT_MINIPROGRAM_ENABLED:-}"
+        WECHAT_MINIPROGRAM_APP_ID="${WECHAT_MINIPROGRAM_APP_ID:-}"
+        WECHAT_MINIPROGRAM_APP_SECRET="${WECHAT_MINIPROGRAM_APP_SECRET:-}"
+        
+        # 检查是否有小程序配置
+        if [ -n "$WECHAT_MINIPROGRAM_APP_ID" ]; then
+            print_success "已加载现有数据库配置和小程序配置"
+        else
+            print_success "已加载现有数据库配置"
+        fi
+    fi
+}
+
+# 停止并删除现有容器
+cleanup_existing_containers() {
+    print_info "清理现有容器..."
+    
+    local app_exists=$(docker ps -a --filter "name=orderease-app" --format "{{.Names}}" 2>/dev/null)
+    local mysql_exists=$(docker ps -a --filter "name=orderease-mysql" --format "{{.Names}}" 2>/dev/null)
+    
+    if [ -n "$app_exists" ]; then
+        print_info "停止并删除旧容器: orderease-app"
+        docker stop orderease-app >/dev/null 2>&1 || true
+        docker rm orderease-app >/dev/null 2>&1 || true
+    fi
+    
+    if [ -n "$mysql_exists" ]; then
+        print_info "停止并删除旧容器: orderease-mysql"
+        docker stop orderease-mysql >/dev/null 2>&1 || true
+        docker rm orderease-mysql >/dev/null 2>&1 || true
+    fi
+    
+    print_success "旧容器清理完成"
+}
+
 create_deploy_dir() {
     print_info "创建部署目录..."
 
     if [ -d "$DEPLOY_DIR" ]; then
         print_warning "部署目录已存在: $DEPLOY_DIR"
+        
+        # 检查现有容器
+        local has_containers=$(check_existing_containers)
+        local has_data=$(check_database_data)
+        
+        if [ "$has_containers" = "true" ]; then
+            print_warning "检测到现有 Docker 容器"
+        fi
+        
+        if [ "$has_data" = "true" ]; then
+            print_warning "检测到现有数据库数据"
+            print_info "系统将自动保留现有数据库配置以避免连接失败"
+            # 自动加载现有配置
+            load_existing_config
+        fi
+        
         read -p "是否覆盖现有配置？(y/N): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             print_info "保留现有配置，跳过创建步骤"
+            # 即使不覆盖配置，也要清理旧容器以便重新部署
+            if [ "$has_containers" = "true" ]; then
+                cleanup_existing_containers
+            fi
             return
         fi
+        
+        # 用户选择覆盖配置
+        if [ "$has_data" = "true" ]; then
+            echo ""
+            print_warning "⚠️  警告：检测到现有数据库数据！"
+            print_warning "覆盖配置将导致新密码与旧数据库不匹配，应用将无法启动"
+            echo ""
+            echo -e "${YELLOW}请选择操作：${NC}"
+            echo "  1) 保留数据库数据和配置（推荐）"
+            echo "  2) 删除数据库数据并重新初始化"
+            echo "  3) 取消部署"
+            echo ""
+            read -p "请选择 [1-3]: " data_choice
+            
+            case $data_choice in
+                1)
+                    print_info "保留数据库数据和现有配置"
+                    load_existing_config
+                    cleanup_existing_containers
+                    return
+                    ;;
+                2)
+                    print_warning "将删除数据库数据..."
+                    read -p "确认删除所有数据？(y/N): " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        print_info "取消删除，保留数据"
+                        load_existing_config
+                        cleanup_existing_containers
+                        return
+                    fi
+                    rm -rf "$DEPLOY_DIR/data/mysql"
+                    print_success "数据库数据已清除"
+                    ;;
+                3)
+                    print_info "部署已取消"
+                    exit 0
+                    ;;
+                *)
+                    print_error "无效选择"
+                    exit 1
+                    ;;
+            esac
+        fi
+        
         print_warning "将覆盖现有配置文件..."
     fi
 
@@ -130,20 +264,43 @@ generate_configs() {
 
     cd "$DEPLOY_DIR"
 
+    # 如果已经有密码（从现有配置加载），则不再生成新密码
     if [ -z "$MYSQL_PASSWORD" ]; then
         MYSQL_PASSWORD=$(openssl rand -base64 16 | tr -d "=+/" | cut -c1-16)
         JWT_SECRET=$(openssl rand -hex 32)
+        print_info "已生成新的数据库密码和JWT密钥"
+    else
+        print_info "使用现有的数据库密码"
+        # 如果JWT_SECRET为空，生成一个新的
+        if [ -z "$JWT_SECRET" ]; then
+            JWT_SECRET=$(openssl rand -hex 32)
+        fi
     fi
 
-    cat > .env << EOF
-MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD
-MYSQL_DATABASE=orderease
-JWT_SECRET=$JWT_SECRET
-JWT_EXPIRATION=7200
-TZ=Asia/Shanghai
-APP_PORT=8080
-MYSQL_PORT=3306
-EOF
+    # 构建 .env 文件内容
+    local env_content=""
+    env_content+="MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD\n"
+    env_content+="MYSQL_DATABASE=orderease\n"
+    env_content+="JWT_SECRET=$JWT_SECRET\n"
+    env_content+="JWT_EXPIRATION=7200\n"
+    env_content+="TZ=Asia/Shanghai\n"
+    env_content+="APP_PORT=8080\n"
+    env_content+="MYSQL_PORT=3306\n"
+    
+    # 如果存在小程序配置，保留它们
+    if [ -n "$WECHAT_MINIPROGRAM_ENABLED" ]; then
+        env_content+="\n# ==================== 微信小程序配置 ====================\n"
+        env_content+="WECHAT_MINIPROGRAM_ENABLED=$WECHAT_MINIPROGRAM_ENABLED\n"
+        if [ -n "$WECHAT_MINIPROGRAM_APP_ID" ]; then
+            env_content+="WECHAT_MINIPROGRAM_APP_ID=$WECHAT_MINIPROGRAM_APP_ID\n"
+        fi
+        if [ -n "$WECHAT_MINIPROGRAM_APP_SECRET" ]; then
+            env_content+="WECHAT_MINIPROGRAM_APP_SECRET=$WECHAT_MINIPROGRAM_APP_SECRET\n"
+        fi
+        print_info "已保留小程序配置"
+    fi
+    
+    echo -e "$env_content" > .env
 
     cat > config/config.yaml << EOF
 server:
