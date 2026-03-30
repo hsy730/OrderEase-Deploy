@@ -39,6 +39,11 @@ services:
 
       # 时区配置
       - TZ=${TZ}
+
+      # 微信小程序配置
+      - WECHAT_MINIPROGRAM_ENABLED=${WECHAT_MINIPROGRAM_ENABLED}
+      - WECHAT_MINIPROGRAM_APP_ID=${WECHAT_MINIPROGRAM_APP_ID}
+      - WECHAT_MINIPROGRAM_APP_SECRET=${WECHAT_MINIPROGRAM_APP_SECRET}
     volumes:
       # 持久化上传文件
       - ./data/uploads:/app/uploads

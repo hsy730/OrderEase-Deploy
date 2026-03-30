@@ -25,7 +25,12 @@
 | `DB_NAME` | 数据库名称 | `orderease` | 是 |
 | `JWT_SECRET` | JWT 签名密钥（≥32字节） | `random_secret_key_32_bytes_minimum` | 是 |
 | `JWT_EXPIRATION` | JWT 过期时间（秒） | `7200` (2小时) | 否 |
+| `WECHAT_MINIPROGRAM_ENABLED` | 启用微信小程序登录 | `true` / `false` | 否 |
+| `WECHAT_MINIPROGRAM_APP_ID` | 微信小程序 AppID | `wx1234567890abcdef` | 条件必需* |
+| `WECHAT_MINIPROGRAM_APP_SECRET` | 微信小程序 AppSecret | `your_app_secret_here` | 条件必需* |
 | `TZ` | 时区 | `Asia/Shanghai` | 否 |
+
+> **条件必需***: 当 `WECHAT_MINIPROGRAM_ENABLED=true` 时必需
 | `SERVER_HOST` | 服务器监听地址 | `0.0.0.0` | 否 |
 | `SERVER_PORT` | 服务器端口 | `8080` | 否 |
 
@@ -55,6 +60,19 @@ SERVER_HOST=0.0.0.0    # 监听所有网络接口
 SERVER_PORT=8080       # 应用服务端口
 TZ=Asia/Shanghai       # 时区配置
 ```
+
+#### 微信小程序配置
+
+```bash
+WECHAT_MINIPROGRAM_ENABLED=true           # 是否启用微信小程序登录
+WECHAT_MINIPROGRAM_APP_ID=wx1234567890    # 小程序 AppID（从微信公众平台获取）
+WECHAT_MINIPROGRAM_APP_SECRET=xxx         # 小程序 AppSecret（从微信公众平台获取）
+```
+
+**获取方式：**
+1. 登录 `https://mp.weixin.qq.com/`
+2. 进入「开发」→「开发管理」→「开发设置」
+3. 在「开发者ID」中查看 AppID 和 AppSecret
 
 ---
 

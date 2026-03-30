@@ -75,6 +75,8 @@ cd D:\local_code_repo\OrderEase-Deploy
 ```
 orderease-deploy/
 ├── docker-compose.yml      # Docker Compose 配置文件
+├── .env                    # 环境变量文件（敏感信息，不要提交到 Git）
+├── .env.example            # 环境变量模板示例
 ├── config/
 │   └── config.yaml        # 应用配置文件
 └── data/
@@ -82,6 +84,8 @@ orderease-deploy/
     ├── logs/              # 日志文件
     └── mysql/             # MySQL 数据持久化
 ```
+
+> ⚠️ **重要**: `.env` 文件包含数据库密码、JWT 密钥等敏感信息，**不要提交到 Git 仓库**！
 
 ### 服务说明
 部署后会启动两个容器：
@@ -328,6 +332,9 @@ Write-Host "JWT_SECRET: $jwtSecret"
 | `DB_NAME` | 数据库名称 | `orderease` | 是 |
 | `JWT_SECRET` | JWT签名密钥 | `≥32字节随机字符串` | **是（需配置）** |
 | `JWT_EXPIRATION` | JWT过期时间（秒） | `7200` | 否 |
+| `WECHAT_MINIPROGRAM_ENABLED` | 是否启用微信小程序登录 | `true` / `false` | 否 |
+| `WECHAT_MINIPROGRAM_APP_ID` | 小程序 AppID | `wx1234567890abcdef` | 启用时必需 |
+| `WECHAT_MINIPROGRAM_APP_SECRET` | 小程序 AppSecret | `your_secret_here` | 启用时必需 |
 | `TZ` | 时区 | `Asia/Shanghai` | 否 |
 
 ### CI/CD 环境变量配置
