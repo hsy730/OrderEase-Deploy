@@ -153,6 +153,44 @@ docker pull siyuanh640/orderease:latest
 docker compose up -d --force-recreate
 ```
 
+### 清理旧的镜像和容器
+```powershell
+# 使用清理脚本（推荐）
+cd scripts
+.\cleanup.ps1
+
+# 预览将要清理的内容（不实际执行）
+.\cleanup.ps1 -DryRun
+
+# 强制清理，不提示确认
+.\cleanup.ps1 -Force
+
+# 全面清理（包括未使用的卷）
+.\cleanup.ps1 -RemoveAll
+```
+
+**清理脚本功能：**
+- 清理已停止的容器
+- 清理悬空镜像（dangling images）
+- 清理旧版 OrderEase 镜像（非 latest 版本）
+- 清理未使用的网络
+- 可选：清理未使用的卷（使用 `-RemoveAll` 参数）
+
+**手动清理命令：**
+```powershell
+# 查看磁盘使用情况
+docker system df
+
+# 清理悬空镜像
+docker image prune -f
+
+# 清理已停止的容器
+docker container prune -f
+
+# 清理所有未使用的资源（包括卷）
+docker system prune -a -f --volumes
+```
+
 ---
 
 ## 访问应用

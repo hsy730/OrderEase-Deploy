@@ -138,13 +138,13 @@ load_existing_config() {
     if [ -f "$DEPLOY_DIR/.env" ]; then
         print_info "检测到现有配置文件，加载中..."
         source "$DEPLOY_DIR/.env"
-        MYSQL_PASSWORD="${MYSQL_ROOT_PASSWORD:-}"
-        
+        MYSQL_PASSWORD="${DB_PASSWORD:-}"
+
         # 加载小程序配置（如果存在）
         WECHAT_MINIPROGRAM_ENABLED="${WECHAT_MINIPROGRAM_ENABLED:-}"
         WECHAT_MINIPROGRAM_APP_ID="${WECHAT_MINIPROGRAM_APP_ID:-}"
         WECHAT_MINIPROGRAM_APP_SECRET="${WECHAT_MINIPROGRAM_APP_SECRET:-}"
-        
+
         # 检查是否有小程序配置
         if [ -n "$WECHAT_MINIPROGRAM_APP_ID" ]; then
             print_success "已加载现有数据库配置和小程序配置"
@@ -277,10 +277,30 @@ generate_configs() {
         fi
     fi
 
+    # 交互式询问是否配置微信小程序
+    if [ -z "$WECHAT_MINIPROGRAM_ENABLED" ]; then
+        echo ""
+        echo -e "${YELLOW}是否配置微信小程序登录？${NC}"
+        read -p "启用微信小程序登录？(y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            WECHAT_MINIPROGRAM_ENABLED="true"
+            echo ""
+            print_info "请输入微信小程序配置（从微信公众平台获取）："
+            echo "  获取方式：登录 https://mp.weixin.qq.com/ → 开发 → 开发管理 → 开发设置"
+            echo ""
+            read -p "请输入小程序 AppID: " WECHAT_MINIPROGRAM_APP_ID
+            read -p "请输入小程序 AppSecret: " WECHAT_MINIPROGRAM_APP_SECRET
+            print_success "微信小程序配置完成"
+        else
+            WECHAT_MINIPROGRAM_ENABLED="false"
+        fi
+    fi
+
     # 构建 .env 文件内容
     local env_content=""
-    env_content+="MYSQL_ROOT_PASSWORD=$MYSQL_PASSWORD\n"
-    env_content+="MYSQL_DATABASE=orderease\n"
+    env_content+="DB_PASSWORD=$MYSQL_PASSWORD\n"
+    env_content+="DB_NAME=orderease\n"
     env_content+="JWT_SECRET=$JWT_SECRET\n"
     env_content+="JWT_EXPIRATION=7200\n"
     env_content+="TZ=Asia/Shanghai\n"
@@ -297,9 +317,13 @@ generate_configs() {
         if [ -n "$WECHAT_MINIPROGRAM_APP_SECRET" ]; then
             env_content+="WECHAT_MINIPROGRAM_APP_SECRET=$WECHAT_MINIPROGRAM_APP_SECRET\n"
         fi
-        print_info "已保留小程序配置"
+        if [ "$WECHAT_MINIPROGRAM_ENABLED" = "true" ]; then
+            print_info "已配置微信小程序"
+        else
+            print_info "微信小程序未启用"
+        fi
     fi
-    
+
     echo -e "$env_content" > .env
 
     cat > config/config.yaml << EOF
@@ -341,14 +365,17 @@ services:
       mysql:
         condition: service_healthy
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USERNAME=root
-      - DB_PASSWORD=\${MYSQL_ROOT_PASSWORD}
-      - DB_NAME=orderease
+      - DB_HOST=\${DB_HOST:-mysql}
+      - DB_PORT=\${DB_PORT:-3306}
+      - DB_USERNAME=\${DB_USERNAME:-root}
+      - DB_PASSWORD=\${DB_PASSWORD}
+      - DB_NAME=\${DB_NAME:-orderease}
       - JWT_SECRET=\${JWT_SECRET}
-      - JWT_EXPIRATION=7200
+      - JWT_EXPIRATION=\${JWT_EXPIRATION:-7200}
       - TZ=\${TZ:-Asia/Shanghai}
+      - WECHAT_MINIPROGRAM_ENABLED=\${WECHAT_MINIPROGRAM_ENABLED:-false}
+      - WECHAT_MINIPROGRAM_APP_ID=\${WECHAT_MINIPROGRAM_APP_ID:-}
+      - WECHAT_MINIPROGRAM_APP_SECRET=\${WECHAT_MINIPROGRAM_APP_SECRET:-}
     volumes:
       - ./data/uploads:/app/uploads
       - ./data/logs:/app/logs
@@ -367,8 +394,8 @@ services:
     image: mysql:8.0
     container_name: orderease-mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=\${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=orderease
+      - MYSQL_ROOT_PASSWORD=\${DB_PASSWORD}
+      - MYSQL_DATABASE=\${DB_NAME:-orderease}
       - TZ=\${TZ:-Asia/Shanghai}
     volumes:
       - ./data/mysql:/var/lib/mysql
@@ -379,7 +406,7 @@ services:
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p\${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p\${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5

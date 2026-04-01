@@ -3,47 +3,40 @@ version: '3.8'
 # OrderEase 生产环境部署配置
 # 用途：基于已构建的镜像进行部署
 # 使用方法：
-#   cd d:\local_code_repo\OrderEase-Deploy\deploy
+#   cd d:\local_code_repo\OrderEase\OrderEase-Deploy\deploy
 #   docker-compose up -d
 
 services:
   # 应用服务
   orderease-app:
-    image: orderease:latest
+    image: siyuanh640/orderease:latest
     container_name: orderease-app
     ports:
-      - "8080:8080"  # Go后端提供所有服务（API + 前后台UI）
+      - "${APP_PORT:-8080}:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     env_file:
       - .env
     environment:
-      # 数据库配置（通过 .env 文件注入）
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USERNAME=${DB_USERNAME}
+      # 数据库配置
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USERNAME=${DB_USERNAME:-root}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      - DB_NAME=${DB_NAME:-orderease}
 
-      # JWT配置（通过 .env 文件注入）
+      # JWT配置
       - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-
-      # 服务器配置
-      - SERVER_HOST=${SERVER_HOST}
-      - SERVER_PORT=${SERVER_PORT}
-
-      # 前端 UI API 配置
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-      - VITE_API_PREFIX=${VITE_API_PREFIX}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-7200}
 
       # 时区配置
-      - TZ=${TZ}
+      - TZ=${TZ:-Asia/Shanghai}
 
       # 微信小程序配置
-      - WECHAT_MINIPROGRAM_ENABLED=${WECHAT_MINIPROGRAM_ENABLED}
-      - WECHAT_MINIPROGRAM_APP_ID=${WECHAT_MINIPROGRAM_APP_ID}
-      - WECHAT_MINIPROGRAM_APP_SECRET=${WECHAT_MINIPROGRAM_APP_SECRET}
+      - WECHAT_MINIPROGRAM_ENABLED=${WECHAT_MINIPROGRAM_ENABLED:-false}
+      - WECHAT_MINIPROGRAM_APP_ID=${WECHAT_MINIPROGRAM_APP_ID:-}
+      - WECHAT_MINIPROGRAM_APP_SECRET=${WECHAT_MINIPROGRAM_APP_SECRET:-}
     volumes:
       # 持久化上传文件
       - ./data/uploads:/app/uploads
@@ -69,23 +62,24 @@ services:
       - .env
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
-      - TZ=${TZ}
+      - MYSQL_DATABASE=${DB_NAME:-orderease}
+      - TZ=${TZ:-Asia/Shanghai}
     volumes:
       - ./data/mysql:/var/lib/mysql
       # 初始化SQL脚本（可选）
       # - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    # 注意：端口已移除，仅通过Docker内部网络访问，提高安全性
-    # 如需外部访问，请使用SSH隧道或VPN
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
     networks:
       - orderease-network
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$DB_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
 networks:
   orderease-network:
