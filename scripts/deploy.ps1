@@ -1,4 +1,4 @@
-﻿# OrderEase 自动部署脚本
+# OrderEase 自动部署脚本
 # 用法: .\deploy.ps1 [-SkipPull]
 
 param(
@@ -58,7 +58,7 @@ foreach ($d in $dirs) {
 Write-Success "目录创建完成"
 
 # 生成密码
-$MYSQL_PWD = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 16 | % {[char]$_})
+$DB_PASSWORD = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 16 | % {[char]$_})
 $JWT_SECRET = -join ((97..102)+(48..57) | Get-Random -Count 64 | % {[char]$_})
 
 # 生成 docker-compose.yml
@@ -78,7 +78,7 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USERNAME=root
-      - DB_PASSWORD=$MYSQL_PWD
+      - DB_PASSWORD=$DB_PASSWORD
       - DB_NAME=orderease
       - JWT_SECRET=$JWT_SECRET
       - JWT_EXPIRATION=7200
@@ -100,7 +100,7 @@ services:
     image: mysql:8.0
     container_name: orderease-mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=$MYSQL_PWD
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
       - MYSQL_DATABASE=orderease
       - TZ=Asia/Shanghai
     volumes:
@@ -112,7 +112,7 @@ services:
     restart: unless-stopped
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_PWD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$DB_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -136,7 +136,7 @@ database:
   host: mysql
   port: 3306
   username: root
-  password: $MYSQL_PWD
+  password: $DB_PASSWORD
   dbname: orderease
   charset: utf8mb4
   parseTime: true
@@ -203,7 +203,7 @@ Write-Host "  docker compose stop"
 Write-Host "  docker compose restart"
 Write-Host "  docker compose down"
 Write-Host ""
-Write-Host "数据库密码: $MYSQL_PWD" -ForegroundColor Red
+Write-Host "数据库密码: $DB_PASSWORD" -ForegroundColor Red
 Write-Host "请妥善保管此密码！"
 Write-Host ""
 
