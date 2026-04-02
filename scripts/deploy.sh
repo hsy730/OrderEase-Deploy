@@ -139,6 +139,7 @@ load_existing_config() {
         print_info "检测到现有配置文件，加载中..."
         source "$DEPLOY_DIR/.env"
         MYSQL_PASSWORD="${DB_PASSWORD:-}"
+        JWT_SECRET="${JWT_SECRET:-}"
 
         # 加载小程序配置（如果存在）
         WECHAT_MINIPROGRAM_ENABLED="${WECHAT_MINIPROGRAM_ENABLED:-}"
@@ -174,6 +175,44 @@ cleanup_existing_containers() {
     fi
     
     print_success "旧容器清理完成"
+}
+
+# 安全删除 MySQL 数据目录
+remove_mysql_data() {
+    print_info "正在删除 MySQL 数据目录..."
+    
+    # 先确保 MySQL 容器已停止
+    local mysql_exists=$(docker ps -a --filter "name=orderease-mysql" --format "{{.Names}}" 2>/dev/null)
+    if [ -n "$mysql_exists" ]; then
+        print_info "停止 MySQL 容器..."
+        docker stop orderease-mysql >/dev/null 2>&1 || true
+    fi
+    
+    # 尝试直接删除
+    if rm -rf "$DEPLOY_DIR/data/mysql" 2>/dev/null; then
+        print_success "数据库数据已清除"
+        return 0
+    fi
+    
+    # 如果直接删除失败，尝试使用 sudo
+    print_warning "需要管理员权限删除 MySQL 数据..."
+    if command -v sudo &> /dev/null; then
+        if sudo rm -rf "$DEPLOY_DIR/data/mysql"; then
+            print_success "数据库数据已清除"
+            return 0
+        else
+            print_error "sudo 删除失败，请手动删除"
+            print_info "手动删除命令: sudo rm -rf $DEPLOY_DIR/data/mysql"
+            return 1
+        fi
+    fi
+    
+    # 如果没有 sudo，提供手动删除指导
+    print_error "无法删除 MySQL 数据目录，请手动执行以下命令："
+    echo ""
+    echo "  sudo rm -rf $DEPLOY_DIR/data/mysql"
+    echo ""
+    return 1
 }
 
 create_deploy_dir() {
@@ -238,8 +277,12 @@ create_deploy_dir() {
                         cleanup_existing_containers
                         return
                     fi
-                    rm -rf "$DEPLOY_DIR/data/mysql"
-                    print_success "数据库数据已清除"
+                    remove_mysql_data || {
+                        print_info "保留现有配置继续部署..."
+                        load_existing_config
+                        cleanup_existing_containers
+                        return
+                    }
                     ;;
                 3)
                     print_info "部署已取消"
@@ -270,10 +313,11 @@ generate_configs() {
         JWT_SECRET=$(openssl rand -hex 32)
         print_info "已生成新的数据库密码和JWT密钥"
     else
-        print_info "使用现有的数据库密码"
+        print_info "使用现有的数据库密码和JWT密钥"
         # 如果JWT_SECRET为空，生成一个新的
         if [ -z "$JWT_SECRET" ]; then
             JWT_SECRET=$(openssl rand -hex 32)
+            print_warning "JWT_SECRET 未找到，已生成新的密钥"
         fi
     fi
 

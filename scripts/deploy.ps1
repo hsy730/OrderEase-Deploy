@@ -57,9 +57,31 @@ foreach ($d in $dirs) {
 }
 Write-Success "目录创建完成"
 
-# 生成密码
-$DB_PASSWORD = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 16 | % {[char]$_})
-$JWT_SECRET = -join ((97..102)+(48..57) | Get-Random -Count 64 | % {[char]$_})
+# 生成或保留密码
+$existingCompose = Join-Path $DEPLOY_DIR "docker-compose.yml"
+if (Test-Path $existingCompose) {
+    Write-Info "检测到现有配置，保留数据库密码和JWT密钥..."
+    $composeContent = Get-Content $existingCompose -Raw
+    
+    if ($composeContent -match 'DB_PASSWORD=([^\s]+)') {
+        $DB_PASSWORD = $Matches[1].Trim()
+    }
+    if ($composeContent -match 'JWT_SECRET=([^\s]+)') {
+        $JWT_SECRET = $Matches[1].Trim()
+    }
+    
+    if (-not $DB_PASSWORD -or -not $JWT_SECRET) {
+        Write-Warning "无法从现有配置读取密码，将生成新密码"
+        $DB_PASSWORD = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 16 | % {[char]$_})
+        $JWT_SECRET = -join ((97..102)+(48..57) | Get-Random -Count 64 | % {[char]$_})
+    } else {
+        Write-Success "已保留现有数据库配置"
+    }
+} else {
+    Write-Info "首次部署，生成新的数据库密码和JWT密钥..."
+    $DB_PASSWORD = -join ((48..57)+(65..90)+(97..122) | Get-Random -Count 16 | % {[char]$_})
+    $JWT_SECRET = -join ((97..102)+(48..57) | Get-Random -Count 64 | % {[char]$_})
+}
 
 # 生成 docker-compose.yml
 Write-Info "生成配置文件..."
