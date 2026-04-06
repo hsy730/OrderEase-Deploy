@@ -135,12 +135,106 @@ jobs:
           go tool cover -func=coverage.out | tail -n 1
 
   # ============================================
+  # Job 1.6: 前端单元测试 (BackedUI & FrontUI)
+  # ============================================
+  frontend-test:
+    name: Frontend Unit Tests
+    runs-on: ubuntu-latest
+    needs: checkout-repos
+    steps:
+      - name: Checkout BackedUI Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-BackedUI
+          ref: main
+          path: OrderEase-BackedUI
+
+      - name: Checkout FrontUI Repository
+        uses: actions/checkout@v4
+        with:
+          repository: hsy730/OrderEase-FrontUI
+          ref: main
+          path: OrderEase-FrontUI
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            OrderEase-BackedUI/package-lock.json
+            OrderEase-FrontUI/package-lock.json
+
+      - name: Install BackedUI Dependencies
+        working-directory: OrderEase-BackedUI
+        run: npm ci
+
+      - name: Run BackedUI Tests
+        id: backedui-test
+        working-directory: OrderEase-BackedUI
+        run: |
+          echo "Running BackedUI unit tests..."
+          npm run test:run -- --reporter=json --outputFile=test-results.json
+
+      - name: Upload BackedUI Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backedui-test-results
+          path: OrderEase-BackedUI/test-results.json
+          retention-days: 7
+
+      - name: Install FrontUI Dependencies
+        working-directory: OrderEase-FrontUI
+        run: npm ci
+
+      - name: Run FrontUI Tests
+        id: frontui-test
+        working-directory: OrderEase-FrontUI
+        run: |
+          echo "Running FrontUI unit tests..."
+          npm run test -- --reporter=json --outputFile=test-results.json
+
+      - name: Generate FrontUI Coverage Report
+        if: always()
+        working-directory: OrderEase-FrontUI
+        run: npm run test:coverage || true
+
+      - name: Upload FrontUI Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontui-test-results
+          path: |
+            OrderEase-FrontUI/test-results.json
+            OrderEase-FrontUI/coverage/
+          retention-days: 7
+
+      - name: Print Test Summary
+        if: always()
+        run: |
+          echo "=== BackedUI Test Results ==="
+          if [ -f OrderEase-BackedUI/test-results.json ]; then
+            cat OrderEase-BackedUI/test-results.json | jq '.numPassedTests, .numFailedTests, .numTotalTests' 2>/dev/null || echo "Test results file found but could not parse"
+          else
+            echo "No test results file found"
+          fi
+          
+          echo ""
+          echo "=== FrontUI Test Results ==="
+          if [ -f OrderEase-FrontUI/test-results.json ]; then
+            cat OrderEase-FrontUI/test-results.json | jq '.numPassedTests, .numFailedTests, .numTotalTests' 2>/dev/null || echo "Test results file found but could not parse"
+          else
+            echo "No test results file found"
+          fi
+
+  # ============================================
   # Job 2: 构建多阶段 Docker 镜像
   # ============================================
   build-image:
     name: Build All-in-One Docker Image
     runs-on: ubuntu-latest
-    needs: [checkout-repos, go-test]
+    needs: [checkout-repos, go-test, frontend-test]
     outputs:
       image-tag: ${{ steps.set-tag.outputs.tag }}
       image-digest: ${{ steps.build.outputs.digest }}
