@@ -167,66 +167,275 @@ jobs:
 
       - name: Install BackedUI Dependencies
         working-directory: OrderEase-BackedUI
-        run: npm ci
+        run: |
+          echo "=== Installing BackedUI Dependencies ==="
+          npm ci 2>&1 | tee npm-install.log
+          echo "=== Node.js Version ==="
+          node --version
+          echo "=== npm Version ==="
+          npm --version
+          echo "=== Installed Packages ==="
+          ls -la node_modules/ | head -20
 
-      - name: Run BackedUI Tests
+      - name: Debug BackedUI Environment
+        run: |
+          echo "=== BackedUI Project Structure ==="
+          ls -la OrderEase-BackedUI/
+          echo ""
+          echo "=== Test Files Found ==="
+          find OrderEase-BackedUI/src/__tests__ -name "*.test.js" -type f 2>/dev/null || echo "No test files found in src/__tests__"
+          echo ""
+          echo "=== Vitest Config ==="
+          cat OrderEase-BackedUI/vitest.config.js || echo "No vitest.config.js found"
+          echo ""
+          echo "=== Package.json Scripts ==="
+          cat OrderEase-BackedUI/package.json | grep -A 10 '"scripts"'
+
+      - name: Run BackedUI Tests (Verbose)
         id: backedui-test
         working-directory: OrderEase-BackedUI
         run: |
-          echo "Running BackedUI unit tests..."
-          npm run test:run -- --reporter=json --outputFile=test-results.json
+          echo "=========================================="
+          echo "Running BackedUI Unit Tests with Verbose Output"
+          echo "=========================================="
+          
+          # Run tests with verbose output and save to log file
+          set +e
+          npm run test:run -- \
+            --reporter=verbose \
+            --reporter=json \
+            --outputFile=test-results.json \
+            2>&1 | tee test-output.log
+          TEST_EXIT_CODE=$?
+          set -e
+          
+          echo ""
+          echo "=========================================="
+          echo "Test Exit Code: $TEST_EXIT_CODE"
+          echo "=========================================="
+          
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ TESTS FAILED"
+            echo ""
+            echo "=== Failed Test Details ==="
+            
+            # Extract failed tests from results if available
+            if [ -f test-results.json ]; then
+              echo "Failed test suites:"
+              cat test-results.json | jq -r '.testResults[]? | select(.status == "failed") | "\(.name): \(.message // .failureMessage)"' 2>/dev/null || true
+              
+              echo ""
+              echo "Summary:"
+              cat test-results.json | jq '{numPassedTestSuites, numFailedTestSuites, numPassedTests, numFailedTests, numTotalTests}' 2>/dev/null || true
+            fi
+            
+            echo ""
+            echo "=== Last 100 lines of test output ==="
+            tail -100 test-output.log
+          fi
+          
+          exit $TEST_EXIT_CODE
 
-      - name: Upload BackedUI Test Results
+      - name: Upload BackedUI Test Results JSON
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: backedui-test-results
+          name: backedui-test-results-json
           path: OrderEase-BackedUI/test-results.json
+          retention-days: 7
+
+      - name: Upload BackedUI Test Output Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backedui-test-output-log
+          path: OrderEase-BackedUI/test-output.log
+          retention-days: 7
+
+      - name: Upload BackedUI Install Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backedui-npm-install-log
+          path: OrderEase-BackedUI/npm-install.log
           retention-days: 7
 
       - name: Install FrontUI Dependencies
         working-directory: OrderEase-FrontUI
-        run: npm ci
+        run: |
+          echo "=== Installing FrontUI Dependencies ==="
+          npm ci 2>&1 | tee npm-install.log
+          echo "=== Node.js Version ==="
+          node --version
+          echo "=== npm Version ==="
+          npm --version
 
-      - name: Run FrontUI Tests
+      - name: Debug FrontUI Environment
+        run: |
+          echo "=== FrontUI Project Structure ==="
+          ls -la OrderEase-FrontUI/
+          echo ""
+          echo "=== Test Files Found ==="
+          find OrderEase-FrontUI/tests -name "*.test.js" -type f 2>/dev/null || echo "No test files found in tests/"
+          echo ""
+          echo "=== Vitest Config ==="
+          cat OrderEase-FrontUI/vitest.config.js || echo "No vitest.config.js found"
+
+      - name: Run FrontUI Tests (Verbose)
         id: frontui-test
         working-directory: OrderEase-FrontUI
         run: |
-          echo "Running FrontUI unit tests..."
-          npm run test -- --reporter=json --outputFile=test-results.json
+          echo "=========================================="
+          echo "Running FrontUI Unit Tests with Verbose Output"
+          echo "=========================================="
+          
+          # Run tests with verbose output and save to log file
+          set +e
+          npm run test -- \
+            --reporter=verbose \
+            --reporter=json \
+            --outputFile=test-results.json \
+            2>&1 | tee test-output.log
+          TEST_EXIT_CODE=$?
+          set -e
+          
+          echo ""
+          echo "=========================================="
+          echo "Test Exit Code: $TEST_EXIT_CODE"
+          echo "=========================================="
+          
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ TESTS FAILED"
+            echo ""
+            echo "=== Failed Test Details ==="
+            
+            # Extract failed tests from results if available
+            if [ -f test-results.json ]; then
+              echo "Failed test suites:"
+              cat test-results.json | jq -r '.testResults[]? | select(.status == "failed") | "\(.name): \(.message // .failureMessage)"' 2>/dev/null || true
+              
+              echo ""
+              echo "Summary:"
+              cat test-results.json | jq '{numPassedTestSuites, numFailedTestSuites, numPassedTests, numFailedTests, numTotalTests}' 2>/dev/null || true
+            fi
+            
+            echo ""
+            echo "=== Last 100 lines of test output ==="
+            tail -100 test-output.log
+          fi
+          
+          exit $TEST_EXIT_CODE
 
       - name: Generate FrontUI Coverage Report
         if: always()
         working-directory: OrderEase-FrontUI
-        run: npm run test:coverage || true
+        run: npm run test:coverage 2>&1 | tee coverage-output.log || true
 
-      - name: Upload FrontUI Test Results
+      - name: Upload FrontUI Test Results JSON
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontui-test-results
+          name: frontui-test-results-json
+          path: OrderEase-FrontUI/test-results.json
+          retention-days: 7
+
+      - name: Upload FrontUI Test Output Log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontui-test-output-log
+          path: OrderEase-FrontUI/test-output.log
+          retention-days: 7
+
+      - name: Upload FrontUI Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontui-coverage-report
           path: |
-            OrderEase-FrontUI/test-results.json
             OrderEase-FrontUI/coverage/
+            OrderEase-FrontUI/coverage-output.log
+          retention-days: 7
+
+      - name: Upload FrontUI Install Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontui-npm-install-log
+          path: OrderEase-FrontUI/npm-install.log
           retention-days: 7
 
       - name: Print Test Summary
         if: always()
         run: |
-          echo "=== BackedUI Test Results ==="
+          echo "=========================================="
+          echo "           TEST SUMMARY REPORT"
+          echo "=========================================="
+          echo ""
+          
+          echo "📊 BackedUI Test Results:"
+          echo "------------------------"
           if [ -f OrderEase-BackedUI/test-results.json ]; then
-            cat OrderEase-BackedUI/test-results.json | jq '.numPassedTests, .numFailedTests, .numTotalTests' 2>/dev/null || echo "Test results file found but could not parse"
+            echo "✅ Test results file found"
+            echo ""
+            cat OrderEase-BackedUI/test-results.json | jq '{
+              total_tests: .numTotalTests,
+              passed: .numPassedTests,
+              failed: .numFailedTests,
+              success_rate: (if .numTotalTests > 0 then ((.numPassedTests / .numTotalTests) * 100 | floor) else 0 end)
+            }' 2>/dev/null || echo "Could not parse test results JSON"
+            
+            # Show failed tests if any
+            FAILED_COUNT=$(cat OrderEase-BackedUI/test-results.json | jq '.numFailedTests' 2>/dev/null || echo "0")
+            if [ "$FAILED_COUNT" -gt 0 ] 2>/dev/null; then
+              echo ""
+              echo "❌ Failed Tests Details:"
+              cat OrderEase-BackedUI/test-results.json | jq -r '.testResults[]? | select(.status == "failed") | "  - \(.name)"' 2>/dev/null || true
+            fi
           else
-            echo "No test results file found"
+            echo "❌ No test results file found - tests may not have run"
+            if [ -f OrderEase-BackedUI/test-output.log ]; then
+              echo ""
+              echo "Last 50 lines of test output:"
+              tail -50 OrderEase-BackedUI/test-output.log
+            fi
           fi
           
           echo ""
-          echo "=== FrontUI Test Results ==="
+          echo "📊 FrontUI Test Results:"
+          echo "-----------------------"
           if [ -f OrderEase-FrontUI/test-results.json ]; then
-            cat OrderEase-FrontUI/test-results.json | jq '.numPassedTests, .numFailedTests, .numTotalTests' 2>/dev/null || echo "Test results file found but could not parse"
+            echo "✅ Test results file found"
+            echo ""
+            cat OrderEase-FrontUI/test-results.json | jq '{
+              total_tests: .numTotalTests,
+              passed: .numPassedTests,
+              failed: .numFailedTests,
+              success_rate: (if .numTotalTests > 0 then ((.numPassedTests / .numTotalTests) * 100 | floor) else 0 end)
+            }' 2>/dev/null || echo "Could not parse test results JSON"
+            
+            # Show failed tests if any
+            FAILED_COUNT=$(cat OrderEase-FrontUI/test-results.json | jq '.numFailedTests' 2>/dev/null || echo "0")
+            if [ "$FAILED_COUNT" -gt 0 ] 2>/dev/null; then
+              echo ""
+              echo "❌ Failed Tests Details:"
+              cat OrderEase-FrontUI/test-results.json | jq -r '.testResults[]? | select(.status == "failed") | "  - \(.name)"' 2>/dev/null || true
+            fi
           else
-            echo "No test results file found"
+            echo "❌ No test results file found - tests may not have run"
+            if [ -f OrderEase-FrontUI/test-output.log ]; then
+              echo ""
+              echo "Last 50 lines of test output:"
+              tail -50 OrderEase-FrontUI/test-output.log
+            fi
           fi
+          
+          echo ""
+          echo "=========================================="
+          echo "         END OF TEST SUMMARY"
+          echo "=========================================="
 
   # ============================================
   # Job 2: 构建多阶段 Docker 镜像
