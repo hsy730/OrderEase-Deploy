@@ -349,14 +349,14 @@ class TestBusinessFlow:
 
         # 更新标签（如果之前创建了标签）
         if tag_id:
-            result = tag_actions.update_tag(self.admin_token, tag_id, name="Updated Tag Name")
+            result = tag_actions.update_tag(self.admin_token, tag_id, name="Updated Tag Name", shop_id=shop_id)
             if result:
                 print("✓ 更新标签成功")
             else:
                 print("⚠ 更新标签失败，继续其他测试")
 
             # 删除标签
-            result = tag_actions.delete_tag(self.admin_token, tag_id)
+            result = tag_actions.delete_tag(self.admin_token, tag_id, shop_id=shop_id)
             if result:
                 print("✓ 删除标签成功")
             else:
@@ -376,8 +376,6 @@ class TestBusinessFlow:
             description="Shop created for flow testing",
             address="Test address"
         )
-        if shop_id:
-            self.cleanup_resources.append(lambda: shop_actions.delete_shop(self.admin_token, shop_id))
         return shop_id
 
     def _test_create_product(self, shop_id):
@@ -390,8 +388,6 @@ class TestBusinessFlow:
             description="Product created for flow testing",
             stock=100
         )
-        if product_id:
-            self.cleanup_resources.append(lambda: product_actions.delete_product(self.admin_token, product_id, shop_id))
         return product_id
 
     def _test_get_user_id(self):
@@ -405,8 +401,6 @@ class TestBusinessFlow:
         """创建订单（辅助方法）"""
         items = [{"product_id": str(product_id), "quantity": 1, "price": 100}]
         order_id = order_actions.create_order(self.admin_token, shop_id, user_id, items)
-        if order_id:
-            self.cleanup_resources.append(lambda: order_actions.delete_order(self.admin_token, order_id, shop_id))
         return order_id
 
     def _test_delete_order(self, order_id, shop_id):

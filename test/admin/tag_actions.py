@@ -220,13 +220,14 @@ def get_tag_detail(admin_token, tag_id):
     return None
 
 
-def update_tag(admin_token, tag_id, name=None):
+def update_tag(admin_token, tag_id, name=None, shop_id=None):
     """更新标签信息
 
     Args:
         admin_token: 管理员令牌
         tag_id: 标签ID
         name: 新的标签名称
+        shop_id: 店铺ID（必需）
 
     Returns:
         bool: 是否更新成功
@@ -235,6 +236,8 @@ def update_tag(admin_token, tag_id, name=None):
     payload = {"id": tag_id}
     if name:
         payload["name"] = name
+    if shop_id:
+        payload["shop_id"] = str(shop_id)
 
     headers = {"Authorization": f"Bearer {admin_token}"}
 
@@ -251,18 +254,21 @@ def update_tag(admin_token, tag_id, name=None):
         return False
 
 
-def delete_tag(admin_token, tag_id):
+def delete_tag(admin_token, tag_id, shop_id=None):
     """删除标签
 
     Args:
         admin_token: 管理员令牌
         tag_id: 标签ID
+        shop_id: 店铺ID（可选）
 
     Returns:
         bool: 是否删除成功
     """
     url = f"{API_BASE_URL}/admin/tag/delete"
-    params = {"tagId": tag_id}
+    params = {"id": tag_id}
+    if shop_id:
+        params["shop_id"] = str(shop_id)
     headers = {"Authorization": f"Bearer {admin_token}"}
 
     def request_func():
