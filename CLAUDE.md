@@ -250,6 +250,62 @@ Located in `.github/workflows/build-test-deploy.yml`:
 
 ## Testing Conventions
 
+### Assertion Strictness (CRITICAL)
+
+**测试断言必须严格明确，禁止模糊处理！**
+
+#### ✅ 正确做法：单一期望
+
+```python
+# 期望成功：严格断言必须成功
+def test_delete_product():
+    result = product_actions.delete_product(admin_token, product_id, shop_id)
+    assert result, f"删除商品失败，product_id: {product_id}"  # 必须成功
+```
+
+```python
+# 期望失败：使用 pytest.raises 明确捕获异常
+def test_delete_nonexistent_product():
+    with pytest.raises(Exception):  # 或者检查特定的错误状态码
+        product_actions.delete_product(admin_token, invalid_id, shop_id)
+```
+
+#### ❌ 错误做法：混合期望（禁止）
+
+```python
+# 禁止：将成功和失败都视为"通过"
+if response.status_code == 200:
+    return True
+elif response.status_code == 404:
+    return True  # ❌ 错误！404应该被视为失败
+else:
+    return False
+```
+
+```python
+# 禁止：try-except 吞掉所有错误
+try:
+    delete_product(product_id)
+except:
+    pass  # ❌ 错误！隐藏了真实的失败原因
+```
+
+#### 🎯 核心原则
+
+1. **一一对应**：每个 `create_*` 操作必须有且仅有一个对应的 `delete_*` 操作
+2. **严格断言**：使用 `assert` 强制要求操作必须成功或必须失败
+3. **不兼容**：不能同时期望"成功"和"失败"两种结果都通过
+4. **明确意图**：代码要清晰表达预期行为，不要用容错逻辑掩盖问题
+
+#### ⚠️ 常见违规模式
+
+| 违规模式 | 问题 | 正确做法 |
+|---------|------|---------|
+| `if success or 404: return True` | 模糊处理 | 只接受一种状态 |
+| `try-except: pass` | 吞掉异常 | 让异常暴露或明确处理 |
+| 双重清理机制 | 资源被删除多次 | 只清理一次 |
+| 宽松的返回值 | 返回 True/False 但不断言 | 使用 assert 严格验证 |
+
 ### Data Uniqueness
 
 Test data uses random suffixes to avoid conflicts:
