@@ -40,7 +40,7 @@ RUN echo "=== Debug: Checking dist directory structure ===" && \
     fi
 
 # 阶段3: 构建Go后端 - 极致优化
-FROM golang:1.24-alpine AS go-builder
+FROM golang:1.25-alpine AS go-builder
 WORKDIR /app/src
 COPY OrderEase-Golang/src/ .
 ENV GOPROXY=https://goproxy.cn,direct
