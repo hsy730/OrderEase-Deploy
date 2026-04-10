@@ -631,6 +631,33 @@ jobs:
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=${{ github.sha }}
 
+      - name: Debug - Check Docker Build Result
+        if: always()
+        run: |
+          echo "=== Docker Build Output ==="
+          echo "Build ID: ${{ steps.build.outputs.build-id }}"
+          echo "Digest: ${{ steps.build.outputs.digest }}"
+          echo ""
+          echo "=== Docker Images ==="
+          docker images | grep orderease || echo "No orderease images found"
+          echo ""
+          if [ "${{ steps.build.outcome }}" != "success" ]; then
+            echo "❌ Docker build FAILED!"
+            echo ""
+            echo "Possible causes:"
+            echo "1. COPY command failed (check file paths)"
+            echo "2. npm ci or npm run build failed (frontend)"
+            echo "3. go build failed (Go version mismatch)"
+            echo "4. UPX compression failed"
+            echo ""
+            echo "To debug, try running locally:"
+            echo "  cd OrderEase-Deploy/build"
+            echo "  docker build --progress=plain -t orderease:debug . 2>&1 | tee build-debug.log"
+            exit 1
+          else
+            echo "✅ Docker build SUCCEEDED!"
+          fi
+
       - name: Export Image to TAR
         run: |
           TAG="${{ steps.set-tag.outputs.tag }}"
