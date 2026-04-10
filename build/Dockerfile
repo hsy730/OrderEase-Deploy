@@ -28,6 +28,9 @@ RUN echo "=== Debug: Listing files after COPY scripts ===" && \
     ls -la scripts/ || echo "scripts directory not found"
 RUN npm ci --production=false && npm cache clean --force
 COPY OrderEase-FrontUI/ ./
+# 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
+RUN echo "VITE_API_BASE_URL=" > .env && \
+    echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
 RUN npm run build:h5
 # uni-app H5构建输出到 dist/build/h5/ 目录
 RUN echo "=== Debug: Checking dist directory structure ===" && \
