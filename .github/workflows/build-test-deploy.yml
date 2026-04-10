@@ -114,14 +114,116 @@ jobs:
         id: go-test
         working-directory: OrderEase-Golang/src
         run: |
-          echo "Running Go unit tests..."
-          go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+          echo "=========================================="
+          echo "  Running Go Tests (Unit + Integration)"
+          echo "=========================================="
+          echo ""
+          
+          # 设置环境变量以启用详细日志
+          export LOG_LEVEL=debug
+          export GIN_MODE=test
+          
+          # Step 1: 运行单元测试（排除集成测试）
+          echo "📋 Step 1/2: Running Unit Tests..."
+          set +e
+          go test -v -short -race \
+            -coverprofile=unit-coverage.out \
+            -covermode=atomic \
+            ./... 2>&1 | tee unit-test-output.log
+          UNIT_EXIT_CODE=$?
+          set -e
+          
+          echo ""
+          echo "=== Unit Test Exit Code: $UNIT_EXIT_CODE ==="
+          
+          if [ $UNIT_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ Unit tests failed!"
+            echo "=== Last 100 lines of unit test output ==="
+            tail -100 unit-test-output.log
+          fi
+          
+          # Step 2: 运行集成测试（单独运行，带详细日志）
+          echo ""
+          echo "📋 Step 2/2: Running Integration Tests..."
+          echo "(import_export_integration_test.go with go-mysql-server)"
+          echo ""
+          
+          set +e
+          go test -v -race \
+            -timeout=5m \
+            -run "TestImportExportIntegration" \
+            ./contexts/ordercontext/application/handlers/ \
+            2>&1 | tee integration-test-output.log
+          INTEGRATION_EXIT_CODE=$?
+          set -e
+          
+          echo ""
+          echo "=== Integration Test Exit Code: $INTEGRATION_EXIT_CODE ==="
+          
+          if [ $INTEGRATION_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "❌ Integration tests failed!"
+            echo ""
+            echo "=== Integration Test Error Summary ==="
+            echo "Failed tests:"
+            grep -E "FAIL|Error|error|panic" integration-test-output.log | head -20 || true
+            echo ""
+            echo "=== Last 200 lines of integration test output ==="
+            tail -200 integration-test-output.log
+          fi
+          
+          # 合并覆盖率报告
+          if [ -f unit-coverage.out ]; then
+            cp unit-coverage.out coverage.out
+          fi
+          
+          # 如果任何一个测试失败，整体失败
+          if [ $UNIT_EXIT_CODE -ne 0 ] || [ $INTEGRATION_EXIT_CODE -ne 0 ]; then
+            echo ""
+            echo "=========================================="
+            echo "  ❌ TESTS FAILED"
+            echo "  Unit Tests: $([ $UNIT_EXIT_CODE -eq 0 ] && echo '✅ PASS' || echo '❌ FAIL')"
+            echo "  Integration Tests: $([ $INTEGRATION_EXIT_CODE -eq 0 ] && echo '✅ PASS' || echo '❌ FAIL')"
+            echo "=========================================="
+            exit 1
+          fi
+          
+          echo ""
+          echo "=========================================="
+          echo "  ✅ ALL TESTS PASSED"
+          echo "  Unit Tests: ✅ PASS"
+          echo "  Integration Tests: ✅ PASS"
+          echo "=========================================="
+
+      - name: Upload Unit Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-unit-test-logs
+          path: OrderEase-Golang/src/unit-test-output.log
+          retention-days: 7
+
+      - name: Upload Integration Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-integration-test-logs
+          path: OrderEase-Golang/src/integration-test-output.log
+          retention-days: 7
 
       - name: Generate Coverage Report
         working-directory: OrderEase-Golang/src
-        run: go tool cover -html=coverage.out -o coverage.html
+        run: |
+          if [ -f coverage.out ]; then
+            go tool cover -html=coverage.out -o coverage.html
+            echo "✅ Coverage report generated"
+          else
+            echo "⚠️ No coverage data available"
+          fi
 
       - name: Upload Coverage Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: go-coverage-report
@@ -132,7 +234,11 @@ jobs:
         working-directory: OrderEase-Golang/src
         run: |
           echo "=== Coverage Summary ==="
-          go tool cover -func=coverage.out | tail -n 1
+          if [ -f coverage.out ]; then
+            go tool cover -func=coverage.out | tail -n 1
+          else
+            echo "No coverage data available"
+          fi
 
   # ============================================
   # Job 1.6: 前端单元测试 (BackedUI & FrontUI)
