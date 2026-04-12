@@ -174,6 +174,59 @@ def user_token():
     return ""
 
 @pytest.fixture(scope="session")
+def frontend_user_token():
+    """前端用户令牌 fixture - 通过前端用户登录获取真实token"""
+    import time
+    import os
+    
+    # 生成唯一的用户名
+    unique_suffix = os.urandom(4).hex()
+    username = f"test_user_{unique_suffix}"
+    password = "Admin@123456"
+    
+    # 1. 注册用户
+    register_url = f"{API_BASE_URL}/user/register"
+    register_payload = {
+        "username": username,
+        "password": password
+    }
+    
+    def register_request():
+        return requests.post(register_url, json=register_payload)
+    
+    register_response = make_request_with_retry(register_request)
+    
+    if register_response.status_code != 200:
+        print(f"用户注册失败: {register_response.status_code}, {register_response.text}")
+        return ""
+    
+    print(f"成功注册用户: {username}")
+    
+    # 等待系统处理
+    time.sleep(0.5)
+    
+    # 2. 登录获取 token
+    login_url = f"{API_BASE_URL}/user/login"
+    login_payload = {
+        "username": username,
+        "password": password
+    }
+    
+    def login_request():
+        return requests.post(login_url, json=login_payload)
+    
+    login_response = make_request_with_retry(login_request)
+    
+    if login_response.status_code != 200:
+        print(f"用户登录失败: {login_response.status_code}, {login_response.text}")
+        return ""
+    
+    login_data = login_response.json()
+    token = login_data.get("token", "")
+    print(f"成功获取前端用户token: {username}")
+    return token
+
+@pytest.fixture(scope="session")
 def test_token():
     """测试令牌 fixture (已废弃，使用admin_token、shop_owner_token或user_token)"""
     return "test_token"
