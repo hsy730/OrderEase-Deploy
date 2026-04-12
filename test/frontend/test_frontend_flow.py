@@ -368,18 +368,17 @@ class TestFrontendFlow:
         print("✓ 获取店铺详情成功")
 
     def test_get_shop_image(self):
-        """测试获取店铺图片"""
+        """测试获取店铺图片（无需鉴权）"""
         print("\n========== 获取店铺图片测试 ==========")
 
         assert TestFrontendFlow.frontend_shop_image_path, "shop_image_path 未设置，请确保 test_upload_shop_image 先执行"
 
-        # 图片接口需要 path 参数
+        # 图片接口需要 path 参数（公开访问，无需token）
         url = f"{API_BASE_URL}/shop/image"
         params = {"path": TestFrontendFlow.frontend_shop_image_path}
-        headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
-            return requests.get(url, params=params, headers=headers)
+            return requests.get(url, params=params)
 
         response = make_request_with_retry(request_func)
         # 严格断言：必须成功获取图片
@@ -475,18 +474,17 @@ class TestFrontendFlow:
             print("✓ 获取商品详情成功，但响应格式无法解析")
 
     def test_get_product_image(self):
-        """测试获取商品图片"""
+        """测试获取商品图片（无需鉴权）"""
         print("\n========== 获取商品图片测试 ==========")
 
         assert TestFrontendFlow.frontend_product_image_path, "product_image_path 未设置，请确保 test_upload_product_image 先执行"
 
-        # 图片接口需要 path 参数
+        # 图片接口需要 path 参数（公开访问，无需token）
         url = f"{API_BASE_URL}/product/image"
         params = {"path": TestFrontendFlow.frontend_product_image_path}
-        headers = {"Authorization": f"Bearer {TestFrontendFlow.frontend_token}"}
 
         def request_func():
-            return requests.get(url, params=params, headers=headers, allow_redirects=False)  # 禁用自动重定向
+            return requests.get(url, params=params, allow_redirects=False)  # 禁用自动重定向
 
         response = make_request_with_retry(request_func)
         # 严格断言：必须成功获取图片

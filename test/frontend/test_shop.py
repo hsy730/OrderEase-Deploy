@@ -31,22 +31,20 @@ class FrontendShopHelper:
         return make_request_with_retry(request_func)
 
     @staticmethod
-    def get_shop_image(path, token):
-        """测试获取店铺图片
+    def get_shop_image(path):
+        """测试获取店铺图片（无需鉴权）
 
         Args:
             path: 图片文件路径
-            token: 认证token
 
         Returns:
             response: HTTP响应对象
         """
         url = f"{API_BASE_URL}/shop/image"
         params = {"path": path}
-        headers = {"Authorization": f"Bearer {token}"}
 
         def request_func():
-            return requests.get(url, params=params, headers=headers)
+            return requests.get(url, params=params)
 
         return make_request_with_retry(request_func)
 

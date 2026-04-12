@@ -179,135 +179,129 @@ class TestUserAvatarGet:
         finally:
             os.unlink(temp_file)
 
-    def test_get_avatar_success(self, frontend_user_token, uploaded_avatar_url):
-        """测试成功获取头像"""
+    def test_get_avatar_success(self, uploaded_avatar_url):
+        """测试成功获取头像（无需鉴权）"""
         # 从 URL 中提取文件名
         filename = uploaded_avatar_url.replace('/uploads/avatars/', '')
-        
+
         url = f"{API_BASE_URL}/user/avatar"
         params = {'path': filename}
-        headers = {'Authorization': f'Bearer {frontend_user_token}'}
-        
+
         def request_func():
-            return requests.get(url, params=params, headers=headers)
-        
+            return requests.get(url, params=params)
+
         response = make_request_with_retry(request_func)
-        
+
         assert response.status_code == 200, f"获取头像应该返回200，实际返回: {response.status_code}"
         assert response.headers.get('content-type', '').startswith('image/'), \
             f"响应应该是图片类型，实际 Content-Type: {response.headers.get('content-type')}"
 
     def test_get_avatar_without_token(self, uploaded_avatar_url):
-        """测试未授权获取头像"""
+        """测试无需token获取头像（接口已改为公开访问）"""
         filename = uploaded_avatar_url.replace('/uploads/avatars/', '')
-        
+
         url = f"{API_BASE_URL}/user/avatar"
         params = {'path': filename}
-        
+
         def request_func():
             return requests.get(url, params=params)
-        
+
         response = make_request_with_retry(request_func)
-        
-        assert response.status_code == 401, f"未授权获取应该返回401，实际返回: {response.status_code}"
+
+        assert response.status_code == 200, f"公开接口获取头像应该返回200，实际返回: {response.status_code}"
 
     def test_get_avatar_with_invalid_token(self, uploaded_avatar_url):
-        """测试使用无效 token 获取头像"""
+        """测试使用无效 token 获取头像（接口已改为公开访问，token不影响访问）"""
         filename = uploaded_avatar_url.replace('/uploads/avatars/', '')
-        
+
         url = f"{API_BASE_URL}/user/avatar"
         params = {'path': filename}
         headers = {'Authorization': 'Bearer invalid_token'}
-        
+
         def request_func():
             return requests.get(url, params=params, headers=headers)
-        
-        response = make_request_with_retry(request_func)
-        
-        assert response.status_code == 401, f"无效 token 获取应该返回401，实际返回: {response.status_code}"
 
-    def test_get_avatar_without_path(self, frontend_user_token):
+        response = make_request_with_retry(request_func)
+
+        assert response.status_code == 200, f"公开接口获取头像应该返回200，实际返回: {response.status_code}"
+
+    def test_get_avatar_without_path(self):
         """测试不带 path 参数获取头像"""
         url = f"{API_BASE_URL}/user/avatar"
-        headers = {'Authorization': f'Bearer {frontend_user_token}'}
-        
+
         def request_func():
-            return requests.get(url, headers=headers)
-        
+            return requests.get(url)
+
         response = make_request_with_retry(request_func)
-        
+
         assert response.status_code == 400, f"不带 path 应该返回400，实际返回: {response.status_code}"
 
-    def test_get_avatar_with_empty_path(self, frontend_user_token):
+    def test_get_avatar_with_empty_path(self):
         """测试使用空 path 参数获取头像"""
         url = f"{API_BASE_URL}/user/avatar"
         params = {'path': ''}
-        headers = {'Authorization': f'Bearer {frontend_user_token}'}
-        
+
         def request_func():
-            return requests.get(url, params=params, headers=headers)
-        
+            return requests.get(url, params=params)
+
         response = make_request_with_retry(request_func)
-        
+
         assert response.status_code == 400, f"空 path 应该返回400，实际返回: {response.status_code}"
 
-    def test_get_avatar_not_found(self, frontend_user_token):
+    def test_get_avatar_not_found(self):
         """测试获取不存在的头像"""
         url = f"{API_BASE_URL}/user/avatar"
         # 使用符合格式但不存在的文件名: {随机字符串}_{时间戳}.{扩展名}
         params = {'path': 'aBcDeFgHiJ_1234567890123.png'}
-        headers = {'Authorization': f'Bearer {frontend_user_token}'}
-        
+
         def request_func():
-            return requests.get(url, params=params, headers=headers)
-        
+            return requests.get(url, params=params)
+
         response = make_request_with_retry(request_func)
-        
+
         assert response.status_code == 404, f"不存在的头像应该返回404，实际返回: {response.status_code}"
 
-    def test_get_avatar_invalid_path_format(self, frontend_user_token):
+    def test_get_avatar_invalid_path_format(self):
         """测试使用无效格式的 path 获取头像"""
         url = f"{API_BASE_URL}/user/avatar"
-        
+
         invalid_paths = [
             '../../../etc/passwd',  # 路径遍历攻击
             'avatar.png;rm -rf /',  # 命令注入
             '<script>alert(1)</script>',  # XSS
             'avatar.png\x00.jpg',  # 空字节攻击
         ]
-        
+
         for invalid_path in invalid_paths:
             params = {'path': invalid_path}
-            headers = {'Authorization': f'Bearer {frontend_user_token}'}
-            
+
             def request_func():
-                return requests.get(url, params=params, headers=headers)
-            
+                return requests.get(url, params=params)
+
             response = make_request_with_retry(request_func)
-            
+
             assert response.status_code in [400, 404], \
                 f"无效 path '{invalid_path}' 应该返回400或404，实际返回: {response.status_code}"
 
-    def test_get_avatar_with_directory_traversal(self, frontend_user_token):
+    def test_get_avatar_with_directory_traversal(self):
         """测试目录遍历攻击防护"""
         url = f"{API_BASE_URL}/user/avatar"
-        
+
         traversal_paths = [
             '../config.yaml',
-            '..\\\windows\\\system32\\\config\\\sam',
+            r'..\windows\system32\config\sam',
             '....//....//etc/passwd',
             '%2e%2e%2f%2e%2e%2fetc/passwd',  # URL 编码
         ]
-        
+
         for path in traversal_paths:
             params = {'path': path}
-            headers = {'Authorization': f'Bearer {frontend_user_token}'}
-            
+
             def request_func():
-                return requests.get(url, params=params, headers=headers)
-            
+                return requests.get(url, params=params)
+
             response = make_request_with_retry(request_func)
-            
+
             assert response.status_code in [400, 404], \
                 f"目录遍历路径 '{path}' 应该返回400或404，实际返回: {response.status_code}"
 
@@ -344,14 +338,14 @@ class TestUserAvatarIntegration:
             assert upload_response.status_code == 200, f"上传失败: {upload_response.text}"
             avatar_url = upload_response.json()['avatar_url']
             
-            # 3. 获取头像
+            # 3. 获取头像（无需鉴权）
             filename = avatar_url.replace('/uploads/avatars/', '')
             get_url = f"{API_BASE_URL}/user/avatar"
             params = {'path': filename}
-            
+
             def get_request():
-                return requests.get(get_url, params=params, headers=headers)
-            
+                return requests.get(get_url, params=params)
+
             get_response = make_request_with_retry(get_request)
             
             assert get_response.status_code == 200, f"获取头像失败: {get_response.status_code}"
@@ -413,13 +407,13 @@ class TestUserAvatarIntegration:
                 # 验证两个头像 URL 不同
                 assert first_avatar_url != second_avatar_url, "新头像 URL 应该与旧的不同"
                 
-                # 验证旧头像已不存在（被删除）
+                # 验证旧头像已不存在（被删除）- 无需鉴权
                 get_url = f"{API_BASE_URL}/user/avatar"
                 params = {'path': first_filename}
-                
+
                 def get_old_request():
-                    return requests.get(get_url, params=params, headers=headers)
-                
+                    return requests.get(get_url, params=params)
+
                 old_response = make_request_with_retry(get_old_request)
                 
                 # 旧头像应该返回 404（已被删除）
