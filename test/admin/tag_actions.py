@@ -54,17 +54,17 @@ def create_tag(admin_token, name=None, shop_id="1"):
                 tag_response = data.get("data", data)
                 returned_name = tag_response.get("name") or tag_response.get("Name")
                 if returned_name and returned_name == name:
-                    print(f"✓ 创建标签成功，ID: {tag_id}, 名称: {returned_name}")
+                    print(f"[OK] 创建标签成功，ID: {tag_id}, 名称: {returned_name}")
                 else:
-                    print(f"⚠ 创建标签成功但名称不匹配，期望: {name}, 返回: {returned_name}")
+                    print(f"[WARN] 创建标签成功但名称不匹配，期望: {name}, 返回: {returned_name}")
             except:
-                print(f"✓ 创建标签成功，ID: {tag_id}")
+                print(f"[OK] 创建标签成功，ID: {tag_id}")
             return tag_id
         else:
-            print(f"⚠ 创建标签成功但无法提取ID，响应: {response.text}")
+            print(f"[WARN] 创建标签成功但无法提取ID，响应: {response.text}")
             return None
     else:
-        print(f"✗ 创建标签失败，状态码: {response.status_code}, 响应: {response.text}")
+        print(f"[FAIL] 创建标签失败，状态码: {response.status_code}, 响应: {response.text}")
         return None
 
 
@@ -116,7 +116,9 @@ def get_bound_tags(admin_token, product_id, shop_id):
 
     response = make_request_with_retry(request_func)
     if response.status_code == 200:
-        return response.json().get("data", [])
+        data = response.json()
+        # 响应格式: {"product_id": "xxx", "tags": [...]}
+        return data.get("tags", [])
     return []
 
 
@@ -260,10 +262,10 @@ def update_tag(admin_token, tag_id, name=None, shop_id=None):
     response = make_request_with_retry(request_func)
 
     if response.status_code == 200:
-        print(f"✓ 更新标签成功，ID: {tag_id}")
+        print(f"[OK] 更新标签成功，ID: {tag_id}")
         return True
     else:
-        print(f"✗ 更新标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        print(f"[FAIL] 更新标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
         return False
 
 
@@ -290,10 +292,10 @@ def delete_tag(admin_token, tag_id, shop_id=None):
     response = make_request_with_retry(request_func)
 
     if response.status_code == 200:
-        print(f"✓ 删除标签成功，ID: {tag_id}")
+        print(f"[OK] 删除标签成功，ID: {tag_id}")
         return True
     else:
-        print(f"✗ 删除标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
+        print(f"[FAIL] 删除标签失败，ID: {tag_id}, 状态码: {response.status_code}, 响应: {response.text}")
         return False
 
 
