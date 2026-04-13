@@ -202,7 +202,7 @@ class TestBusinessFlow:
     # ==================== 订单相关测试 ====================
 
     def test_order_management_flow(self):
-        """测试订单管理流程"""
+        """测试订单管理流程 - 包含创建后立即查询验证"""
         print("\n========== 订单管理流程测试 ==========")
 
         # 创建店铺和商品
@@ -210,25 +210,37 @@ class TestBusinessFlow:
         product_id = self._test_create_product(shop_id)
         user_id = self._test_get_user_id()
 
-        # 创建订单
+        # 1. 创建订单前获取订单列表数量
+        orders_before = order_actions.get_order_list(self.admin_token, shop_id)
+        count_before = len(orders_before) if isinstance(orders_before, list) else 0
+        print(f"创建前订单数量: {count_before}")
+
+        # 2. 创建订单
         order_id = self._test_create_order(shop_id, user_id, product_id)
         assert order_id is not None, "创建订单失败"
         print(f"✓ 创建订单成功，ID: {order_id}")
 
-        # 获取订单列表
-        orders = order_actions.get_order_list(self.admin_token, shop_id)
-        # 验证订单列表元素包含必需字段（如果有订单的话）
-        for order in orders:
-            assert isinstance(order, dict), "订单应为字典类型"
-            assert "id" in order, "订单应包含id字段"
-        print(f"✓ 获取订单列表成功，共 {len(orders)} 个订单")
+        # 3. 【关键】立即查询订单列表，验证新订单存在
+        orders_after = order_actions.get_order_list(self.admin_token, shop_id)
+        assert isinstance(orders_after, list), "订单列表应为列表类型"
 
-        # 获取订单详情
+        # 验证订单数量增加
+        count_after = len(orders_after)
+        print(f"创建后订单数量: {count_after}")
+        assert count_after > count_before, f"订单数量未增加，创建前{count_before}，创建后{count_after}"
+
+        # 验证刚创建的订单ID在列表中
+        order_ids = [str(order.get("id")) for order in orders_after]
+        assert str(order_id) in order_ids, f"刚创建的订单ID {order_id} 不在订单列表中，列表包含: {order_ids}"
+        print(f"✓ 订单列表验证成功，包含新创建的订单ID: {order_id}")
+
+        # 4. 【关键】立即查询订单详情，验证能获取到正确的订单
         detail = order_actions.get_order_detail(self.admin_token, order_id, shop_id)
-        if detail is not None:
-            print("✓ 获取订单详情成功")
-        else:
-            print("⚠ 获取订单详情失败（可能是API响应格式问题），继续其他测试")
+        assert detail is not None, f"获取订单详情失败，订单ID: {order_id}"
+        # 验证返回的详情中包含正确的订单ID
+        detail_order_id = detail.get("id") or detail.get("order_id") or detail.get("orderId")
+        assert str(detail_order_id) == str(order_id), f"订单详情ID不匹配，期望{order_id}，实际{detail_order_id}"
+        print(f"✓ 获取订单详情成功，验证订单ID: {order_id}")
 
         # 更新订单
         self._test_update_order(order_id, shop_id, user_id, product_id)

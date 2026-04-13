@@ -91,6 +91,22 @@ def get_order_list(admin_token, shop_id=None, page=1, page_size=10):
 def get_order_detail(admin_token, order_id, shop_id):
     """获取订单详情
 
+    接口: GET /admin/order/detail
+    
+    响应格式（直接返回订单对象）：
+        {
+            "id": "string",
+            "user_id": "string",
+            "shop_id": "string",
+            "total_price": number,
+            "status": number,
+            "remark": "string",
+            "created_at": "string",
+            "updated_at": "string",
+            "items": [...],
+            "user": {...}
+        }
+
     Args:
         admin_token: 管理员令牌
         order_id: 订单ID
@@ -110,15 +126,17 @@ def get_order_detail(admin_token, order_id, shop_id):
 
     if response.status_code == 200:
         json_data = response.json()
-        # 处理不同的响应格式
-        if isinstance(json_data, dict):
-            result = json_data.get("data")
-            if result:
-                print(f"✓ 获取订单详情成功，ID: {order_id}")
-                return result
-        elif isinstance(json_data, list) and len(json_data) > 0:
-            print(f"✓ 获取订单详情成功，ID: {order_id}")
-            return json_data[0]
+        
+        # 严格断言响应格式
+        assert isinstance(json_data, dict), f"响应必须是字典类型，实际是: {type(json_data)}"
+        assert "id" in json_data, f"响应必须包含id字段，实际响应: {json_data}"
+        
+        # 验证返回的ID与请求的ID匹配
+        result_id = json_data.get("id")
+        assert str(result_id) == str(order_id), f"返回的订单ID不匹配，期望: {order_id}，实际: {result_id}"
+        
+        print(f"✓ 获取订单详情成功，ID: {order_id}")
+        return json_data
     else:
         print(f"✗ 获取订单详情失败，状态码: {response.status_code}, 响应: {response.text}")
     return None
