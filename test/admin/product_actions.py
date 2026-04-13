@@ -137,12 +137,17 @@ def get_product_detail(admin_token, product_id, shop_id):
 
     if response.status_code == 200:
         json_data = response.json()
+        print(f"获取商品详情响应数据: {json_data}")
         # 处理不同的响应格式
         if isinstance(json_data, dict):
             result = json_data.get("data")
             if result:
                 print(f"✓ 获取商品详情成功: {result.get('name') if isinstance(result, dict) else result}")
                 return result
+            # 如果响应直接包含id字段，直接返回整个对象
+            elif "id" in json_data:
+                print(f"✓ 获取商品详情成功（直接格式）: {json_data.get('name')}")
+                return json_data
         elif isinstance(json_data, list) and len(json_data) > 0:
             print(f"✓ 获取商品详情成功: {json_data[0]}")
             return json_data[0]

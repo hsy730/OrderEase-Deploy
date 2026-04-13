@@ -148,33 +148,44 @@ class TestBusinessFlow:
     # ==================== 商品相关测试 ====================
 
     def test_product_management_flow(self):
-        """测试商品管理流程"""
+        """测试商品管理流程 - 包含创建后立即查询验证"""
         print("\n========== 商品管理流程测试 ==========")
 
         # 先创建店铺
         shop_id = self._test_create_shop()
         assert shop_id is not None, "创建店铺失败"
 
-        # 创建商品
+        # 1. 创建商品前获取商品列表数量
+        products_before = product_actions.get_product_list(self.admin_token, shop_id)
+        count_before = len(products_before) if isinstance(products_before, list) else 0
+        print(f"创建前商品数量: {count_before}")
+
+        # 2. 创建商品
         product_id = self._test_create_product(shop_id)
         assert product_id is not None, "创建商品失败"
         print(f"✓ 创建商品成功，ID: {product_id}")
 
-        # 获取商品列表
-        products = product_actions.get_product_list(self.admin_token, shop_id)
-        # 验证商品列表包含必需字段
-        for product in products:
-            assert isinstance(product, dict), "商品应为字典类型"
-            assert "id" in product, "商品应包含id字段"
-            assert "name" in product, "商品应包含name字段"
-        print(f"✓ 获取商品列表成功，共 {len(products)} 个商品")
+        # 3. 【关键】立即查询商品列表，验证新商品存在
+        products_after = product_actions.get_product_list(self.admin_token, shop_id)
+        assert isinstance(products_after, list), "商品列表应为列表类型"
 
-        # 获取商品详情
+        # 验证商品数量增加
+        count_after = len(products_after)
+        print(f"创建后商品数量: {count_after}")
+        assert count_after > count_before, f"商品数量未增加，创建前{count_before}，创建后{count_after}"
+
+        # 验证刚创建的商品ID在列表中
+        product_ids = [str(product.get("id")) for product in products_after]
+        assert str(product_id) in product_ids, f"刚创建的商品ID {product_id} 不在商品列表中，列表包含: {product_ids}"
+        print(f"✓ 商品列表验证成功，包含新创建的商品ID: {product_id}")
+
+        # 4. 【关键】立即查询商品详情，验证能获取到正确的商品
         detail = product_actions.get_product_detail(self.admin_token, product_id, shop_id)
-        if detail is not None:
-            print("✓ 获取商品详情成功")
-        else:
-            print("⚠ 获取商品详情失败（可能是API响应格式问题），继续其他测试")
+        assert detail is not None, f"获取商品详情失败，商品ID: {product_id}"
+        # 验证返回的详情中包含正确的商品ID
+        detail_product_id = detail.get("id") or detail.get("product_id") or detail.get("productId")
+        assert str(detail_product_id) == str(product_id), f"商品详情ID不匹配，期望{product_id}，实际{detail_product_id}"
+        print(f"✓ 获取商品详情成功，验证商品ID: {product_id}")
 
         # 更新商品信息
         self._test_update_product(product_id, shop_id)
