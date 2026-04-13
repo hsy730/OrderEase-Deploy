@@ -354,7 +354,7 @@ class TestBusinessFlow:
         # 2. 创建标签
         tag_id = tag_actions.create_tag(self.admin_token, shop_id=shop_id)
         assert tag_id is not None, "创建标签失败"
-        print(f"✓ 创建标签成功，ID: {tag_id}")
+        print(f"[OK] 创建标签成功，ID: {tag_id}")
 
         # 3. 【关键】立即查询标签列表，验证新标签存在
         tags_after = tag_actions.get_tag_list(self.admin_token, shop_id=shop_id)
@@ -368,24 +368,24 @@ class TestBusinessFlow:
         # 验证刚创建的标签ID在列表中
         tag_ids = [str(tag.get("id")) for tag in tags_after]
         assert str(tag_id) in tag_ids, f"刚创建的标签ID {tag_id} 不在标签列表中，列表包含: {tag_ids}"
-        print(f"✓ 标签列表验证成功，包含新创建的标签ID: {tag_id}")
+        print(f"[OK] 标签列表验证成功，包含新创建的标签ID: {tag_id}")
 
         # 获取商品已绑定的标签
         bound_tags_before = tag_actions.get_bound_tags(self.admin_token, product_id, shop_id)
         bound_count_before = len(bound_tags_before) if isinstance(bound_tags_before, list) else 0
-        print(f"✓ 获取商品已绑定标签成功，共 {bound_count_before} 个标签")
+        print(f"[OK] 获取商品已绑定标签成功，共 {bound_count_before} 个标签")
 
         # 获取商品未绑定的标签
         unbound_tags = tag_actions.get_unbound_tags(self.admin_token, product_id, shop_id)
-        print(f"✓ 获取商品未绑定标签成功，共 {len(unbound_tags)} 个标签")
+        print(f"[OK] 获取商品未绑定标签成功，共 {len(unbound_tags)} 个标签")
 
         # 4. 【关键】给商品打标签并立即验证
         if tag_id:
             result = tag_actions.batch_tag_products(self.admin_token, [product_id], tag_id, shop_id)
             assert result, f"给商品打标签失败，商品ID: {product_id}，标签ID: {tag_id}"
-            print(f"✓ 给商品打标签成功，商品ID: {product_id}，标签ID: {tag_id}")
+            print(f"[OK] 给商品打标签成功，商品ID: {product_id}，标签ID: {tag_id}")
 
-            # 立即查询商品已绑定标签，验证标签已绑定
+            # 立即查询商品绑定标签，验证标签已绑定
             bound_tags_after = tag_actions.get_bound_tags(self.admin_token, product_id, shop_id)
             bound_count_after = len(bound_tags_after) if isinstance(bound_tags_after, list) else 0
             print(f"打标签后商品绑定标签数量: {bound_count_after}")
@@ -396,7 +396,7 @@ class TestBusinessFlow:
             # 验证刚创建的标签ID在绑定列表中
             bound_tag_ids = [str(tag.get("id")) for tag in bound_tags_after]
             assert str(tag_id) in bound_tag_ids, f"刚创建的标签ID {tag_id} 不在商品绑定标签列表中，列表包含: {bound_tag_ids}"
-            print(f"✓ 商品绑定标签验证成功，包含标签ID: {tag_id}")
+            print(f"[OK] 商品绑定标签验证成功，包含标签ID: {tag_id}")
 
         # 更新标签（如果之前创建了标签）
         if tag_id:
@@ -406,29 +406,45 @@ class TestBusinessFlow:
             else:
                 print("⚠ 更新标签失败，继续其他测试")
 
-            # 先解绑标签与商品的关联
-            result = tag_actions.batch_untag_products(self.admin_token, [str(product_id)], [int(tag_id)])
-            if result:
-                print("✓ 解绑商品标签成功")
-            else:
-                print("⚠ 解绑商品标签失败，继续其他测试")
+            # 5. 【关键】解绑标签与商品的关联并立即验证
+            # 记录解绑前的绑定标签数量
+            bound_tags_before_unbind = tag_actions.get_bound_tags(self.admin_token, product_id, shop_id)
+            bound_count_before_unbind = len(bound_tags_before_unbind) if isinstance(bound_tags_before_unbind, list) else 0
+            print(f"解绑前商品绑定标签数量: {bound_count_before_unbind}")
+
+            result = tag_actions.batch_untag_products(self.admin_token, [str(product_id)], tag_id, shop_id)
+            assert result, f"解绑商品标签失败，商品ID: {product_id}，标签ID: {tag_id}"
+            print(f"[OK] 解绑商品标签成功，商品ID: {product_id}，标签ID: {tag_id}")
+
+            # 立即查询商品绑定标签，验证标签已解绑
+            bound_tags_after_unbind = tag_actions.get_bound_tags(self.admin_token, product_id, shop_id)
+            bound_count_after_unbind = len(bound_tags_after_unbind) if isinstance(bound_tags_after_unbind, list) else 0
+            print(f"解绑后商品绑定标签数量: {bound_count_after_unbind}")
+
+            # 验证绑定标签数量减少
+            assert bound_count_after_unbind < bound_count_before_unbind, f"商品绑定标签数量未减少，解绑前{bound_count_before_unbind}，解绑后{bound_count_after_unbind}"
+
+            # 验证标签ID不在绑定列表中
+            bound_tag_ids_after = [str(tag.get("id")) for tag in bound_tags_after_unbind]
+            assert str(tag_id) not in bound_tag_ids_after, f"标签ID {tag_id} 仍在商品绑定标签列表中，列表包含: {bound_tag_ids_after}"
+            print(f"[OK] 商品解绑标签验证成功，标签ID {tag_id} 已不在绑定列表中")
 
             # 删除标签
             result = tag_actions.delete_tag(self.admin_token, tag_id, shop_id=shop_id)
             if result:
-                print("✓ 删除标签成功")
+                print("[OK] 删除标签成功")
             else:
-                print("⚠ 删除标签失败，继续其他测试")
+                print("[WARN] 删除标签失败，继续其他测试")
 
         # 清理（如果标签关联未解除，删除可能会失败，但不影响核心测试）
         try:
             self._test_delete_product(product_id, shop_id)
         except AssertionError:
-            print("⚠ 删除商品失败（可能还有标签关联），跳过")
+            print("[WARN] 删除商品失败（可能还有标签关联），跳过")
         try:
             self._test_delete_shop(shop_id)
         except AssertionError:
-            print("⚠ 删除店铺失败（可能还有关联数据），跳过")
+            print("[WARN] 删除店铺失败（可能还有关联数据），跳过")
 
     # ==================== 辅助方法 ====================
 
