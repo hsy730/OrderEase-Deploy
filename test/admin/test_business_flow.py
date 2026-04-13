@@ -293,26 +293,28 @@ class TestBusinessFlow:
     # ==================== 用户相关测试 ====================
 
     def test_user_management_flow(self):
-        """测试用户管理流程"""
+        """测试用户管理流程 - 包含创建后立即查询验证"""
         print("\n========== 用户管理流程测试 ==========")
 
-        # 创建用户
-        user_id = user_actions.create_user(self.admin_token)
-        # 注意：如果创建失败可能是重复用户，我们继续进行其他测试
-        if user_id:
-            print(f"✓ 创建用户成功，ID: {user_id}")
-        else:
-            print("⚠ 创建用户失败（可能是用户已存在），继续其他测试")
+        # 1. 创建用户前获取用户列表数量
+        users_before = user_actions.get_user_list(self.admin_token)
+        count_before = len(users_before) if isinstance(users_before, list) else 0
+        print(f"创建前用户数量: {count_before}")
 
-        # 获取用户列表
-        users = user_actions.get_user_list(self.admin_token)
-        assert len(users) > 0, "获取用户列表失败"
-        # 验证用户列表包含必需字段
-        for user in users:
-            assert isinstance(user, dict), "用户应为字典类型"
-            assert "id" in user, "用户应包含id字段"
-            assert "name" in user, "用户应包含name字段"
-        print(f"✓ 获取用户列表成功，共 {len(users)} 个用户")
+        # 2. 创建用户
+        user_id = user_actions.create_user(self.admin_token)
+        assert user_id is not None, "创建用户失败"
+        print(f"✓ 创建用户成功，ID: {user_id}")
+
+        # 3. 【关键】立即查询用户列表，验证新用户存在
+        # 注意：用户列表可能分页，需要查询所有页面或增加页面大小
+        users_after = user_actions.get_user_list(self.admin_token, page=1, page_size=100)
+        assert isinstance(users_after, list), "用户列表应为列表类型"
+
+        # 验证刚创建的用户ID在列表中（不依赖数量增加，因为可能分页）
+        user_ids = [str(user.get("id")) for user in users_after]
+        assert str(user_id) in user_ids, f"刚创建的用户ID {user_id} 不在用户列表中，列表包含: {user_ids[:10]}..."
+        print(f"✓ 用户列表验证成功，包含新创建的用户ID: {user_id}")
 
         # 获取用户简单列表
         simple_users = user_actions.get_user_simple_list(self.admin_token)
@@ -323,12 +325,10 @@ class TestBusinessFlow:
             assert "id" in user, "用户应包含id字段"
         print(f"✓ 获取用户简单列表成功")
 
-        # 更新第一个用户
-        if users:
-            first_user_id = users[0].get("id")
-            result = user_actions.update_user(self.admin_token, first_user_id, name="Updated Test User")
-            assert result, "更新用户失败"
-            print("✓ 更新用户成功")
+        # 更新刚创建的用户
+        result = user_actions.update_user(self.admin_token, user_id, name="Updated Test User")
+        assert result, "更新用户失败"
+        print("✓ 更新用户成功")
 
         # 删除用户（如果之前创建了用户）
         if user_id:
