@@ -325,13 +325,14 @@ def batch_tag_product(admin_token, product_id, tag_ids):
     return response.status_code == 200
 
 
-def batch_untag_products(admin_token, product_ids, tag_ids):
+def batch_untag_products(admin_token, product_ids, tag_id, shop_id):
     """批量解绑商品标签
 
     Args:
         admin_token: 管理员令牌
         product_ids: 商品ID列表
-        tag_ids: 标签ID列表
+        tag_id: 标签ID（单个）
+        shop_id: 店铺ID（必需）
 
     Returns:
         bool: 是否解绑成功
@@ -339,15 +340,18 @@ def batch_untag_products(admin_token, product_ids, tag_ids):
     url = f"{API_BASE_URL}/admin/tag/batch-untag"
     payload = {
         "product_ids": product_ids,
-        "tag_ids": tag_ids
+        "tag_id": int(tag_id),
+        "shop_id": str(shop_id)
     }
     headers = {"Authorization": f"Bearer {admin_token}"}
+
+    print(f"[DEBUG] 批量解绑请求参数: {payload}")
 
     def request_func():
         return requests.delete(url, json=payload, headers=headers)
 
     response = make_request_with_retry(request_func)
-    print(f"批量解绑商品标签响应码: {response.status_code}，响应内容: {response.text}")
+    print(f"[DEBUG] 批量解绑商品标签响应码: {response.status_code}，响应内容: {response.text}")
     return response.status_code == 200
 
 
