@@ -67,17 +67,17 @@ def create_product(admin_token, shop_id, name=None, price=100, description=None,
                 product_response = data.get("data", data)
                 returned_name = product_response.get("name") or product_response.get("Name")
                 if returned_name and returned_name == name:
-                    print(f"✓ 创建商品成功，ID: {product_id}, 名称: {returned_name}")
+                    print(f"[OK] 创建商品成功，ID: {product_id}, 名称: {returned_name}")
                 else:
-                    print(f"⚠ 创建商品成功但名称不匹配，期望: {name}, 返回: {returned_name}")
+                    print(f"[WARN] 创建商品成功但名称不匹配，期望: {name}, 返回: {returned_name}")
             except:
-                print(f"✓ 创建商品成功，ID: {product_id}")
+                print(f"[OK] 创建商品成功，ID: {product_id}")
             return product_id
         else:
-            print(f"⚠ 创建商品成功但无法提取ID，响应: {response.text}")
+            print(f"[WARN] 创建商品成功但无法提取ID，响应: {response.text}")
             return None
     else:
-        print(f"✗ 创建商品失败，状态码: {response.status_code}, 响应: {response.text}")
+        print(f"[FAIL] 创建商品失败，状态码: {response.status_code}, 响应: {response.text}")
         return None
 
 

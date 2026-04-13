@@ -168,11 +168,12 @@ def get_unbound_tags(admin_token, product_id, shop_id):
     return []
 
 
-def get_tag_list(admin_token, page=1, page_size=10):
+def get_tag_list(admin_token, shop_id=None, page=1, page_size=10):
     """获取标签列表
 
     Args:
         admin_token: 管理员令牌
+        shop_id: 店铺ID（可选，如果提供则只返回该店铺的标签）
         page: 页码
         page_size: 每页数量
 
@@ -181,6 +182,8 @@ def get_tag_list(admin_token, page=1, page_size=10):
     """
     url = f"{API_BASE_URL}/admin/tag/list"
     params = {"page": page, "pageSize": page_size}
+    if shop_id:
+        params["shop_id"] = str(shop_id)
     headers = {"Authorization": f"Bearer {admin_token}"}
 
     def request_func():
@@ -189,11 +192,21 @@ def get_tag_list(admin_token, page=1, page_size=10):
     response = make_request_with_retry(request_func)
 
     if response.status_code == 200:
-        tags = response.json().get("data", [])
-        print(f"✓ 获取标签列表成功，数量: {len(tags) if isinstance(tags, list) else 0}")
+        data = response.json()
+        # 处理不同的响应格式
+        # 格式1: {"tags": [...], "total": 1}
+        # 格式2: {"data": [...]}
+        # 格式3: [...]
+        if isinstance(data, dict):
+            tags = data.get("tags", data.get("data", []))
+        elif isinstance(data, list):
+            tags = data
+        else:
+            tags = []
+        print(f"[OK] 获取标签列表成功，数量: {len(tags) if isinstance(tags, list) else 0}")
         return tags
     else:
-        print(f"✗ 获取标签列表失败，状态码: {response.status_code}, 响应: {response.text}")
+        print(f"[FAIL] 获取标签列表失败，状态码: {response.status_code}, 响应: {response.text}")
         return []
 
 

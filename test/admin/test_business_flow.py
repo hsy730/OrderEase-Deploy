@@ -339,19 +339,36 @@ class TestBusinessFlow:
     # ==================== 标签相关测试 ====================
 
     def test_tag_management_flow(self):
-        """测试标签管理流程"""
+        """测试标签管理流程 - 包含创建后立即查询验证"""
         print("\n========== 标签管理流程测试 ==========")
 
         # 创建店铺和商品
         shop_id = self._test_create_shop()
         product_id = self._test_create_product(shop_id)
 
-        # 创建标签
+        # 1. 创建标签前获取标签列表数量
+        tags_before = tag_actions.get_tag_list(self.admin_token, shop_id=shop_id)
+        count_before = len(tags_before) if isinstance(tags_before, list) else 0
+        print(f"创建前标签数量: {count_before}")
+
+        # 2. 创建标签
         tag_id = tag_actions.create_tag(self.admin_token, shop_id=shop_id)
-        if tag_id:
-            print(f"✓ 创建标签成功，ID: {tag_id}")
-        else:
-            print("⚠ 创建标签失败（可能是标签已存在），继续其他测试")
+        assert tag_id is not None, "创建标签失败"
+        print(f"✓ 创建标签成功，ID: {tag_id}")
+
+        # 3. 【关键】立即查询标签列表，验证新标签存在
+        tags_after = tag_actions.get_tag_list(self.admin_token, shop_id=shop_id)
+        assert isinstance(tags_after, list), "标签列表应为列表类型"
+
+        # 验证标签数量增加
+        count_after = len(tags_after)
+        print(f"创建后标签数量: {count_after}")
+        assert count_after > count_before, f"标签数量未增加，创建前{count_before}，创建后{count_after}"
+
+        # 验证刚创建的标签ID在列表中
+        tag_ids = [str(tag.get("id")) for tag in tags_after]
+        assert str(tag_id) in tag_ids, f"刚创建的标签ID {tag_id} 不在标签列表中，列表包含: {tag_ids}"
+        print(f"✓ 标签列表验证成功，包含新创建的标签ID: {tag_id}")
 
         # 获取商品已绑定的标签
         bound_tags = tag_actions.get_bound_tags(self.admin_token, product_id, shop_id)
@@ -360,15 +377,6 @@ class TestBusinessFlow:
         # 获取商品未绑定的标签
         unbound_tags = tag_actions.get_unbound_tags(self.admin_token, product_id, shop_id)
         print(f"✓ 获取商品未绑定标签成功，共 {len(unbound_tags)} 个标签")
-
-        # 获取标签列表
-        tags_list = tag_actions.get_tag_list(self.admin_token)
-        # 验证标签列表元素包含必需字段（如果有标签的话）
-        for tag in tags_list:
-            assert isinstance(tag, dict), "标签应为字典类型"
-            assert "id" in tag, "标签应包含id字段"
-            assert "name" in tag, "标签应包含name字段"
-        print(f"✓ 获取标签列表成功，共 {len(tags_list)} 个标签")
 
         # 更新标签（如果之前创建了标签）
         if tag_id:
