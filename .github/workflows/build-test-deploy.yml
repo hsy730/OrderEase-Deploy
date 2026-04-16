@@ -630,6 +630,7 @@ jobs:
           build-args: |
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VERSION=${{ github.sha }}
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_number }}-${{ github.sha }}
 
       - name: Debug - Check Docker Build Result
         if: always()

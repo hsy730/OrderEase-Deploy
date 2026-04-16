@@ -10,7 +10,9 @@ COPY OrderEase-BackedUI/ .
 # 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
 RUN echo "VITE_API_BASE_URL=" > .env && \
     echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
-RUN npm run build
+# 使用 CACHE_BUST 参数确保每次构建都执行，不缓存构建结果
+ARG CACHE_BUST
+RUN echo "Cache bust: ${CACHE_BUST}" && npm run build
 RUN echo "=== Debug: Checking backend dist directory ===" && \
     ls -la dist/ && \
     if [ ! -f dist/index.html ]; then \
@@ -31,7 +33,9 @@ COPY OrderEase-FrontUI/ ./
 # 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
 RUN echo "VITE_API_BASE_URL=" > .env && \
     echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
-RUN npm run build:h5
+# 使用 CACHE_BUST 参数确保每次构建都执行，不缓存构建结果
+ARG CACHE_BUST
+RUN echo "Cache bust: ${CACHE_BUST}" && npm run build:h5
 # uni-app H5构建输出到 dist/build/h5/ 目录
 RUN echo "=== Debug: Checking dist directory structure ===" && \
     ls -la dist/ && \

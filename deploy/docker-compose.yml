@@ -10,6 +10,7 @@ services:
   # 应用服务
   orderease-app:
     image: siyuanh640/orderease:latest
+    pull_policy: always  # 强制每次拉取最新镜像，避免使用本地缓存的旧镜像
     container_name: orderease-app
     ports:
       - "${APP_PORT:-8080}:8080"
