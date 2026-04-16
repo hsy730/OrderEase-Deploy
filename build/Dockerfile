@@ -6,12 +6,13 @@ FROM node:20-alpine AS backend-ui-build
 WORKDIR /app/backend-ui
 COPY OrderEase-BackedUI/package*.json ./
 RUN npm ci --production=false && npm cache clean --force
+# 在依赖安装之后定义 CACHE_BUST，确保 npm ci 仍然可以缓存
+ARG CACHE_BUST
 COPY OrderEase-BackedUI/ .
 # 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
 RUN echo "VITE_API_BASE_URL=" > .env && \
     echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
 # 使用 CACHE_BUST 参数确保每次构建都执行，不缓存构建结果
-ARG CACHE_BUST
 RUN echo "Cache bust: ${CACHE_BUST}" && npm run build
 RUN echo "=== Debug: Checking backend dist directory ===" && \
     ls -la dist/ && \
@@ -29,12 +30,13 @@ RUN echo "=== Debug: Listing files after COPY scripts ===" && \
     ls -la && \
     ls -la scripts/ || echo "scripts directory not found"
 RUN npm ci --production=false && npm cache clean --force
+# 在依赖安装之后定义 CACHE_BUST，确保 npm ci 仍然可以缓存
+ARG CACHE_BUST
 COPY OrderEase-FrontUI/ ./
 # 覆盖 .env 文件，设置生产环境配置（前后端在同一服务器，使用相对路径）
 RUN echo "VITE_API_BASE_URL=" > .env && \
     echo "VITE_API_PREFIX=/api/order-ease/v1" >> .env
 # 使用 CACHE_BUST 参数确保每次构建都执行，不缓存构建结果
-ARG CACHE_BUST
 RUN echo "Cache bust: ${CACHE_BUST}" && npm run build:h5
 # uni-app H5构建输出到 dist/build/h5/ 目录
 RUN echo "=== Debug: Checking dist directory structure ===" && \
